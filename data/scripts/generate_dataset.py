@@ -96,5 +96,6 @@ def create_dataset(dataset_path: str, dst_path: str, include_seq_frames: bool = 
     print(f"Dataset creation complete. Check the '{dst_path}' folder.")
 
 
+
 if __name__ == "__main__":
     create_dataset(Constants.DATASET_PATH, Constants.DST_PATH, include_seq_frames=True)
