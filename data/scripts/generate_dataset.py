@@ -2,7 +2,7 @@ import os
 import shutil
 from typing import List
 from PIL import Image
-from constants import Constants
+from data.constants import Constants
 
 def create_folders(target_path: str, new_dirs: List[str]) -> None:
     """
@@ -14,7 +14,6 @@ def create_folders(target_path: str, new_dirs: List[str]) -> None:
     """
     for item in new_dirs:
         os.makedirs(os.path.join(target_path, item), exist_ok=True)
-
 
 
 def create_black_mask(image_path: str, save_path: str) -> None:
@@ -30,22 +29,22 @@ def create_black_mask(image_path: str, save_path: str) -> None:
     black_mask.save(save_path)
 
 
-
-def create_dataset(dataset_path: str, include_seq_frames: bool = False) -> None:
+def create_dataset(dataset_path: str, dst_path: str, include_seq_frames: bool = False) -> None:
     """
     Create dataset structure by combining single-frame and optional sequence data.
 
     Args:
-        dataset_path (str): Base path where dataset will be created.
+        dataset_path (str): Path to the original dataset.
+        dst_path (str): Destination path where processed data will be stored.
         include_seq_frames (bool): If True, include sequence frames in the dataset.
     """
-    target_path = os.path.join(dataset_path, "Generated")
-    new_dirs = ["AllImages", "AllMasks"]
-    create_folders(target_path, new_dirs)
+    # Define paths for processed data
+    processed_dirs = ["AllImages", "AllMasks"]
+    create_folders(dst_path, processed_dirs)
 
     # Define paths to target folders
-    all_images_path = os.path.join(target_path, "AllImages")
-    all_masks_path = os.path.join(target_path, "AllMasks")
+    all_images_path = os.path.join(dst_path, "AllImages")
+    all_masks_path = os.path.join(dst_path, "AllMasks")
 
     # Collect single-frame images and masks
     img_folders = [f"data_C{i}/images_C{i}" for i in range(1, 7)]
@@ -65,8 +64,6 @@ def create_dataset(dataset_path: str, include_seq_frames: bool = False) -> None:
             mask_path = os.path.join(data_path, mask)
             shutil.copy(mask_path, os.path.join(all_masks_path, mask))
 
-
-
     # Collect sequence-frame images and masks if required
     if include_seq_frames:
         # Process positive sequences
@@ -84,7 +81,6 @@ def create_dataset(dataset_path: str, include_seq_frames: bool = False) -> None:
                         file_path = os.path.join(root, file)
                         shutil.copy(file_path, os.path.join(all_masks_path, file))
 
-
         # Process negative sequences
         seq_negative_path = os.path.join(dataset_path, "sequenceData", "negativeOnly")
         for root, _, files in os.walk(seq_negative_path):
@@ -97,6 +93,8 @@ def create_dataset(dataset_path: str, include_seq_frames: bool = False) -> None:
                     black_mask_path = os.path.join(all_masks_path, black_mask_name)
                     create_black_mask(file_path, black_mask_path)
 
-    print("Dataset creation complete. Check the 'Generated' folder.")
+    print(f"Dataset creation complete. Check the '{dst_path}' folder.")
 
-create_dataset(Constants.DATASET_PATH, include_seq_frames = False)
+
+if __name__ == "__main__":
+    create_dataset(Constants.DATASET_PATH, Constants.DST_PATH, include_seq_frames=True)
