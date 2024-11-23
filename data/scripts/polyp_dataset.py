@@ -13,7 +13,6 @@ class PolypDataset(Dataset):
         self.masks_dir = masks_dir
         self.transform = get_dataset_transforms()
         self.data = create_image_mask_pairs(self.images_dir, self.masks_dir)
-        self.max_height, self.max_width = 0, 0
 
     def __len__(self):
         return len(self.data)
@@ -41,13 +40,6 @@ class PolypDataset(Dataset):
             mask = self.transform["masks"](mask)
             # self.max_size(mask.shape[1],mask.shape[2])
 
-        return image, mask
-
-    # def max_size(self, h, w):
-    #     if self.max_height < h:
-    #         self.max_height = h
-    #     if self.max_width < w:
-    #         self.max_width = w
-
+        return image, mask, (img_path, mask_path)
 
 

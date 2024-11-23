@@ -1,6 +1,7 @@
 import os
 from torchvision import transforms
 import torchvision.transforms.functional as TF
+from data.constants import Constants
 
 
 def create_image_mask_pairs(images_dir, masks_dir):
@@ -60,7 +61,7 @@ def binarize_mask(mask):
     return (mask > 128).float()
 
 
-def zero_padding_to_max_size(input, target_size=(1920, 1080)):
+def zero_padding_to_max_size(input):
     """
     Pad input to the target size on all four sides.
 
@@ -72,7 +73,7 @@ def zero_padding_to_max_size(input, target_size=(1920, 1080)):
         Tuple[torch.Tensor, torch.Tensor]: Padded image and mask tensors.
     """
     h, w = input.shape[1], input.shape[2]  # Assuming [C, H, W] shape
-    target_h, target_w = target_size
+    target_h, target_w = Constants.INPUT_IMAGE_MAX_SIZE
 
     # Calculate padding
     pad_h = target_h - h
