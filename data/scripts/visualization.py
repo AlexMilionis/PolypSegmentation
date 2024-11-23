@@ -1,55 +1,62 @@
 import os.path
-
 import matplotlib.pyplot as plt
 import torch
+import random
 
 
-# def visualize_batch_from_loader(dataloader):
-#
-#     image, mask, path = next(iter(dataloader))
-#     print(path)
-#     # image_tensor = image[0].permute(2, 1, 0).numpy()
-#     image_tensor = image[0].permute(1,2,0).numpy()
-#
-#     plt.imshow(image_tensor)
-#     plt.title(os.path.basename(path[0][0]))
-#     plt.axis("off")
-#     plt.show()
-
-
-
-def visualize_batch_from_loader(dataloader):
+def visualize_samples_from_random_batch(dataloader, num_samples=2):
     """
-    Visualizes the first image and its corresponding mask from a DataLoader side by side.
+    Visualizes a specified number of randomly selected images and their corresponding masks
+    from a single batch in a DataLoader. Images and masks are displayed side-by-side in a
+    grid with dimensions `num_samples x 2`.
 
     Args:
-        dataloader (torch.utils.data.DataLoader): The DataLoader object.
+        dataloader (torch.utils.data.DataLoader): The DataLoader object containing the dataset.
+        num_samples (int): Number of random samples to visualize from the batch.
+                           Defaults to 2. If the number exceeds the batch size,
+                           it is capped at the batch size.
+
+    Visualization:
+        - Each row of the grid corresponds to a randomly selected image-mask pair.
+        - The first column contains the images.
+        - The second column contains the corresponding masks.
+        - Each subplot is titled with the respective file name of the image or mask.
+
+    Returns:
+        None. Displays the visualization as a matplotlib figure.
     """
     # Fetch the first batch from the dataloader
     dl = iter(dataloader)
-    for _ in range(10):
-        image_batch, mask_batch, paths_batch = next(dl)
+    image_batch, mask_batch, paths_batch = next(dl)
 
-    # Extract the Nth image, mask, and paths
-    N = -1
-    image = image_batch[N].permute(1, 2, 0).numpy()  # Convert to (H, W, C)
-    mask = mask_batch[N].squeeze().numpy()           # Convert to (H, W)
+    # Max number of samples becomes batch size
+    if num_samples > len(image_batch):
+        num_samples = len(image_batch)
 
-    img_path, mask_path = paths_batch[0][N], paths_batch[1][N]
+    # Randomly select  indices from the batch
+    batch_size = image_batch.shape[0]
+    random_indices = random.sample(range(batch_size), num_samples)
 
-    # Create a figure for side-by-side visualization
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    # Create a figure for num_samples x 2 visualization
+    fig, axes = plt.subplots(num_samples, 2, figsize=(12, 12))
 
-    # Plot the image
-    axes[0].imshow(image)
-    axes[0].set_title(f"Image: {os.path.basename(img_path)}")
-    axes[0].axis("off")
+    for i, idx in enumerate(random_indices):
+        image = image_batch[idx].permute(1, 2, 0).numpy()  # Convert image to (H, W, C)
+        mask = mask_batch[idx].squeeze().numpy()           # Convert mask to (H, W)
 
-    # Plot the mask
-    axes[1].imshow(mask, cmap="gray")
-    axes[1].set_title(f"Mask: {os.path.basename(mask_path)}")
-    axes[1].axis("off")
+        img_path, mask_path = paths_batch[0][idx], paths_batch[1][idx]
+
+        # Plot the image
+        axes[i, 0].imshow(image)
+        axes[i, 0].set_title(f"Image: {os.path.basename(img_path)}")
+        axes[i, 0].axis("off")
+
+        # Plot the mask
+        axes[i, 1].imshow(mask, cmap="gray")
+        axes[i, 1].set_title(f"Mask: {os.path.basename(mask_path)}")
+        axes[i, 1].axis("off")
 
     # Show the plot
     plt.tight_layout()
     plt.show()
+
