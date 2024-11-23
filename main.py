@@ -3,10 +3,10 @@ import torch
 from torch.utils.data import DataLoader
 from data.scripts.polyp_dataset import PolypDataset
 from data.constants import Constants
-from data.scripts.visualization import visualize_batch_from_loader
+from data.scripts.visualization import *
 
 
-# TODO: Check that all images and masks are padded with zeros on all 4 dimensions, to get in dataloader batches
+# TODO: Fix augmentation errors, create train/test split, train/test dataloaders
 
 
 if __name__ == '__main__':
@@ -17,4 +17,4 @@ if __name__ == '__main__':
     train_loader = DataLoader(dataset, batch_size=32, shuffle=False)
 
     # Visualize a single batch by index
-    visualize_batch_from_loader(train_loader)
+    visualize_samples_from_random_batch(train_loader, num_samples = 5)

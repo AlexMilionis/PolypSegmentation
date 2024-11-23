@@ -92,6 +92,59 @@ def zero_padding_to_max_size(input):
     return padded_input
 
 
+class transformation_dicts():
+
+    pad_images_pad_binarize_masks = {
+        "images": transforms.Compose([
+            # No transformation applied; images returned as-is.
+            transforms.Lambda(zero_padding_to_max_size)
+        ]),
+        "masks": transforms.Compose([
+            transforms.Lambda(zero_padding_to_max_size),
+            # Convert grayscale mask to binary mask.
+            transforms.Lambda(binarize_mask),
+        ])
+    }
+
+    # scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks = {
+    #     "images": transforms.Compose([
+    #         transforms.RandomResizedCrop(size=(512, 5122), scale=(0.5, 2.0)),  # Resize and crop
+    #         transforms.RandomHorizontalFlip(p=0.5),  # Horizontal flip
+    #         transforms.RandomCrop(size=(200, 200)),  # Random crop
+    #         transforms.ToTensor(),  # Convert image to tensor
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+    #     ]),
+    #     "masks": transforms.Compose([
+    #         transforms.RandomResizedCrop(size=(512, 5122), scale=(0.5, 2.0)),  # Resize and crop
+    #         transforms.RandomHorizontalFlip(p=0.5),  # Horizontal flip
+    #         transforms.RandomCrop(size=(200, 200)),  # Random crop
+    #         transforms.ToTensor(),  # Convert image to tensor
+    #         # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+    #     ])
+    # }
+
+    scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks = {
+        "images": transforms.Compose([
+            transforms.ToPILImage(),  # Convert tensor to PIL.Image
+            transforms.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomCrop(size=(200, 200)),
+            transforms.ToTensor(),  # Convert back to tensor
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        "masks": transforms.Compose([
+            transforms.ToPILImage(),  # Convert tensor to PIL.Image
+            transforms.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomCrop(size=(200, 200)),
+            transforms.ToTensor(),  # Convert back to tensor
+            transforms.Lambda(binarize_mask),  # Convert to binary mask
+        ])
+    }
+
+
+
+
 
 def get_dataset_transforms():
     """
@@ -110,17 +163,7 @@ def get_dataset_transforms():
               - "images": Transformations for the input images.
               - "masks": Transformations for the ground-truth masks.
     """
-    dataset_transforms = {
-        "images": transforms.Compose([
-            # No transformation applied; images returned as-is.
-            transforms.Lambda(zero_padding_to_max_size)
-        ]),
-        "masks": transforms.Compose([
-            transforms.Lambda(zero_padding_to_max_size),
-            # Convert grayscale mask to binary mask.
-            transforms.Lambda(binarize_mask),
-        ])
-    }
+    dataset_transforms = transformation_dicts.scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks
 
     return dataset_transforms
 
