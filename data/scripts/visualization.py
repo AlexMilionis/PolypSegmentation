@@ -27,7 +27,8 @@ def visualize_samples_from_random_batch(dataloader, num_samples=2):
     """
     # Fetch the first batch from the dataloader
     dl = iter(dataloader)
-    image_batch, mask_batch, paths_batch = next(dl)
+    for _ in range(9):
+        image_batch, mask_batch, paths_batch = next(dl)
 
     # Max number of samples becomes batch size
     if num_samples > len(image_batch):
@@ -38,23 +39,27 @@ def visualize_samples_from_random_batch(dataloader, num_samples=2):
     random_indices = random.sample(range(batch_size), num_samples)
 
     # Create a figure for num_samples x 2 visualization
-    fig, axes = plt.subplots(num_samples, 2, figsize=(12, 12))
+    fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
+
+    # If only one sample, axes is not a 2D array
+    if num_samples == 1:
+        axes = [axes]  # Wrap it in a list for consistent indexing
 
     for i, idx in enumerate(random_indices):
         image = image_batch[idx].permute(1, 2, 0).numpy()  # Convert image to (H, W, C)
-        mask = mask_batch[idx].squeeze().numpy()           # Convert mask to (H, W)
+        mask = mask_batch[idx].squeeze().numpy()  # Convert mask to (H, W)
 
         img_path, mask_path = paths_batch[0][idx], paths_batch[1][idx]
 
         # Plot the image
-        axes[i, 0].imshow(image)
-        axes[i, 0].set_title(f"Image: {os.path.basename(img_path)}")
-        axes[i, 0].axis("off")
+        axes[i][0].imshow(image)
+        axes[i][0].set_title(f"Image: {os.path.basename(img_path)}")
+        axes[i][0].axis("off")
 
         # Plot the mask
-        axes[i, 1].imshow(mask, cmap="gray")
-        axes[i, 1].set_title(f"Mask: {os.path.basename(mask_path)}")
-        axes[i, 1].axis("off")
+        axes[i][1].imshow(mask, cmap="gray")
+        axes[i][1].set_title(f"Mask: {os.path.basename(mask_path)}")
+        axes[i][1].axis("off")
 
     # Show the plot
     plt.tight_layout()

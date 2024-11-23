@@ -1,5 +1,5 @@
 import os
-from torchvision import transforms
+import torchvision.transforms.v2 as transformsv2
 import torchvision.transforms.functional as TF
 from data.constants import Constants
 
@@ -61,109 +61,110 @@ def binarize_mask(mask):
     return (mask > 128).float()
 
 
-def zero_padding_to_max_size(input):
+# def zero_padding_to_max_size(input):
+#     """
+#     Pad input to the target size on all four sides.
+#
+#     Args:
+#         input (torch.Tensor): Input image tensor of shape [C, H, W].
+#         target_size (tuple): Target dimensions (height, width).
+#
+#     Returns:
+#         Tuple[torch.Tensor, torch.Tensor]: Padded image and mask tensors.
+#     """
+#     h, w = input.shape[1], input.shape[2]  # Assuming [C, H, W] shape
+#     target_h, target_w = Constants.INPUT_IMAGE_MAX_SIZE
+#
+#     # Calculate padding
+#     pad_h = target_h - h
+#     pad_w = target_w - w
+#
+#     # Distribute padding evenly on all sides
+#     pad_top = pad_h // 2
+#     pad_bottom = pad_h - pad_top
+#     pad_left = pad_w // 2
+#     pad_right = pad_w - pad_left
+#
+#     # Apply padding
+#     padding = [pad_left, pad_top, pad_right, pad_bottom]  # Left, Top, Right, Bottom
+#     padded_input = TF.pad(input, padding, fill=0)  # Fill with 0 for black borders
+#
+#     return padded_input
+
+
+class PadToMaxSize:
     """
-    Pad input to the target size on all four sides.
+    Custom transformation to pad an image or mask to a specified maximum size.
 
     Args:
-        input (torch.Tensor): Input image tensor of shape [C, H, W].
-        target_size (tuple): Target dimensions (height, width).
-
-    Returns:
-        Tuple[torch.Tensor, torch.Tensor]: Padded image and mask tensors.
+        max_size (tuple): The target size (height, width).
+        fill (int, optional): The padding value. Defaults to 0.
     """
-    h, w = input.shape[1], input.shape[2]  # Assuming [C, H, W] shape
-    target_h, target_w = Constants.INPUT_IMAGE_MAX_SIZE
 
-    # Calculate padding
-    pad_h = target_h - h
-    pad_w = target_w - w
+    def __init__(self, max_size, fill=0):
+        self.max_size = max_size
+        self.fill = fill
 
-    # Distribute padding evenly on all sides
-    pad_top = pad_h // 2
-    pad_bottom = pad_h - pad_top
-    pad_left = pad_w // 2
-    pad_right = pad_w - pad_left
+    def __call__(self, img):
+        """
+        Apply the padding transformation to the input image or mask.
 
-    # Apply padding
-    padding = [pad_left, pad_top, pad_right, pad_bottom]  # Left, Top, Right, Bottom
-    padded_input = TF.pad(input, padding, fill=0)  # Fill with 0 for black borders
+        Args:
+            img (PIL Image or Tensor): The input image or mask.
 
-    return padded_input
+        Returns:
+            Tensor: The padded image or mask.
+        """
+        # Get current size
+        h, w = TF.get_size(img)  # Extract height and width
+
+        # Calculate padding
+        target_h, target_w = self.max_size
+        pad_h = target_h - h
+        pad_w = target_w - w
+
+        if pad_h < 0 or pad_w < 0:
+            raise ValueError(
+                f"Image size {h}x{w} is larger than the target size {target_h}x{target_w}."
+            )
+
+        pad_top = pad_h // 2
+        pad_bottom = pad_h - pad_top
+        pad_left = pad_w // 2
+        pad_right = pad_w - pad_left
+
+        # Apply padding using torchvision.transforms.v2.Pad
+        return transformsv2.Pad([pad_left, pad_top, pad_right, pad_bottom], fill=self.fill)(img)
 
 
-class transformation_dicts():
+class TransformDicts():
 
-    pad_images_pad_binarize_masks = {
-        "images": transforms.Compose([
-            # No transformation applied; images returned as-is.
-            transforms.Lambda(zero_padding_to_max_size)
-        ]),
-        "masks": transforms.Compose([
-            transforms.Lambda(zero_padding_to_max_size),
-            # Convert grayscale mask to binary mask.
-            transforms.Lambda(binarize_mask),
-        ])
-    }
-
-    # scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks = {
-    #     "images": transforms.Compose([
-    #         transforms.RandomResizedCrop(size=(512, 5122), scale=(0.5, 2.0)),  # Resize and crop
-    #         transforms.RandomHorizontalFlip(p=0.5),  # Horizontal flip
-    #         transforms.RandomCrop(size=(200, 200)),  # Random crop
-    #         transforms.ToTensor(),  # Convert image to tensor
-    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
-    #     ]),
-    #     "masks": transforms.Compose([
-    #         transforms.RandomResizedCrop(size=(512, 5122), scale=(0.5, 2.0)),  # Resize and crop
-    #         transforms.RandomHorizontalFlip(p=0.5),  # Horizontal flip
-    #         transforms.RandomCrop(size=(200, 200)),  # Random crop
-    #         transforms.ToTensor(),  # Convert image to tensor
-    #         # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
-    #     ])
-    # }
-
-    scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks = {
-        "images": transforms.Compose([
-            transforms.ToPILImage(),  # Convert tensor to PIL.Image
-            transforms.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomCrop(size=(200, 200)),
-            transforms.ToTensor(),  # Convert back to tensor
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ]),
-        "masks": transforms.Compose([
-            transforms.ToPILImage(),  # Convert tensor to PIL.Image
-            transforms.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomCrop(size=(200, 200)),
-            transforms.ToTensor(),  # Convert back to tensor
-            transforms.Lambda(binarize_mask),  # Convert to binary mask
-        ])
-    }
+    binarize_masks       = transformsv2.Lambda(binarize_mask)
+    identity             = transformsv2.Lambda(identity_transform)
+    zero_padding         = PadToMaxSize(max_size=Constants.INPUT_IMAGE_MAX_SIZE, fill=0)  # Pad to max size
+    randomresizedcrop    = transformsv2.RandomResizedCrop(size=(512, 512), scale=(0.8, 2.0)) # Resize and crop
+    randomcrop           = transformsv2.RandomCrop(size=(512, 512))
+    randomhorizontalflip = transformsv2.RandomHorizontalFlip(p=1)
+    # converttotensor      = transformsv2.ToTensor(),  # Convert image to tensor
+    # converttopil              = transformsv2.ToTensor(),
+    normalize            = transformsv2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
 
 
 
+def get_image_and_mask_transforms():
+
+    data_masks_shared_transforms = transformsv2.Compose([
+        transformsv2.RandomCrop(size=(512, 512))
+    ])
+    return data_masks_shared_transforms
 
 
-def get_dataset_transforms():
-    """
-    Define and return the transformations to be applied to the dataset.
 
-    The transformations are split into two categories:
-    1. `images`: Transformations to be applied to the input images.
-       - In the current setup, no transformation is applied (`Lambda(lambda x: x)`).
-         This means the images will be returned as-is without any changes.
-    2. `masks`: Transformations to be applied to the ground-truth masks.
-       - The `binarize_mask` function is applied to convert grayscale masks into binary masks
-         (e.g., 0 or 1 values) for segmentation tasks.
+def get_mask_transforms():
 
-    Returns:
-        dict: A dictionary with two keys:
-              - "images": Transformations for the input images.
-              - "masks": Transformations for the ground-truth masks.
-    """
-    dataset_transforms = transformation_dicts.scale_rcrop_rhorizontalflip_normalize_images_scale_rcrop_rhorizontalflip_masks
+    mask_transforms = transformsv2.Compose([
+        transformsv2.Lambda(binarize_mask)
+    ])
 
-    return dataset_transforms
+    return mask_transforms
 

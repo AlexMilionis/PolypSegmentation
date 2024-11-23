@@ -6,7 +6,7 @@ from data.constants import Constants
 from data.scripts.visualization import *
 
 
-# TODO: Fix augmentation errors, create train/test split, train/test dataloaders
+# TODO: Fix v2 mismatching size errors, create train/test split, train/test dataloaders
 
 
 if __name__ == '__main__':
@@ -17,4 +17,4 @@ if __name__ == '__main__':
     train_loader = DataLoader(dataset, batch_size=32, shuffle=False)
 
     # Visualize a single batch by index
-    visualize_samples_from_random_batch(train_loader, num_samples = 5)
+    visualize_samples_from_random_batch(train_loader, num_samples = 2)
