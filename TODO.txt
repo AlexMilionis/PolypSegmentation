@@ -1,0 +1,9 @@
+
+# TODO: delete full loader (no purpose),
+    #   better documentation on all scripts
+    #   write down all processes before continuing further,
+    #   maybe create custom collate functions for dataloader, in order to receive variable sizes for images and masks?
+    #   include sequence frames?
+    #   implement resnetunet
+    #   check how many masks are in each category (class balance)
+    #   create visualizations for raw data (there is no point for visualization in train data, i think)
