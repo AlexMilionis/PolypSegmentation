@@ -1,8 +1,7 @@
 import os
-import torchvision.transforms.v2 as transformsv2
-import torchvision.transforms.functional as TF
+from torchvision.transforms import v2 as T
 from data.constants import Constants
-
+import numpy as np
 
 def create_image_mask_pairs(images_dir, masks_dir):
     """
@@ -61,110 +60,47 @@ def binarize_mask(mask):
     return (mask > 128).float()
 
 
-# def zero_padding_to_max_size(input):
-#     """
-#     Pad input to the target size on all four sides.
-#
-#     Args:
-#         input (torch.Tensor): Input image tensor of shape [C, H, W].
-#         target_size (tuple): Target dimensions (height, width).
-#
-#     Returns:
-#         Tuple[torch.Tensor, torch.Tensor]: Padded image and mask tensors.
-#     """
-#     h, w = input.shape[1], input.shape[2]  # Assuming [C, H, W] shape
-#     target_h, target_w = Constants.INPUT_IMAGE_MAX_SIZE
-#
-#     # Calculate padding
-#     pad_h = target_h - h
-#     pad_w = target_w - w
-#
-#     # Distribute padding evenly on all sides
-#     pad_top = pad_h // 2
-#     pad_bottom = pad_h - pad_top
-#     pad_left = pad_w // 2
-#     pad_right = pad_w - pad_left
-#
-#     # Apply padding
-#     padding = [pad_left, pad_top, pad_right, pad_bottom]  # Left, Top, Right, Bottom
-#     padded_input = TF.pad(input, padding, fill=0)  # Fill with 0 for black borders
-#
-#     return padded_input
+def convert_to_01_range(image):
+    return image/255
 
 
-class PadToMaxSize:
+
+def apply_image_transforms():
+    return T.Compose([
+        T.Lambda(convert_to_01_range),
+        T.Normalize(mean = Constants.IMAGENET_COLOR_MEANS,
+                    std  = Constants.IMAGENET_COLOR_STDS)
+    ])
+
+def apply_mask_transforms():
+    return T.Compose([
+        T.Lambda(binarize_mask)
+    ])
+
+def apply_image_and_mask_transforms():
+    return T.Compose([
+        T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
+        T.RandomHorizontalFlip(p=0.5),
+        ])
+
+
+def unnormalize_image(image):
     """
-    Custom transformation to pad an image or mask to a specified maximum size.
+    Unnormalize a normalized image tensor for visualization.
 
     Args:
-        max_size (tuple): The target size (height, width).
-        fill (int, optional): The padding value. Defaults to 0.
+        image (torch.Tensor): Normalized image tensor (C, H, W).
+        mean (list): Mean values used during normalization (per channel).
+        std (list): Standard deviation values used during normalization (per channel).
+
+    Returns:
+        numpy.ndarray: Unnormalized image in (H, W, C) format for visualization.
     """
+    mean = np.array(Constants.IMAGENET_COLOR_MEANS)
+    std = np.array(Constants.IMAGENET_COLOR_STDS)
 
-    def __init__(self, max_size, fill=0):
-        self.max_size = max_size
-        self.fill = fill
+    # reverse normalization
+    unnormalized_image = (image * std) + mean
+    unnormalized_image = np.clip(unnormalized_image, a_min = None, a_max = 1)
 
-    def __call__(self, img):
-        """
-        Apply the padding transformation to the input image or mask.
-
-        Args:
-            img (PIL Image or Tensor): The input image or mask.
-
-        Returns:
-            Tensor: The padded image or mask.
-        """
-        # Get current size
-        h, w = TF.get_size(img)  # Extract height and width
-
-        # Calculate padding
-        target_h, target_w = self.max_size
-        pad_h = target_h - h
-        pad_w = target_w - w
-
-        if pad_h < 0 or pad_w < 0:
-            raise ValueError(
-                f"Image size {h}x{w} is larger than the target size {target_h}x{target_w}."
-            )
-
-        pad_top = pad_h // 2
-        pad_bottom = pad_h - pad_top
-        pad_left = pad_w // 2
-        pad_right = pad_w - pad_left
-
-        # Apply padding using torchvision.transforms.v2.Pad
-        return transformsv2.Pad([pad_left, pad_top, pad_right, pad_bottom], fill=self.fill)(img)
-
-
-class TransformDicts():
-
-    binarize_masks       = transformsv2.Lambda(binarize_mask)
-    identity             = transformsv2.Lambda(identity_transform)
-    zero_padding         = PadToMaxSize(max_size=Constants.INPUT_IMAGE_MAX_SIZE, fill=0)  # Pad to max size
-    randomresizedcrop    = transformsv2.RandomResizedCrop(size=(512, 512), scale=(0.8, 2.0)) # Resize and crop
-    randomcrop           = transformsv2.RandomCrop(size=(512, 512))
-    randomhorizontalflip = transformsv2.RandomHorizontalFlip(p=1)
-    # converttotensor      = transformsv2.ToTensor(),  # Convert image to tensor
-    # converttopil              = transformsv2.ToTensor(),
-    normalize            = transformsv2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
-
-
-
-def get_image_and_mask_transforms():
-
-    data_masks_shared_transforms = transformsv2.Compose([
-        transformsv2.RandomCrop(size=(512, 512))
-    ])
-    return data_masks_shared_transforms
-
-
-
-def get_mask_transforms():
-
-    mask_transforms = transformsv2.Compose([
-        transformsv2.Lambda(binarize_mask)
-    ])
-
-    return mask_transforms
-
+    return unnormalized_image

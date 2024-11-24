@@ -2,6 +2,9 @@ import os.path
 import matplotlib.pyplot as plt
 import torch
 import random
+from data.scripts.dataset_utils import unnormalize_image
+import numpy as np
+# from data.constants import Constants
 
 
 def visualize_samples_from_random_batch(dataloader, num_samples=2):
@@ -47,6 +50,7 @@ def visualize_samples_from_random_batch(dataloader, num_samples=2):
 
     for i, idx in enumerate(random_indices):
         image = image_batch[idx].permute(1, 2, 0).numpy()  # Convert image to (H, W, C)
+        image = unnormalize_image(image)
         mask = mask_batch[idx].squeeze().numpy()  # Convert mask to (H, W)
 
         img_path, mask_path = paths_batch[0][idx], paths_batch[1][idx]
