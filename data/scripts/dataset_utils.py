@@ -64,20 +64,19 @@ def convert_to_01_range(image):
     return image/255
 
 
-
-def apply_image_transforms():
+def image_transforms():
     return T.Compose([
         T.Lambda(convert_to_01_range),
         T.Normalize(mean = Constants.IMAGENET_COLOR_MEANS,
                     std  = Constants.IMAGENET_COLOR_STDS)
     ])
 
-def apply_mask_transforms():
+def mask_transforms():
     return T.Compose([
         T.Lambda(binarize_mask)
     ])
 
-def apply_image_and_mask_transforms():
+def image_and_mask_transforms():
     return T.Compose([
         T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
         T.RandomHorizontalFlip(p=0.5),
@@ -101,6 +100,6 @@ def unnormalize_image(image):
 
     # reverse normalization
     unnormalized_image = (image * std) + mean
-    unnormalized_image = np.clip(unnormalized_image, a_min = None, a_max = 1)
+    unnormalized_image = np.clip(unnormalized_image, a_min = 0, a_max = 1)
 
     return unnormalized_image

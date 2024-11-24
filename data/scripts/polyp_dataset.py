@@ -4,19 +4,32 @@ from torchvision.io import read_image
 from torchvision import tv_tensors
 # from PIL import Image
 from data.scripts.dataset_utils import *
+from torchvision.transforms.functional import to_tensor
 
 class PolypDataset(Dataset):
     """
     A custom Dataset class for loading images and masks.
     """
 
-    def __init__(self, images_dir, masks_dir, transform=None):
+    def __init__(self, images_dir, masks_dir, mode):
         self.images_dir = images_dir
         self.masks_dir = masks_dir
-        self.image_mask_transform = apply_image_and_mask_transforms()
-        self.image_transform      = apply_image_transforms()
-        self.mask_transform       = apply_mask_transforms()
+        self.mode = mode
         self.data = create_image_mask_pairs(self.images_dir, self.masks_dir)
+        self.image_mask_transform = self._get_image_and_mask_transforms()
+        self.image_transform      = self._get_image_transforms()
+        self.mask_transform       = self._get_mask_transforms()
+
+
+    @staticmethod
+    def tensor_to_tv_tensor(image, mask, direct = False):
+        if direct:
+            image = tv_tensors.Image(image)
+            mask = tv_tensors.Mask(mask)
+        else:
+            image = to_tensor(image)
+            mask  = to_tensor(mask)
+        return image, mask
 
     def __len__(self):
         return len(self.data)
@@ -38,18 +51,45 @@ class PolypDataset(Dataset):
         image = read_image(img_path)
         mask = read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY)
 
-        # Apply transformations
+
         if self.image_transform:
             image = self.image_transform(image)
         if self.mask_transform:
             mask = self.mask_transform(mask)
         if self.image_mask_transform:
             # Convert to tv_tensors
-            # image = tv_tensors.Image(image)
-            # mask = tv_tensors.Mask(mask)
+            image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = True)
             image, mask = self.image_mask_transform(image, mask)
-        # print(image.shape, mask.shape)
-
+            # image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = False)
+        # print(image.shape, mask.shape, img_path, mask_path)
         return image, mask, (img_path, mask_path)
 
+    def _get_image_transforms(self):
+        """
+        Return image-only transformations based on the mode.
+        """
+        if self.mode == "train":
+            return image_transforms()
+        elif self.mode == "test":
+            return image_transforms()
+        return None  # No transforms for 'full'
 
+    def _get_mask_transforms(self):
+        """
+        Return mask-only transformations based on the mode.
+        """
+        if self.mode == "train":
+            return mask_transforms()
+        elif self.mode == "test":
+            return mask_transforms()
+        return None  # No transforms for 'full'
+
+    def _get_image_and_mask_transforms(self):
+        """
+        Return image-mask pair transformations based on the mode.
+        """
+        if self.mode == "train":
+            return image_and_mask_transforms()
+        elif self.mode == "test":
+            return None  # Example: No combined transforms in 'test' mode
+        return None  # No transforms for 'full'

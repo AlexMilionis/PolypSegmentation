@@ -32,6 +32,9 @@ def visualize_samples_from_random_batch(dataloader, num_samples=2):
     dl = iter(dataloader)
     for _ in range(9):
         image_batch, mask_batch, paths_batch = next(dl)
+    # batch = next(dl)
+    # print(len(batch))
+    # # print(batch)
 
     # Max number of samples becomes batch size
     if num_samples > len(image_batch):
