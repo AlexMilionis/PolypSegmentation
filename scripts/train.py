@@ -1,18 +1,18 @@
 import torch
-from data.scripts.dataloader import DataLoading
 from torch import optim
-from scripts.hyperparameters import Hyperparameters
+from hyperparameters import Hyperparameters
 from models.unet import UNet
 
-def train_model():
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")\
-    train_loader = DataLoading(mode="train").get_loader()
+def train_model(train_loader):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("device: ", device)
+    # train_loader = DataLoading(mode="train").get_loader()
     model = UNet(encoder_name="resnet18", encoder_weights="imagenet")
     model = model.to(device)
-    criterion = None
+    criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy']
     optimizer = optim.Adam(model.parameters(), lr=Hyperparameters.LEARNING_RATE)
 
-    num_epochs = 10 #Hyperparameters.EPOCHS
+    num_epochs = 1 #Hyperparameters.EPOCHS
     for epoch in range(num_epochs):
         model.train()
         total_loss = 0

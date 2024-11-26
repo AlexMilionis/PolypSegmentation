@@ -6,11 +6,17 @@ from data.scripts.polyp_dataset import PolypDataset
 from data.constants import Constants
 from data.scripts.visualization import *
 from data.scripts.dataloader import DataLoading
+from scripts.train import train_model
+from torch.utils.data import Subset
 
 if __name__ == '__main__':
-
+    dataloader = DataLoading
     train_loader = DataLoading(mode="train", shuffle=False).get_loader()
     test_loader = DataLoading(mode="test", shuffle=False).get_loader()
 
-    # Visualize a single batch by index
-    visualize_samples_from_random_batch(train_loader, num_samples = 5)
+    train_model(train_loader)
+
+    # # Visualize a single batch by index
+    # visualize_samples_from_random_batch(train_loader, num_samples = 5)
+
+    # train(train_loader)
