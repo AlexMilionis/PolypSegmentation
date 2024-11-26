@@ -1,9 +1,7 @@
-import torch
-from torch.utils.data import DataLoader, random_split, Subset
-from torchvision import transforms
+from torch.utils.data import DataLoader, random_split
 from data.constants import Constants  # Assuming constants have paths
 from data.scripts.polyp_dataset import PolypDataset  # Assuming PolypDataset is already implemented
-from scripts.hyperparameters import Hyperparameters
+from hyperparameters import Hyperparameters
 
 class DataLoading:
     def __init__(self, mode, shuffle=True, num_workers=4):
@@ -33,7 +31,7 @@ class DataLoading:
         self.data_loader = self._create_dataloader()
 
 
-    def _split_data(self):
+    def split_data(self):
         # Split dataset into train/test
         train_size = int(self.train_ratio * len(self.dataset))
         test_size = len(self.dataset) - train_size
@@ -43,7 +41,7 @@ class DataLoading:
 
     def _create_dataloader(self):
 
-        train_dataset, test_dataset = DataLoading._split_data(self)
+        train_dataset, test_dataset = DataLoading.split_data(self)
 
         if self.mode == 'train':
             return DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers)
