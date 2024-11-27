@@ -2,9 +2,10 @@ from torch.utils.data import DataLoader, random_split
 from data.constants import Constants  # Assuming constants have paths
 from data.scripts.polyp_dataset import PolypDataset  # Assuming PolypDataset is already implemented
 from hyperparameters import Hyperparameters
+from torch import Generator
 
 class DataLoading:
-    def __init__(self, mode, shuffle=True, num_workers=4):
+    def __init__(self, mode, include_data, shuffle=True, num_workers=4):
         """
         Initializes the dataset and splits into train/test/full based on the mode.
 
@@ -16,18 +17,15 @@ class DataLoading:
             num_workers (int): Number of workers for data loading.
         """
         self.mode = mode
+        self.include_data = include_data
         self.train_ratio = Hyperparameters.TRAIN_RATIO
         self.batch_size = Hyperparameters.BATCH_SIZE
         self.shuffle = shuffle if mode == 'train' else False
         self.num_workers = num_workers
 
-        # Initialize the full dataset
-        self.dataset = PolypDataset(
-            images_dir=Constants.IMAGE_DIR,
-            masks_dir=Constants.MASK_DIR,
-            mode=self.mode,
-        )
 
+        # Initialize the full dataset
+        self.dataset = PolypDataset(mode=self.mode, include_data=self.include_data)
         self.data_loader = self._create_dataloader()
 
 
@@ -35,13 +33,14 @@ class DataLoading:
         # Split dataset into train/test
         train_size = int(self.train_ratio * len(self.dataset))
         test_size = len(self.dataset) - train_size
-        train_dataset, test_dataset = random_split(self.dataset, [train_size, test_size])
+        generator = Generator().manual_seed(42)
+        train_dataset, test_dataset = random_split(self.dataset, [train_size, test_size], generator=generator)
         return train_dataset, test_dataset
 
 
     def _create_dataloader(self):
 
-        train_dataset, test_dataset = DataLoading.split_data(self)
+        train_dataset, test_dataset = self.split_data()
 
         if self.mode == 'train':
             return DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers)
@@ -50,7 +49,8 @@ class DataLoading:
             return DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
 
         else:
-            raise ValueError(f"Invalid mode '{self.mode}'. Use 'train' or 'test'.")
+            # raise ValueError(f"Invalid mode '{self.mode}'. Use 'train' or 'test'.")
+            assert self.mode in ['train','test'], "Use train or test mode!"
 
 
     def get_loader(self):
