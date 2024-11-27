@@ -74,12 +74,14 @@ def create_dataset(dataset_path: str, dst_path: str, include_seq_frames: bool = 
                 for file in files:
                     if file.endswith((".jpg", ".png")):  # Process images
                         file_path = os.path.join(root, file)
-                        shutil.copy(file_path, os.path.join(all_images_path, file))
+                        new_name = "seq_" + file
+                        shutil.copy(file_path, os.path.join(all_images_path, new_name))
             elif "masks_seq" in root:
                 for file in files:
                     if file.endswith("_mask.jpg"):  # Process masks
                         file_path = os.path.join(root, file)
-                        shutil.copy(file_path, os.path.join(all_masks_path, file))
+                        new_name = "seq_" + file
+                        shutil.copy(file_path, os.path.join(all_masks_path, new_name))
 
         # Process negative sequences
         seq_negative_path = os.path.join(dataset_path, "sequenceData", "negativeOnly")
@@ -87,9 +89,10 @@ def create_dataset(dataset_path: str, dst_path: str, include_seq_frames: bool = 
             for file in files:
                 if file.endswith((".jpg", ".png")):  # Process images
                     file_path = os.path.join(root, file)
-                    shutil.copy(file_path, os.path.join(all_images_path, file))
+                    new_name = "seq_" + file
+                    shutil.copy(file_path, os.path.join(all_images_path, new_name))
                     # Create a black mask for each negative image
-                    black_mask_name = os.path.splitext(file)[0] + "_mask.jpg"
+                    black_mask_name = "seq_" + os.path.splitext(file)[0] + "_mask.jpg"
                     black_mask_path = os.path.join(all_masks_path, black_mask_name)
                     create_black_mask(file_path, black_mask_path)
 
