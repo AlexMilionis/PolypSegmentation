@@ -3,37 +3,40 @@ from torchvision.transforms import v2 as T
 from data.constants import Constants
 import numpy as np
 
-def create_image_mask_pairs(images_dir, masks_dir):
-    """
-    Creates a list of tuples (image, mask) where the mask corresponds to the image
-    based on the naming convention: image name + "_mask" = mask name.
+def _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir):
+    expected_mask_name = f"{base_image_name}_mask.jpg"  # Adjust extension if necessary
 
-    Args:
-        images_dir (str): Directory containing images.
-        masks_dir (str): Directory containing masks.
+    mask_path = os.path.join(masks_dir, expected_mask_name)
+    if os.path.exists(mask_path):
+        image_path = os.path.join(images_dir, image)
+        image_mask_pairs.append((image_path, mask_path))
+        return image_mask_pairs
+    else:
+        raise ValueError(f"No matching mask found for image {image}")
 
-    Returns:
-        list: List of tuples [(image_path, mask_path), ...].
 
-    Raises:
-        ValueError: If an image does not have a corresponding mask.
-    """
+def create_image_mask_pairs(images_dir, masks_dir, include_data="single_frames"):
+
     # Get sorted lists of image and mask filenames
-    images = os.listdir(images_dir)
-    masks = os.listdir(masks_dir)
+    images = sorted(os.listdir(images_dir))
+    masks = sorted(os.listdir(masks_dir))
 
     # Create list of tuples
     image_mask_pairs = []
     for image in images:
         base_image_name, _ = os.path.splitext(image)
-        expected_mask_name = f"{base_image_name}_mask.jpg"  # Adjust extension if necessary
 
-        mask_path = os.path.join(masks_dir, expected_mask_name)
-        if os.path.exists(mask_path):
-            image_path = os.path.join(images_dir, image)
-            image_mask_pairs.append((image_path, mask_path))
-        else:
-            raise ValueError(f"No matching mask found for image {image}")
+        if include_data == "single_frames":
+            if "seq_" not in base_image_name:
+                image_mask_pairs = _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir)
+
+        elif include_data == "seq_frames":
+            if "seq_" in base_image_name:
+                image_mask_pairs = _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir)
+
+        else:   # single_frames + seq_frames
+            image_mask_pairs = _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir)
+
 
     return image_mask_pairs
 
@@ -103,3 +106,4 @@ def unnormalize_image(image):
     unnormalized_image = np.clip(unnormalized_image, a_min = 0, a_max = 1)
 
     return unnormalized_image
+
