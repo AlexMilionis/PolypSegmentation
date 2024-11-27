@@ -5,21 +5,26 @@ from torchvision import tv_tensors
 # from PIL import Image
 from data.scripts.dataset_utils import *
 from torchvision.transforms.functional import to_tensor
+from data.constants import Constants
 
 class PolypDataset(Dataset):
     """
     A custom Dataset class for loading images and masks.
     """
 
-    def __init__(self, images_dir, masks_dir, mode):
-        self.images_dir = images_dir
-        self.masks_dir = masks_dir
+    def __init__(self, mode="train", include_data="both"):
+        self.images_dir = Constants.IMAGE_DIR
+        self.masks_dir  = Constants.MASK_DIR
         self.mode = mode
-        self.data = create_image_mask_pairs(self.images_dir, self.masks_dir)
+        self.include_data = include_data
+        self.data = create_image_mask_pairs(self.images_dir, self.masks_dir, include_data=self.include_data)
         self.image_mask_transform = self._get_image_and_mask_transforms()
         self.image_transform      = self._get_image_transforms()
         self.mask_transform       = self._get_mask_transforms()
 
+        # if self.include_data not in ["single_frames","seq_frames","both"]:
+        #     raise ValueError(f"Invalid data '{self.include_data}'. Use 'single_frames', 'seq_frames' or 'both'.")
+        assert self.include_data in ['single_frames','seq_frames','both'], "Use single_frames, seq_frames or both!"
 
     @staticmethod
     def tensor_to_tv_tensor(image, mask, direct = False):
@@ -61,7 +66,7 @@ class PolypDataset(Dataset):
             image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = True)
             image, mask = self.image_mask_transform(image, mask)
             # image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = False)
-        # print(image.shape, mask.shape, img_path, mask_path)
+        # print(img_path, mask_path)
         return image, mask, (img_path, mask_path)
 
     def _get_image_transforms(self):
