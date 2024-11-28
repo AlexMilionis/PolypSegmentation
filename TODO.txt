@@ -1,11 +1,15 @@
 
-# TODO: delete full loader (no purpose),
-    #   better documentation on all scripts
-    #   write down all processes before continuing further,
-    #   maybe create custom collate functions for dataloader, in order to receive variable sizes for images and masks?
-    #   implement UNet
-    #   study UNet (with resnet backbone) and write report
-    #   check how many masks are in each category (class balance)
-    #   create visualizations for raw data (there is no point for visualization in train data, i think)
-    #   find criterion for training
-    #   add function to utilize only singleframes or only sequnce frames?
+# TODO:
+    #   General
+        #   improve documentation
+        #   write down all processes before continuing further
+    #   Models
+        #   implement UNet
+        #   study UNet (with resnet backbone)
+        #   write report
+    #   Training
+        #   find criterion for training
+
+# TODO: Questions:
+    #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
+    #   
