@@ -44,6 +44,12 @@ def visualize_samples_from_random_batch(dataloader, num_samples=2):
     batch_size = image_batch.shape[0]
     random_indices = random.sample(range(batch_size), num_samples)
 
+    # for j in random_indices:
+    #     # print(torch.sum(mask_batch[j,:,:,:]).item())
+    #     # print(torch.unique(mask_batch[j,:,:,:], return_counts=True))
+    #     # print(torch.sum(image_batch[j,:,:,:]).item())
+    #     print(torch.unique(image_batch[j,:,:,:], return_counts=True))
+
     # Create a figure for num_samples x 2 visualization
     fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
 

@@ -2,7 +2,8 @@ from torch.utils.data import DataLoader, random_split
 from data.constants import Constants  # Assuming constants have paths
 from data.scripts.polyp_dataset import PolypDataset  # Assuming PolypDataset is already implemented
 from hyperparameters import Hyperparameters
-from torch import Generator
+from scripts.seed import worker_init_fn, set_generator
+
 
 class DataLoading:
     def __init__(self, mode, include_data, shuffle=True, num_workers=4):
@@ -22,9 +23,7 @@ class DataLoading:
         self.batch_size = Hyperparameters.BATCH_SIZE
         self.shuffle = shuffle if mode == 'train' else False
         self.num_workers = num_workers
-
-
-        # Initialize the full dataset
+        self.worker_init_fn = worker_init_fn
         self.dataset = PolypDataset(mode=self.mode, include_data=self.include_data)
         self.data_loader = self._create_dataloader()
 
@@ -33,8 +32,7 @@ class DataLoading:
         # Split dataset into train/test
         train_size = int(self.train_ratio * len(self.dataset))
         test_size = len(self.dataset) - train_size
-        generator = Generator().manual_seed(42)
-        train_dataset, test_dataset = random_split(self.dataset, [train_size, test_size], generator=generator)
+        train_dataset, test_dataset = random_split(self.dataset, [train_size, test_size], generator=set_generator())
         return train_dataset, test_dataset
 
 
@@ -43,10 +41,10 @@ class DataLoading:
         train_dataset, test_dataset = self.split_data()
 
         if self.mode == 'train':
-            return DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers)
+            return DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
 
         elif self.mode == 'test':
-            return DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
+            return DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
 
         else:
             # raise ValueError(f"Invalid mode '{self.mode}'. Use 'train' or 'test'.")

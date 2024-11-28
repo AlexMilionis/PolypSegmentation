@@ -41,48 +41,92 @@ def create_image_mask_pairs(images_dir, masks_dir, include_data="single_frames")
     return image_mask_pairs
 
 
+class Transforms():
+    def __init__(self):
+        pass
 
-def identity_transform(x):
-    """
-    A no-op transformation that simply returns the input as is.
-    """
-    return x
+    @staticmethod
+    def identity_transform(x):
+        """
+        A no-op transformation that simply returns the input as is.
+        """
+        return x
 
+    @staticmethod
+    def binarize_mask(mask):
+        """
+        Converts a grayscale mask (tensor) to binary by applying a threshold.
 
+        Args:
+            mask (torch.Tensor): Input mask as a tensor with shape [1, H, W].
 
-def binarize_mask(mask):
-    """
-    Converts a grayscale mask (tensor) to binary by applying a threshold.
+        Returns:
+            torch.Tensor: Binarized mask with values 0 or 1.
+        """
+        return (mask > 128).float()
 
-    Args:
-        mask (torch.Tensor): Input mask as a tensor with shape [1, H, W].
+    @staticmethod
+    def convert_to_01_range(image):
 
-    Returns:
-        torch.Tensor: Binarized mask with values 0 or 1.
-    """
-    return (mask > 128).float()
+        return image / 255.0
 
+    @staticmethod
+    def image_and_mask_train_transforms():
+        """
+        Combined image and mask transformations for training.
+        """
+        return T.Compose([
+            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
+            T.RandomHorizontalFlip(p=0.5),
+        ])
 
-def convert_to_01_range(image):
-    return image/255
+    @staticmethod
+    def image_train_transforms():
+        """
+        Image transformations for training.
+        """
+        return T.Compose([
+            T.Lambda(Transforms.convert_to_01_range),
+            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+        ])
 
+    @staticmethod
+    def mask_train_transforms():
+        """
+        Mask transformations for training.
+        """
+        return T.Compose([
+            T.Lambda(Transforms.binarize_mask),
+            # T.Lambda(Transforms.identity_transform)
+        ])
 
-def image_transforms():
-    return T.Compose([
-        T.Lambda(convert_to_01_range),
-        T.Normalize(mean = Constants.IMAGENET_COLOR_MEANS,
-                    std  = Constants.IMAGENET_COLOR_STDS)
-    ])
+    @staticmethod
+    def image_and_mask_test_transforms():
+        """
+        Combined image and mask transformations for testing.
+        """
+        return T.Compose([
+            T.Resize(size=(512, 512)),
+        ])
 
-def mask_transforms():
-    return T.Compose([
-        T.Lambda(binarize_mask)
-    ])
+    @staticmethod
+    def image_test_transforms():
+        """
+        Image transformations for training.
+        """
+        return T.Compose([
+            T.Lambda(Transforms.convert_to_01_range),
+            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+        ])
 
-def image_and_mask_transforms():
-    return T.Compose([
-        T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
-        T.RandomHorizontalFlip(p=0.5),
+    @staticmethod
+    def mask_test_transforms():
+        """
+        Mask transformations for testing.
+        """
+        return T.Compose([
+            T.Lambda(Transforms.binarize_mask),
+            # T.Lambda(Transforms.identity_transform)
         ])
 
 
