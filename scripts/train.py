@@ -7,7 +7,7 @@ def train_model(train_loader):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device: ", device)
     # train_loader = DataLoading(mode="train").get_loader()
-    model = UNet(encoder_name="resnet18", encoder_weights="imagenet")
+    model = UNet()
     model = model.to(device)
     criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy']
     optimizer = optim.Adam(model.parameters(), lr=Hyperparameters.LEARNING_RATE)

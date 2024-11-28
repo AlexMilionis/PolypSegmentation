@@ -9,6 +9,8 @@
         #   write report
     #   Training
         #   find criterion for training
+        #   fix ValueError: Target size (torch.Size([32, 1, 512, 512])) must be the same as input size (torch.Size([32, 2, 512, 512]))
+            which is caused from having softmax probs for 2 pixel classes -> take argmax
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)

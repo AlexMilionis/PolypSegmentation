@@ -21,9 +21,8 @@ if __name__ == '__main__':
     # images, masks, paths = first_batch
     # print(images.shape, masks.shape)
 
-    # train_model(train_loader)
+    train_model(train_loader)
 
     # # Visualize a single batch by index
-    visualize_samples_from_random_batch(train_loader, num_samples = 3)
+    # visualize_samples_from_random_batch(train_loader, num_samples = 3)
 
-    # train(train_loader)
