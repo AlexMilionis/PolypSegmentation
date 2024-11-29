@@ -8,7 +8,7 @@ class Hyperparameters:
     LEARNING_RATE = 0.01
     # LOSS_FUNCTION = 'binary_crossentropy'
     LOSS_FUNCTIONS = {
-        'binary_crossentropy': BCEWithLogitsLoss(),
+        'binary_crossentropy_with_logits': BCEWithLogitsLoss(),
         # 'dice_loss': DiceLoss(),  # Example for a custom Dice Loss
         # 'combined_loss': CombinedLoss()  # Example for custom combined losses
     }
