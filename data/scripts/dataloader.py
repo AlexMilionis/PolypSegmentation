@@ -6,7 +6,7 @@ from scripts.seed import worker_init_fn, set_generator
 
 
 class DataLoading:
-    def __init__(self, mode, include_data, shuffle=True, num_workers=4):
+    def __init__(self, mode, include_data, shuffle=True, num_workers=8, pin_memory=False):
         """
         Initializes the dataset and splits into train/test/full based on the mode.
 
