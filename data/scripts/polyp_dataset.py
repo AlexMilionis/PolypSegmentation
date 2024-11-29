@@ -1,29 +1,49 @@
+"""
+This script defines a custom PyTorch Dataset class, `PolypDataset`, for loading and preprocessing
+polyp segmentation data, including image-mask pairs. It integrates image and mask transformations
+for both training and testing modes.
+
+Main Features:
+- Automatically pairs images and their corresponding masks using file naming conventions.
+- Supports separate transformations for images and masks, tailored for training or testing.
+- Handles different data types: single frames, sequence frames, or a combination of both.
+
+Class: PolypDataset
+- Attributes:
+  - `images_dir`: Directory containing input images.
+  - `masks_dir`: Directory containing ground truth masks.
+  - `mode`: Dataset mode, either "train" or "test".
+  - `include_data`: Type of data to include ("single_frames", "seq_frames", or "both").
+  - `image_mask_transform`: Combined transformations for both images and masks.
+  - `image_transform`: Transformations for images only.
+  - `mask_transform`: Transformations for masks only.
+
+- Methods:
+  1. `__len__`: Returns the total number of samples in the dataset.
+  2. `__getitem__`: Retrieves and applies transformations to the image-mask pair at a specified index.
+  3. `tensor_to_tv_tensor`: Converts standard tensors to torchvision tensors for images and masks.
+"""
+
+
 import torchvision
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 from torchvision import tv_tensors
-# from PIL import Image
 from data.scripts.dataset_utils import create_image_mask_pairs, Transforms
 from torchvision.transforms.functional import to_tensor
 from data.constants import Constants
-import torch
 
 class PolypDataset(Dataset):
-    """
-    A custom Dataset class for loading images and masks.
-    """
-
     def __init__(self, mode="train", include_data="both"):
         self.images_dir = Constants.IMAGE_DIR
         self.masks_dir  = Constants.MASK_DIR
         self.mode = mode
         self.include_data = include_data
+        assert self.include_data in ['single_frames', 'seq_frames', 'both'], "Use single_frames, seq_frames or both!"
         self.data = create_image_mask_pairs(self.images_dir, self.masks_dir, include_data=self.include_data)
         self.image_mask_transform = Transforms.image_and_mask_train_transforms() if self.mode == "train" else Transforms.image_and_mask_test_transforms()
         self.image_transform      = Transforms.image_train_transforms() if self.mode == "train" else Transforms.image_test_transforms()
         self.mask_transform       = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_test_transforms()
-
-        assert self.include_data in ['single_frames','seq_frames','both'], "Use single_frames, seq_frames or both!"
 
     @staticmethod
     def tensor_to_tv_tensor(image, mask, direct = False):
@@ -39,71 +59,16 @@ class PolypDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        """
-        Retrieve the image and mask pair at the specified index.
-
-        Args:
-            idx (int): Index of the data point.
-
-        Returns:
-            tuple: Transformed image and mask tensors.
-        """
-        # Get image and mask paths from the pre-aligned data
         img_path, mask_path = self.data[idx]
-
         # Read images as tensors
         image = read_image(img_path)
         mask = read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY)
-
-        # if self.image_transform:
-        #     image = self.image_transform(image)
-        # if self.mask_transform:
-        #     mask = self.mask_transform(mask)
-        # if self.image_mask_transform:
-        #     # Convert to tv_tensors
-        #     image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = True)
-        #     image, mask = self.image_mask_transform(image, mask)
-        #     # image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = False)
-        # # print(img_path, mask_path)
-
-
         # Convert to tv_tensors
-        # Combined image and mask transformations
         image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = True)
+        # Combined image and mask transformations
         image, mask = self.image_mask_transform(image, mask)
         # image transformations
         image = self.image_transform(image)
         # mask transformations
         mask = self.mask_transform(mask)
-        # print(torch.sum(mask).item())
         return image, mask, (img_path, mask_path)
-
-    # def _get_image_transforms(self):
-    #     """
-    #     Return image-only transformations based on the mode.
-    #     """
-    #     if self.mode == "train":
-    #         return image_transforms()
-    #     elif self.mode == "test":
-    #         return image_transforms()
-    #     return None  # No transforms for 'full'
-    #
-    # def _get_mask_transforms(self):
-    #     """
-    #     Return mask-only transformations based on the mode.
-    #     """
-    #     if self.mode == "train":
-    #         return mask_transforms()
-    #     elif self.mode == "test":
-    #         return mask_transforms()
-    #     return None  # No transforms for 'full'
-    #
-    # def _get_image_and_mask_transforms(self):
-    #     """
-    #     Return image-mask pair transformations based on the mode.
-    #     """
-    #     if self.mode == "train":
-    #         return image_and_mask_transforms()
-    #     elif self.mode == "test":
-    #         return None  # Example: No combined transforms in 'test' mode
-    #     return None  # No transforms for 'full'
