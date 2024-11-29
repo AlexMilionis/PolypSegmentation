@@ -19,7 +19,7 @@ class UNet(nn.Module):
         in_channels (int): Number of input channels (default: 3 for RGB).
         classes (int): Number of output classes (default: 2 for binary segmentation).
     """
-    def __init__(self, encoder_name="resnet18", encoder_weights="imagenet", in_channels=3, classes=2):
+    def __init__(self, encoder_name="resnet18", encoder_weights="imagenet", in_channels=3, classes=1):
         super(UNet, self).__init__()
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
