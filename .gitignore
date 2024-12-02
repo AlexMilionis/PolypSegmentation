@@ -4,3 +4,4 @@ __pycache__/
 data/processed/
 data/raw/
 dataset_paper.pdf
+*.pth
