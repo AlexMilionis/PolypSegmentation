@@ -2,6 +2,7 @@
     #   General
         #   write down all processes before continuing further
         #   plots to include title the image path
+        #   function/class that saves model.pth to path
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
@@ -11,10 +12,11 @@
         #   find criterion for training
         #   try huggingface models
         #   try pin_memory in dataloader for faster training
-        #   implement tqdm
+        #   create trainer class
     #   Evaluation
         #   evaluation criteria (check paper)
-
+        #   create evaluator class
+        #   tqdm to mention test loss!
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)

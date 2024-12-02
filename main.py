@@ -12,7 +12,6 @@ if __name__ == '__main__':
 
     # visualize_data(test_loader, num_samples = 3)    # Visualize some data
 
-
     model_checkpoint_path = train_model(train_loader)
     evaluate_model(test_loader, model_checkpoint_path, visualize_results=True)
 
