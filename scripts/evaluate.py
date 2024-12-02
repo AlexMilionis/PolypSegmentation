@@ -5,6 +5,8 @@ from models.unet import UNet
 from scripts.visualization_utils import visualize_predictions
 import warnings
 warnings.filterwarnings('ignore')
+from torch.cuda.amp import autocast
+
 
 def evaluate_model(test_loader, model_checkpoint_path, visualize_results=False, num_samples=3, output_dir="visualizations"):
 
@@ -25,8 +27,12 @@ def evaluate_model(test_loader, model_checkpoint_path, visualize_results=False, 
         for batch_idx, (images, masks, _) in enumerate(test_loader):
             start_time = time.time()
             images, masks = images.to(device), masks.to(device)
-            outputs = model(images)  # Raw logits
-            loss = criterion(outputs, masks)  # BCE with logits
+
+            # Mixed precision inference
+            with autocast():
+                outputs = model(images)  # Raw logits
+                loss = criterion(outputs, masks)  # BCE with logits
+
             total_loss += loss.item()
             total_time += time.time() - start_time
 
@@ -38,9 +44,7 @@ def evaluate_model(test_loader, model_checkpoint_path, visualize_results=False, 
                     predictions.append(torch.sigmoid(outputs[i].cpu()))  # Apply sigmoid for probabilities
 
     avg_loss = total_loss / len(test_loader)
-    print(f"Test Loss: {avg_loss:.4f}")
-    print(f"Total Evaluation Time: {total_time:.2f}s")
+    print(f"Test Loss: {avg_loss:.4f}, Evaluation Time: {total_time:.2f}s")
 
-    # Visualize predictions if requested
     if visualize_results:
         visualize_predictions(input_images, ground_truths, predictions, num_samples)

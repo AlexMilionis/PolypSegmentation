@@ -30,6 +30,7 @@ import torch.optim as optim
 class UNet(nn.Module):
     def __init__(self, encoder_name="resnet18", encoder_weights="imagenet", in_channels=3, classes=1):
         super(UNet, self).__init__()
+        self.name = "UNet"
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
         self.in_channels = in_channels
