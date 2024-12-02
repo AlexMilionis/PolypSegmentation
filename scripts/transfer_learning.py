@@ -51,6 +51,7 @@ def train_model(train_loader):
             avg_loss = total_loss / len(train_loader)
             if epoch==num_epochs-1:
                 epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
+        epoch_bar.close()
 
     # Save the model checkpoint
     os.makedirs(Constants.MODEL_CHECKPOINT_DIR, exist_ok=True)

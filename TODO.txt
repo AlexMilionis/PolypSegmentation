@@ -16,7 +16,6 @@
     #   Evaluation
         #   evaluation criteria (check paper)
         #   create evaluator class
-        #   tqdm to mention test loss!
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
