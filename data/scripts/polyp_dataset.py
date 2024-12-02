@@ -31,7 +31,7 @@ from torchvision.io import read_image
 from torchvision import tv_tensors
 from data.scripts.dataset_utils import create_image_mask_pairs, Transforms
 from torchvision.transforms.functional import to_tensor
-from data.constants import Constants
+from constants import Constants
 
 class PolypDataset(Dataset):
     def __init__(self, mode="train", include_data="both"):

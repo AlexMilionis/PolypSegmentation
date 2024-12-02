@@ -24,7 +24,7 @@ import os
 import shutil
 from typing import List
 from PIL import Image
-from data.constants import Constants
+from constants import Constants
 
 
 def create_folders(target_path: str, new_dirs: List[str]) -> None:
