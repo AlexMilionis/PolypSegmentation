@@ -23,8 +23,7 @@ Testing and Analysis Utilities for Datasets:
 
 from torch.utils.data import Subset
 from data.scripts.dataloader import DataLoading
-from data.constants import Constants
-from hyperparameters import Hyperparameters
+from constants import Constants
 import os
 import torch
 
@@ -83,4 +82,7 @@ def class_balance(mode):
 
 
 if __name__ == '__main__':
-    class_balance("test")
+    # # class_balance("test")
+    # name="UNet"
+    # a = os.path.join(Constants.MODEL_CHECKPOINT_DIR, name + "_checkpoint.pth")
+    # print(a)
