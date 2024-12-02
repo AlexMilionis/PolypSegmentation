@@ -21,7 +21,7 @@ dependencies:
   - brotli-bin=1.0.9
   - brotli-python=1.0.9
   - bzip2=1.0.8
-  - ca-certificates=2024.9.24
+  - ca-certificates=2024.11.26
   - certifi=2024.8.30
   - cffi=1.17.1
   - charset-normalizer=3.3.2
