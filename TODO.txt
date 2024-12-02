@@ -11,6 +11,7 @@
         #   find criterion for training
         #   try huggingface models
         #   try pin_memory in dataloader for faster training
+        #   implement tqdm
     #   Evaluation
         #   evaluation criteria (check paper)
 
