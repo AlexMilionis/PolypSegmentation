@@ -1,14 +1,19 @@
 # TODO:
     #   General
         #   write down all processes before continuing further
+        #   plots to include title the image path
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
         #   write report
+        #   check segmentation models from huggingface
     #   Training
         #   find criterion for training
-        #   fix ValueError: Target size (torch.Size([32, 1, 512, 512])) must be the same as input size (torch.Size([32, 2, 512, 512]))
-            which is caused from having softmax probs for 2 pixel classes -> take argmax
+        #   try huggingface models
+        #   try pin_memory in dataloader for faster training
+    #   Evaluation
+        #   evaluation criteria (check paper)
+
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
