@@ -1,8 +1,7 @@
 # TODO:
     #   General
         #   write down all processes before continuing further
-        #   plots to include title the image path
-        #   function/class that saves model.pth to path
+        #   create InMemoryPolypDataset
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
@@ -16,6 +15,7 @@
     #   Evaluation
         #   evaluation criteria (check paper)
         #   create evaluator class
+        #   plots to include title the image path
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
