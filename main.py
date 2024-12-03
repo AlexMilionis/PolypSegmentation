@@ -1,7 +1,7 @@
 from scripts.visualization_utils import visualize_data
 from data.scripts.dataloader import DataLoading
-from scripts.transfer_learning import train_model
-from scripts.evaluate import evaluate_model
+from scripts.transfer_learning import Trainer
+from scripts.evaluate import Evaluator
 from scripts.seed import set_seed
 
 if __name__ == '__main__':
@@ -12,8 +12,8 @@ if __name__ == '__main__':
 
     # visualize_data(test_loader, num_samples = 3)    # Visualize some data
 
-    model_checkpoint_path = train_model(train_loader)
-    evaluate_model(test_loader, model_checkpoint_path, visualize_results=True)
+    Trainer(train_loader, transfer_learning=True).train()
+    Evaluator(test_loader, visualize_results=True).evaluate()
 
 
 
