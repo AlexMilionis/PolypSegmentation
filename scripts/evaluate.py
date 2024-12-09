@@ -42,22 +42,17 @@ class Evaluator:
                 with autocast():
                     outputs = self.model(images)  # Raw logits
                     loss = self.criterion(outputs, masks)  # BCE with logits
+                    print(f"outputs shape: {outputs.shape}")
 
                 total_loss += loss.item()
                 total_time += time.time() - start_time
-
-                # # Collect samples for visualization if required
-                # if self.visualize_results and batch_idx == 9 and len(input_images) < self.num_samples:
-                #     for i in range(min(self.num_samples - len(input_images), images.size(0))):
-                #         input_images.append(images[i].cpu())
-                #         ground_truths.append(masks[i].cpu())
-                #         predictions.append(torch.sigmoid(outputs[i].cpu()))  # Apply sigmoid for probabilities
 
                 if self.visualize_results:
                     self.visualizer(images, masks, outputs)
 
                 # Update postfix dynamically for the progress bar
                 avg_loss = total_loss / (batch_idx + 1)
+
                 batch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
         batch_bar.close()
 
@@ -68,9 +63,9 @@ class Evaluator:
     def visualizer(self, images, masks, outputs):
         # Storage for visualization
         input_images, ground_truths, predictions = [], [], []
-        batch_idx = 9
+        batch_idx = 1
         # Collect samples for visualization if required
-        if self.visualize_results and batch_idx == 9 and len(input_images) < self.num_samples:
+        if self.visualize_results and batch_idx == 1 and len(input_images) < self.num_samples:
             for i in range(min(self.num_samples - len(input_images), images.size(0))):
                 input_images.append(images[i].cpu())
                 ground_truths.append(masks[i].cpu())
