@@ -24,6 +24,7 @@
 
 from torch.utils.data import DataLoader, random_split
 from data.scripts.polyp_dataset import PolypDataset
+from data.scripts.inmemorypolypdataset import InMemoryPolypDataset
 from hyperparameters import Hyperparameters
 from scripts.seed import worker_init_fn, set_generator
 
@@ -38,6 +39,7 @@ class DataLoading:
         self.num_workers = num_workers
         self.worker_init_fn = worker_init_fn
         self.dataset = PolypDataset(mode=self.mode, include_data=self.include_data)
+        # self.dataset = InMemoryPolypDataset(mode=self.mode, include_data=self.include_data)
         self.data_loader = self._create_dataloader()
 
 

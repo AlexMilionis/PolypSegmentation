@@ -8,6 +8,7 @@ if __name__ == '__main__':
     set_seed()
 
     train_loader = DataLoading(mode="train", include_data = 'single_frames', shuffle=False).get_loader()
+    # shuffle na mpei true
     test_loader = DataLoading(mode="test", include_data = 'single_frames',shuffle=False).get_loader()
 
     # visualize_data(test_loader, num_samples = 3)    # Visualize some data
