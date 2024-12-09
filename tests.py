@@ -66,23 +66,27 @@ def count_images():
     print(f"Singleframe masks count: {singleframe_images_count}, Sequence masks count: {seqframe_images_count}")
 
 
-def class_balance(mode):
-    loader = DataLoading(mode=mode, include_data='both', shuffle=False).get_loader()
-    positive_count, negative_count = 0, 0
-    for img, mask, _ in loader:
-        for single_mask in mask:
-            if torch.sum(single_mask == 1).item():  # Check for 1's (white pixels) in the mask
-                positive_count += 1
-            else:
-                negative_count += 1
-        # print(mask.shape, img.shape)
-    print(f'{mode.capitalize()} mode:')
-    print(f"Positive count: {positive_count}")
-    print(f"Negative count: {negative_count}")
+def class_balance(include_data):
+    train_loader, val_loader, test_loader = DataLoading(include_data=include_data, shuffle=False).get_loader()
+    for loader in (train_loader, val_loader, test_loader):
+        positive_count, negative_count = 0, 0
+        for img, mask, _ in loader:
+            for single_mask in mask:
+                if torch.sum(single_mask == 1).item():  # Check for 1's (white pixels) in the mask
+                    positive_count += 1
+                else:
+                    negative_count += 1
+            # print(mask.shape, img.shape)
+        # print(f'{mode.capitalize()} mode:')
+        print(f"Positive count: {positive_count}, Negative count: {negative_count}")
+        # print(f"Negative count: {negative_count}")
 
 
 if __name__ == '__main__':
-    # # class_balance("test")
-    # name="UNet"
-    # a = os.path.join(Constants.MODEL_CHECKPOINT_DIR, name + "_checkpoint.pth")
-    # print(a)
+    # count_images()
+    # test_for_overlaps_in_datasets()
+    # for data in ["both", "single_frames", "seq_frames"]:
+    #     class_balance("train",include_data=data)
+    #     class_balance("test",include_data=data)
+
+    print(torch.randperm(5))
