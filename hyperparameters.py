@@ -3,6 +3,7 @@ from torch.nn import BCEWithLogitsLoss
 class Hyperparameters:
 
     TRAIN_RATIO = 0.8
+    VAL_RATIO = 0.1
     EPOCHS = 1
     BATCH_SIZE = 32
     WEIGHT_DECAY = 0.00001
