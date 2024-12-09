@@ -1,7 +1,11 @@
 # TODO:
     #   General
         #   write down all processes before continuing further
-        #   create InMemoryPolypDataset
+        #   check MONAI
+        #   training on notebooks
+        #   gpu sources, mail me slurm
+    #   Preprocessing
+        #   extra augmentation -> brightness, contrast, jitter
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
@@ -12,6 +16,10 @@
         #   try huggingface models
         #   try pin_memory in dataloader for faster training
         #   create trainer class
+    #   Validating
+        #   create validation dataloader
+        #   include validation metrics (except loss function) -> recall, specificity, dice score
+        #   cross validation?
     #   Evaluation
         #   evaluation criteria (check paper)
         #   create evaluator class
@@ -20,6 +28,3 @@
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
     #   Δουλεύω μονο με single frames ή με single+sequence? Aν both, χρειάζεται να διατηρηθεί το ordering των sequence frames?
-    #   Να χωρίσω περαιτέρω το train dataset σε train και validation?
-    #   Να τρέξω τα μοντέλα σε colab ή κάπου αλλού (έχει το εργαστήριο resources?)
-    #   run python scripts on google colab
