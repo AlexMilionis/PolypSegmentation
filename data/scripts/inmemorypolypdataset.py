@@ -23,9 +23,9 @@ class InMemoryPolypDataset(Dataset):
             mask = read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY)
             self.data.append((image, mask, (img_path, mask_path)))
 
-        self.image_mask_transform = Transforms.image_and_mask_train_transforms() if self.mode == "train" else Transforms.image_and_mask_test_transforms()
-        self.image_transform = Transforms.image_train_transforms() if self.mode == "train" else Transforms.image_test_transforms()
-        self.mask_transform = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_test_transforms()
+        self.image_mask_transform = Transforms.image_and_mask_train_transforms() if self.mode == "train" else Transforms.image_and_mask_val_test_transforms()
+        self.image_transform = Transforms.image_train_transforms() if self.mode == "train" else Transforms.image_val_test_transforms()
+        self.mask_transform = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_val_test_transforms()
 
 
     @staticmethod

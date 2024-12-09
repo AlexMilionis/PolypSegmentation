@@ -1,64 +1,36 @@
-"""
-    DataLoading Class
-    -----------------
-
-    This class handles the loading and splitting of datasets into training and testing sets. It creates PyTorch DataLoader objects for efficient data loading during training and evaluation.
-
-    Attributes:
-        mode (str): Specifies the mode of operation ('train' or 'test').
-        include_data (str): Specifies the data subset to include (e.g., 'single_frames', 'seq_frames', or 'both').
-        train_ratio (float): The ratio of the dataset used for training. The remainder is used for testing.
-        batch_size (int): Batch size for loading data.
-        shuffle (bool): Whether to shuffle the data during loading.
-        num_workers (int): Number of subprocesses used for data loading.
-        worker_init_fn (function): Function to initialize each worker for consistent seeding.
-        dataset (Dataset): The dataset object containing image-mask pairs.
-        data_loader (DataLoader): The PyTorch DataLoader instance.
-
-    Methods:
-        split_data(): Splits the dataset into training and testing subsets based on `train_ratio`.
-        _create_dataloader(): Creates the appropriate DataLoader object for the specified mode.
-        get_loader(): Returns the DataLoader object for the selected mode.
-    """
-
-
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, Subset
 from data.scripts.polyp_dataset import PolypDataset
-from data.scripts.inmemorypolypdataset import InMemoryPolypDataset
 from hyperparameters import Hyperparameters
-from scripts.seed import worker_init_fn, set_generator
+from scripts.seed import worker_init_fn, set_seed
+import torch
+import numpy as np
 
 
 class DataLoading:
-    def __init__(self, mode, include_data, shuffle=True, num_workers=8, pin_memory=False):
-        self.mode = mode
+    def __init__(self, include_data="both", shuffle=True, num_workers=8, pin_memory=False):
         self.include_data = include_data
         self.train_ratio = Hyperparameters.TRAIN_RATIO
+        self.val_ratio = Hyperparameters.VAL_RATIO
         self.batch_size = Hyperparameters.BATCH_SIZE
-        self.shuffle = shuffle if mode == 'train' else False
+        self.shuffle = shuffle
         self.num_workers = num_workers
         self.worker_init_fn = worker_init_fn
-        self.dataset = PolypDataset(mode=self.mode, include_data=self.include_data)
-        # self.dataset = InMemoryPolypDataset(mode=self.mode, include_data=self.include_data)
-        self.data_loader = self._create_dataloader()
-
-
-    def split_data(self):
-        train_size = int(self.train_ratio * len(self.dataset))
-        test_size = len(self.dataset) - train_size
-        train_dataset, test_dataset = random_split(self.dataset, [train_size, test_size], generator=set_generator())
-        return train_dataset, test_dataset
-
-
-    def _create_dataloader(self):
-        train_dataset, test_dataset = self.split_data()
-        if self.mode == 'train':
-            return DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
-        elif self.mode == 'test':
-            return DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
-        else:
-            assert self.mode in ['train','test'], "Use train or test mode!"
+        self.train_dataset = PolypDataset(mode="train", include_data=self.include_data)
+        self.val_test_dataset = PolypDataset(mode="val_test", include_data=self.include_data)
 
 
     def get_loader(self):
-        return self.data_loader
+        set_seed()
+        #   split data
+        indices = torch.randperm(len(self.train_dataset))
+        train_size = int(np.floor(self.train_ratio * len(self.train_dataset)))
+        val_size   = int(np.floor(self.val_ratio * len(self.val_test_dataset)))
+        self.train_dataset = Subset(self.train_dataset, indices[:train_size])
+        self.val_dataset   = Subset(self.val_test_dataset, indices[train_size:train_size + val_size])
+        self.test_dataset  = Subset(self.val_test_dataset, indices[train_size + val_size:])
+        #   create separate dataloaders
+        train_loader = DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
+        val_loader   = DataLoader(self.val_dataset,   batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
+        test_loader  = DataLoader(self.test_dataset,  batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, worker_init_fn=self.worker_init_fn)
+        return train_loader, val_loader, test_loader
+

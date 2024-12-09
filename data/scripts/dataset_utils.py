@@ -106,23 +106,22 @@ class Transforms():
         ])
 
     @staticmethod
-    def image_and_mask_test_transforms():
+    def image_and_mask_val_test_transforms():
         return T.Compose([
             T.Resize(size=(512, 512)),
         ])
 
     @staticmethod
-    def image_test_transforms():
+    def image_val_test_transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_01_range),
             T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
         ])
 
     @staticmethod
-    def mask_test_transforms():
+    def mask_val_test_transforms():
         return T.Compose([
             T.Lambda(Transforms.binarize_mask),
-            # T.Lambda(Transforms.identity_transform)
         ])
 
 
