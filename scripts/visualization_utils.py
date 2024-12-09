@@ -44,7 +44,7 @@ def process_image(image_tensor):
 def visualize_data(dataloader, num_samples=2):
     # Fetch the N=9th batch from the DataLoader
     dl = iter(dataloader)
-    for _ in range(9):
+    for _ in range(1):
         image_batch, mask_batch, paths_batch = next(dl)
     # Limit samples to the batch size if necessary
     num_samples = min(num_samples, len(image_batch))
