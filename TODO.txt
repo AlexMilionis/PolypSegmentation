@@ -4,7 +4,9 @@
         #   check MONAI
         #   training on notebooks
         #   gpu sources, mail me slurm
+        #   EDA
     #   Preprocessing
+        #   do stratified split
         #   extra augmentation -> brightness, contrast, jitter
     #   Models
         #   implement UNet
@@ -21,7 +23,7 @@
         #   include validation metrics (except loss function) -> recall, specificity, dice score
         #   cross validation?
     #   Evaluation
-        #   evaluation criteria (check paper)
+        #   evaluation criteria (check paper) -> recall, specificity, dice score
         #   create evaluator class
         #   plots to include title the image path
 
