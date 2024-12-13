@@ -6,8 +6,8 @@
         #   gpu sources, mail me slurm
         #   EDA
     #   Preprocessing
-        #   do stratified split
-        #   extra augmentation -> brightness, contrast, jitter
+        #   data split: train(C1-C4), validation C5, test C6 ?
+        #   cross validation ?
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
@@ -17,15 +17,13 @@
         #   find criterion for training
         #   try huggingface models
         #   try pin_memory in dataloader for faster training
-        #   create trainer class
     #   Validating
-        #   create validation dataloader
         #   include validation metrics (except loss function) -> recall, specificity, dice score
         #   cross validation?
     #   Evaluation
-        #   evaluation criteria (check paper) -> recall, specificity, dice score
-        #   create evaluator class
+        #   evaluation criteria (check paper) -> recall, specificity, dice score, jaccard index
         #   plots to include title the image path
+        #   rewrite evaluation visualization
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
