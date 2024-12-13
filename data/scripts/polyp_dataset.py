@@ -25,7 +25,7 @@ Class: PolypDataset
 """
 
 
-import torchvision
+import torch, torchvision
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 from torchvision import tv_tensors
@@ -73,7 +73,12 @@ class PolypDataset(Dataset):
         image = self.image_transform(image)
         # mask transformations
         mask = self.mask_transform(mask)
+        #
+
+
         return image, mask, (img_path, mask_path)
+
+
 
 
 

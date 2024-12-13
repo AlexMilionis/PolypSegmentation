@@ -34,8 +34,8 @@ def test_for_overlaps_in_datasets():
             return set(dataset.indices)
         raise ValueError("Dataset must be a Subset instance.")
     # Initialize DataLoaders
-    train_loader = DataLoading(mode="train", shuffle=False).get_loader()
-    test_loader = DataLoading(mode="test", shuffle=False).get_loader()
+    train_loader = DataLoading(mode="train", shuffle=False).get_loaders()
+    test_loader = DataLoading(mode="test", shuffle=False).get_loaders()
     # Extract train and test datasets from DataLoading
     train_dataset, test_dataset = DataLoading.split_data(DataLoading(mode="train"))
     # Validate indices
@@ -67,7 +67,7 @@ def count_images():
 
 
 def class_balance(include_data):
-    train_loader, val_loader, test_loader = DataLoading(include_data=include_data, shuffle=False).get_loader()
+    train_loader, val_loader, test_loader = DataLoading(include_data=include_data, shuffle=False).get_loaders()
     for loader in (train_loader, val_loader, test_loader):
         positive_count, negative_count = 0, 0
         for img, mask, _ in loader:

@@ -95,6 +95,8 @@ class Transforms():
     @staticmethod
     def image_train_transforms():
         return T.Compose([
+            T.RandomApply([T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)], p=0.2),
+            T.RandomApply([T.GaussianNoise(mean=0.0, sigma=0.1)], p = 0.2),
             T.Lambda(Transforms.convert_to_01_range),
             T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
         ])
