@@ -48,7 +48,6 @@ class DataLoading:
         return train_dataset, val_dataset, test_dataset
 
 
-
     def create_loader(self, dataset, mode):
         return DataLoader(
             dataset,
@@ -68,6 +67,5 @@ class DataLoading:
         train_loader = self.create_loader(train_dataset, mode="train")
         val_loader = self.create_loader(val_dataset, mode="val")
         test_loader = self.create_loader(test_dataset, mode="test")
-
         return train_loader, val_loader, test_loader
 

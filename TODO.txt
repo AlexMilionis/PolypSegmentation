@@ -5,6 +5,7 @@
         #   training on notebooks
         #   gpu sources, mail me slurm
         #   EDA
+        #   problem with large epoch time!
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
@@ -23,7 +24,6 @@
     #   Evaluation
         #   evaluation criteria (check paper) -> recall, specificity, dice score, jaccard index
         #   plots to include title the image path
-        #   rewrite evaluation visualization
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
