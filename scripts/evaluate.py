@@ -6,23 +6,30 @@ from scripts.metrics import Metrics
 import warnings
 from torch.cuda.amp import autocast
 from constants import Constants
-from visualization_utils import visualize_outputs
+from scripts.visualization_utils import visualize_outputs
 
 warnings.filterwarnings('ignore')
 
 
 class Evaluator:
-    def __init__(self, loader, visualize_results = False, num_samples=3):
+    def __init__(self, loader: torch.utils.data.DataLoader, visualize_predictions: bool = False, num_samples: int = 3):
         self.loader = loader
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.model = UNet().to(self.device)
-        self.criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy_with_logits']
-        self.visualize_results = visualize_results
+        self.visualize_predictions = visualize_predictions
         self.num_samples = num_samples
+        self.model = self._load_model()
+        self.criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy_with_logits']
 
-        self.model_checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, self.model.name + "_checkpoint.pth")
-        self.model.load_state_dict(torch.load(self.model_checkpoint_path, map_location=self.device))
-        self.model.eval()
+
+    def _load_model(self):
+        model = UNet().to(self.device)
+        checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
+        if not os.path.exists(checkpoint_path):
+            raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
+        model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))
+        model.eval()
+        return model
+
 
     def _eval_loop(self):
         total_loss = 0
@@ -39,10 +46,14 @@ class Evaluator:
                 preds = (probs > 0.5).float()
                 eval_metrics.add_batch(preds, masks)
                 total_loss += loss.item()
-
-                if self.visualize_results and batch_idx == 0:
+                # visualizing the first batch
+                if self.visualize_predictions and batch_idx == 0:
                     visualize_outputs(images, masks, preds, num_samples=self.num_samples)
 
+        return total_loss, eval_metrics
+
+
+    def _display_metrics(self, total_loss, eval_metrics):
         metrics = {"loss": total_loss / len(self.loader),
                    "recall": eval_metrics.recall(),
                    "precision": eval_metrics.precision(),
@@ -53,8 +64,5 @@ class Evaluator:
 
 
     def evaluate(self):
-        self._eval_loop()
-        if self.visualize_results:
-            # next(iter(self.loader))
-            # visualize_outputs(images, masks, predictions, num_samples)
-            pass
+        total_loss, eval_metrics = self._eval_loop()
+        self._display_metrics(total_loss, eval_metrics)
