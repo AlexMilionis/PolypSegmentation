@@ -7,13 +7,24 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
+def samples_per_class(dataset):
+    positives, negatives = 0, 0
+    for _, mask, _ in dataset:
+        if torch.sum(mask == 1).item():
+            positives += 1
+        else:
+            negatives += 1
+    print(f"positives: {positives}, negatives: {negatives}")
+
+
 class DataLoading:
     def __init__(self, include_data="both", shuffle=True, num_workers=8, pin_memory=False):
+        set_seed()
         self.include_data = include_data
         self.train_ratio = Hyperparameters.TRAIN_RATIO
         self.val_ratio = Hyperparameters.VAL_RATIO
         self.batch_size = Hyperparameters.BATCH_SIZE
-        self.shuffle = shuffle
+        self.shuffle = shuffle  # after we iterate over all batches the data is shuffled
         self.num_workers = num_workers
         self.worker_init_fn = worker_init_fn
         self.pin_memory = pin_memory
@@ -42,7 +53,7 @@ class DataLoading:
         return DataLoader(
             dataset,
             batch_size=self.batch_size,
-            shuffle=(self.shuffle if mode == "train" else False),
+            shuffle=self.shuffle,
             num_workers=self.num_workers,
             worker_init_fn=self.worker_init_fn,
             pin_memory=self.pin_memory,
@@ -59,14 +70,4 @@ class DataLoading:
         test_loader = self.create_loader(test_dataset, mode="test")
 
         return train_loader, val_loader, test_loader
-
-
-    def samples_per_class(self, dataset):
-        positives, negatives = 0, 0
-        for _, mask, _ in dataset:
-            if torch.sum(mask == 1).item():
-                positives += 1
-            else:
-                negatives += 1
-        print(f"positives: {positives}, negatives: {negatives}")
 
