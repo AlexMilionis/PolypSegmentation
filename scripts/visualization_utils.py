@@ -41,7 +41,7 @@ def process_image(image_tensor):
     return unnormalize_image(image)
 
 
-def visualize_data(dataloader, num_samples=2):
+def visualize_inputs(dataloader, num_samples=2):
     # Fetch the N=9th batch from the DataLoader
     dl = iter(dataloader)
     for _ in range(1):
@@ -58,23 +58,20 @@ def visualize_data(dataloader, num_samples=2):
         # Plot the image and mask
         plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
         plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
-
-    # Display the plots
     plt.tight_layout()
     plt.show()
 
 
-def visualize_predictions(images, masks, predictions, num_samples):
-    # Create a figure for visualizing the input images, masks, and predictions
+def visualize_outputs(batch_images, batch_masks, batch_predictions, num_samples=3):
+    num_samples = min(num_samples, len(batch_images))  # Ensure we don't exceed batch size
     fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
-    for i in range(min(num_samples, len(images))):
-        image = process_image(images[i])
-        mask = masks[i].squeeze().numpy()  # Convert (1, H, W) -> (H, W)
-        predicted_mask = (predictions[i].squeeze().numpy() > 0.5).astype(int)  # Binarize predictions
-        # Plot the input image, ground truth mask, and predicted mask
+
+    for i in range(num_samples):
+        image = process_image(batch_images[i])
+        mask = batch_masks[i].squeeze().cpu().numpy()
+        predicted_mask = (batch_predictions[i].squeeze().cpu().numpy() > 0.5).astype(int)
         plot_image(axes[i][0], image, "Input Image")
         plot_image(axes[i][1], mask, "Ground Truth Mask", cmap="gray")
         plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
-    # Display the plots
     plt.tight_layout()
     plt.show()

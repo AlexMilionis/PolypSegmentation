@@ -6,12 +6,13 @@ from scripts.metrics import Metrics
 import warnings
 from torch.cuda.amp import autocast
 from constants import Constants
+from visualization_utils import visualize_outputs
 
 warnings.filterwarnings('ignore')
 
 
 class Evaluator:
-    def __init__(self, loader, visualize_results = True, num_samples=3):
+    def __init__(self, loader, visualize_results = False, num_samples=3):
         self.loader = loader
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model = UNet().to(self.device)
@@ -39,17 +40,21 @@ class Evaluator:
                 eval_metrics.add_batch(preds, masks)
                 total_loss += loss.item()
 
+                if self.visualize_results and batch_idx == 0:
+                    visualize_outputs(images, masks, preds, num_samples=self.num_samples)
+
         metrics = {"loss": total_loss / len(self.loader),
                    "recall": eval_metrics.recall(),
                    "precision": eval_metrics.precision(),
                    "specificity": eval_metrics.specificity(),
                    "dice score": eval_metrics.dice_score(),
-                   "jaccard index": eval_metrics.jaccard_index(),}
+                   "jaccard index": eval_metrics.jaccard_index()}
         print(metrics)
 
 
     def evaluate(self):
         self._eval_loop()
         if self.visualize_results:
+            # next(iter(self.loader))
+            # visualize_outputs(images, masks, predictions, num_samples)
             pass
-
