@@ -94,6 +94,7 @@ class Transforms():
         return T.Compose([
             T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
             T.RandomHorizontalFlip(p=0.5),
+            T.RandomCrop(size=(512, 512)),
         ])
 
     @staticmethod

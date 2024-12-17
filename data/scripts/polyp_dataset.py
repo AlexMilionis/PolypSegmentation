@@ -47,17 +47,6 @@ class PolypDataset(Dataset):
         self.mask_transform       = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_val_test_transforms()
 
 
-    @staticmethod
-    def tensor_to_tv_tensor(image, mask, direct = False):
-        if direct:
-            image = tv_tensors.Image(image)
-            mask = tv_tensors.Mask(mask)
-        else:
-            image = to_tensor(image)
-            mask  = to_tensor(mask)
-        return image, mask
-
-
     def __len__(self):
         return len(self.data)
 
@@ -69,14 +58,15 @@ class PolypDataset(Dataset):
         image = read_image(img_path)
         mask = read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY)
         # Convert to tv_tensors
-        image, mask = PolypDataset.tensor_to_tv_tensor(image, mask, direct = True)
+        # image, mask = PolypDataset.convert_to_tv_tensor(image, mask)
+        image, mask = tv_tensors.Image(image), tv_tensors.Mask(mask)
         # Combined image and mask transformations
         image, mask = self.image_mask_transform(image, mask)
         # image transformations
         image = self.image_transform(image)
         # mask transformations
         mask = self.mask_transform(mask)
-        #
+
         return image, mask, (img_path, mask_path)
 
 
