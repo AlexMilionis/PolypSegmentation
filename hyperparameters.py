@@ -4,7 +4,7 @@ class Hyperparameters:
 
     TRAIN_RATIO = 0.8
     VAL_RATIO = 0.1
-    EPOCHS = 1
+    EPOCHS = 3
     BATCH_SIZE = 32
     WEIGHT_DECAY = 0.00001
     LEARNING_RATE = 1e-4

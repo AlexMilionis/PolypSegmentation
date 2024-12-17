@@ -82,6 +82,10 @@ class Transforms():
         return (mask > 128).float()
 
     @staticmethod
+    def convert_to_float(image):
+        return image.float()
+
+    @staticmethod
     def convert_to_01_range(image):
         return image / 255.0
 
@@ -95,6 +99,7 @@ class Transforms():
     @staticmethod
     def image_train_transforms():
         return T.Compose([
+            T.Lambda(Transforms.convert_to_float),
             T.RandomApply([T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)], p=0.2),
             T.RandomApply([T.GaussianNoise(mean=0.0, sigma=0.1)], p = 0.2),
             T.Lambda(Transforms.convert_to_01_range),

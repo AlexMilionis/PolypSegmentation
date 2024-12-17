@@ -2,7 +2,7 @@
     #   General
         #   write down all processes before continuing further
         #   check MONAI
-        #   training on notebooks
+        #   training on notebooks?
         #   gpu sources, mail me slurm
         #   EDA
         #   problem with large epoch time!
@@ -15,15 +15,15 @@
         #   write report
         #   check segmentation models from huggingface
     #   Training
-        #   find criterion for training
-        #   try huggingface models
-        #   try pin_memory in dataloader for faster training
-    #   Validating
-        #   include validation metrics (except loss function) -> recall, specificity, dice score
-        #   cross validation?
-    #   Evaluation
-        #   evaluation criteria (check paper) -> recall, specificity, dice score, jaccard index
-        #   plots to include title the image path
+        #   Train
+            #   find criterion for training
+            #   try pin_memory in dataloader for faster training
+        #   Validation
+            #   include validation metrics (except loss function) -> recall, specificity, dice score
+            #   cross validation?
+        #   Test
+            #   evaluation criteria (check paper) -> recall, specificity, dice score, jaccard index
+            #   plots to include title the image path
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)

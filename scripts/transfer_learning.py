@@ -46,7 +46,6 @@ class Trainer:
                         outputs = self.model(images)
                         loss = self.criterion(outputs, masks)
 
-
                     self.scaler.scale(loss).backward()
                     self.scaler.step(self.optimizer)
                     self.scaler.update()

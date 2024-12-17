@@ -1,10 +1,9 @@
-from torch.utils.data import DataLoader, random_split, Subset
+from torch.utils.data import DataLoader, Subset
 from data.scripts.polyp_dataset import PolypDataset
 from hyperparameters import Hyperparameters
-from scripts.seed import *
+from scripts.seed import set_generator, worker_init_fn
 import torch
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 
 def samples_per_class(dataset):
@@ -18,8 +17,8 @@ def samples_per_class(dataset):
 
 
 class DataLoading:
-    def __init__(self, include_data="both", shuffle=True, num_workers=8, pin_memory=False):
-        set_seed()
+    def __init__(self, include_data="both", shuffle=True, num_workers=4, pin_memory=True, persistent_workers=True):
+        # set_seed()
         self.include_data = include_data
         self.train_ratio = Hyperparameters.TRAIN_RATIO
         self.val_ratio = Hyperparameters.VAL_RATIO
@@ -28,13 +27,14 @@ class DataLoading:
         self.num_workers = num_workers
         self.worker_init_fn = worker_init_fn
         self.pin_memory = pin_memory
+        self.persistent_workers = persistent_workers
         #   Load datasets
         self.dataset_full_with_train_transformations = PolypDataset(mode="train", include_data=self.include_data)
         self.dataset_full_with_val_test_transformations = PolypDataset(mode="val_test", include_data=self.include_data)
 
 
     def split_datasets(self):
-        set_seed()
+        # set_seed()
         # Shuffle indices
         train_indices = torch.randperm(len(self.dataset_full_with_train_transformations), generator=set_generator())
         # Calculate sizes
@@ -48,7 +48,7 @@ class DataLoading:
         return train_dataset, val_dataset, test_dataset
 
 
-    def create_loader(self, dataset, mode):
+    def create_loader(self, dataset):
         return DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -56,6 +56,7 @@ class DataLoading:
             num_workers=self.num_workers,
             worker_init_fn=self.worker_init_fn,
             pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers,
         )
 
 
@@ -64,8 +65,8 @@ class DataLoading:
         # self.samples_per_class(train_dataset)
         # self.samples_per_class(val_dataset)
         # self.samples_per_class(test_dataset)
-        train_loader = self.create_loader(train_dataset, mode="train")
-        val_loader = self.create_loader(val_dataset, mode="val")
-        test_loader = self.create_loader(test_dataset, mode="test")
+        train_loader = self.create_loader(train_dataset)
+        val_loader = self.create_loader(val_dataset)
+        test_loader = self.create_loader(test_dataset)
         return train_loader, val_loader, test_loader
 

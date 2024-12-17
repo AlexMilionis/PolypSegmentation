@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 
 
 class Evaluator:
-    def __init__(self, loader: torch.utils.data.DataLoader, visualize_predictions: bool = False, num_samples: int = 3):
+    def __init__(self, loader: torch.utils.data.DataLoader, visualize_predictions: bool = False, num_samples: int = 5):
         self.loader = loader
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.visualize_predictions = visualize_predictions

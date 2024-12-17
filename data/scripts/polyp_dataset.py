@@ -46,6 +46,7 @@ class PolypDataset(Dataset):
         self.image_transform      = Transforms.image_train_transforms() if self.mode == "train" else Transforms.image_val_test_transforms()
         self.mask_transform       = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_val_test_transforms()
 
+
     @staticmethod
     def tensor_to_tv_tensor(image, mask, direct = False):
         if direct:
@@ -56,11 +57,13 @@ class PolypDataset(Dataset):
             mask  = to_tensor(mask)
         return image, mask
 
+
     def __len__(self):
         return len(self.data)
 
+
     def __getitem__(self, idx):
-        set_seed()
+        # set_seed()
         img_path, mask_path = self.data[idx]
         # Read images as tensors
         image = read_image(img_path)
@@ -74,8 +77,6 @@ class PolypDataset(Dataset):
         # mask transformations
         mask = self.mask_transform(mask)
         #
-
-
         return image, mask, (img_path, mask_path)
 
 
