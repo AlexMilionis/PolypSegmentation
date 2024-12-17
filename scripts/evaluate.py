@@ -60,6 +60,7 @@ class Evaluator:
                    "specificity": eval_metrics.specificity(),
                    "dice score": eval_metrics.dice_score(),
                    "jaccard index": eval_metrics.jaccard_index()}
+        print(f"Displaying test metrics:")
         print(metrics)
 
 
