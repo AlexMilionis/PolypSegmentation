@@ -56,7 +56,8 @@ class Trainer:
                     self.scaler.scale(loss).backward()
                     self.scaler.step(self.optimizer)
                     self.scaler.update()
-                    total_loss += loss.item()
+                    loss_value = loss.item()
+                    total_loss += loss_value
 
                 # Update epoch progress bar with average loss
                 avg_loss = total_loss / len(self.loader)
