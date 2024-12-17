@@ -15,7 +15,9 @@ class Trainer:
     def __init__(self, loader, transfer_learning=True):
         self.loader = loader
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = UNet().to(self.device)
+        # self.model = UNet().to(self.device)
+
+        self.model = self._load_model()
         self.criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy_with_logits']
         self.optimizer = optim.Adam(self.model.parameters(), lr=Hyperparameters.LEARNING_RATE)
         self.transfer_learning =  transfer_learning
@@ -28,15 +30,18 @@ class Trainer:
         self.scaler = GradScaler()
         self.num_epochs = Hyperparameters.EPOCHS
 
+    def _load_model(self):
+        model = UNet().to(self.device)
+        # model.train()
+        return model
 
     def _train_loop(self):
+        self.model.train()
         epoch_bar = tqdm(range(self.num_epochs), desc="Training Epochs", total=self.num_epochs)
-        # Progress bar for epochs
         with epoch_bar:
             for epoch in epoch_bar:
-                self.model.train()
+                torch.cuda.empty_cache()  # Clear GPU memory
                 total_loss = 0
-
                 # Iterate through the DataLoader
                 for images, masks, _ in self.loader:
                     images, masks = images.to(self.device), masks.to(self.device)
@@ -54,9 +59,10 @@ class Trainer:
 
                 # Update epoch progress bar with average loss
                 avg_loss = total_loss / len(self.loader)
-                if epoch == self.num_epochs - 1:
-                    epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
-            epoch_bar.close()
+                # if epoch == self.num_epochs - 1:
+                #     epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
+                epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
+            # epoch_bar.close()
 
 
     def _save_model(self):
@@ -66,7 +72,6 @@ class Trainer:
         if os.path.exists(checkpoint_path):
             os.remove(checkpoint_path)
         torch.save(self.model.state_dict(), checkpoint_path)
-        # tqdm.write(f"Model checkpoint saved to: {checkpoint_path}")
         return checkpoint_path
 
 
