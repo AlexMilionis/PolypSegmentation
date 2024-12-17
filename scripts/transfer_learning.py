@@ -7,6 +7,7 @@ from constants import Constants
 import os
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
+import time
 
 warnings.filterwarnings('ignore')
 
@@ -41,6 +42,7 @@ class Trainer:
         with epoch_bar:
             for epoch in epoch_bar:
                 torch.cuda.empty_cache()  # Clear GPU memory
+
                 total_loss = 0
                 # Iterate through the DataLoader
                 for images, masks, _ in self.loader:
@@ -54,15 +56,11 @@ class Trainer:
                     self.scaler.scale(loss).backward()
                     self.scaler.step(self.optimizer)
                     self.scaler.update()
-
                     total_loss += loss.item()
 
                 # Update epoch progress bar with average loss
                 avg_loss = total_loss / len(self.loader)
-                # if epoch == self.num_epochs - 1:
-                #     epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
                 epoch_bar.set_postfix({"Average Loss": f"{avg_loss:.4f}"})
-            # epoch_bar.close()
 
 
     def _save_model(self):

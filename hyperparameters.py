@@ -4,10 +4,11 @@ class Hyperparameters:
 
     TRAIN_RATIO = 0.8
     VAL_RATIO = 0.1
-    EPOCHS = 4
+    EPOCHS = 5
     BATCH_SIZE = 32
     WEIGHT_DECAY = 0.00001
     LEARNING_RATE = 1e-4
+    NUM_WORKERS = 2
 
     # LOSS_FUNCTION = 'binary_crossentropy'
     LOSS_FUNCTIONS = {

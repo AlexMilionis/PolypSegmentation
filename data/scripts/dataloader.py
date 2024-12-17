@@ -17,14 +17,14 @@ def samples_per_class(dataset):
 
 
 class DataLoading:
-    def __init__(self, include_data="both", shuffle=True, num_workers=4, pin_memory=True, persistent_workers=True):
+    def __init__(self, include_data="both", shuffle=True, pin_memory=True, persistent_workers=True):
         # set_seed()
         self.include_data = include_data
         self.train_ratio = Hyperparameters.TRAIN_RATIO
         self.val_ratio = Hyperparameters.VAL_RATIO
         self.batch_size = Hyperparameters.BATCH_SIZE
         self.shuffle = shuffle  # after we iterate over all batches the data is shuffled
-        self.num_workers = num_workers
+        self.num_workers = Hyperparameters.NUM_WORKERS
         self.worker_init_fn = worker_init_fn
         self.pin_memory = pin_memory
         self.persistent_workers = persistent_workers
@@ -65,8 +65,8 @@ class DataLoading:
         # self.samples_per_class(train_dataset)
         # self.samples_per_class(val_dataset)
         # self.samples_per_class(test_dataset)
-        train_loader = self.create_loader(train_dataset)
-        val_loader = self.create_loader(val_dataset)
-        test_loader = self.create_loader(test_dataset)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, pin_memory=self.pin_memory)
+        val_loader   = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
+        test_loader  = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
         return train_loader, val_loader, test_loader
 

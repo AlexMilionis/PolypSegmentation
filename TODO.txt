@@ -5,10 +5,13 @@
         #   training on notebooks?
         #   gpu sources, mail me slurm
         #   EDA
-        #   problem with large epoch time!
+        #   make epochs faster
+            #   last epoch is always slower, fix
+            #   make transformations more efficient, for faster training
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
+        #   dataset both single frames and sequence frames
     #   Models
         #   implement UNet
         #   study UNet (with resnet backbone)
@@ -19,6 +22,7 @@
             #   find criterion for training
             #   try pin_memory in dataloader for faster training
         #   Validation
+            #   Implement validation
             #   include validation metrics (except loss function) -> recall, specificity, dice score
             #   cross validation?
         #   Test
