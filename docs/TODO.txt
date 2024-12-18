@@ -20,11 +20,17 @@
             #   make epochs faster
                 #   last epoch is always slower, fix
                 #   make transformations more efficient, for faster training ?
+                #   Implement log file for training
+                #   plots for train error
         #   Validation
-            #   Implement validation
             #   cross validation?
+            #   plots for val error, and metrics
         #   Test
             #   plots to include title the image path
+    #   Visualizations
+        #   Visualizations image, mask, predicted mask
+    #   Experiments
+        #   go from models to experiments
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
