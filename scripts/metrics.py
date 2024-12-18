@@ -35,3 +35,15 @@ class Metrics():
 
     def jaccard_index(self):
         return self.true_positives / (self.true_positives + self.false_positives + self.false_negatives)
+
+
+    def compute_metrics(self, total_train_loss, len_train_loader, total_val_loss, len_val_loader):
+        return {
+            "Training Loss": total_train_loss / len_train_loader,
+            "Validation Loss": total_val_loss / len_val_loader,
+            "Recall": self.recall(),
+            "Precision": self.precision(),
+            "Specificity": self.specificity(),
+            "Dice Score": self.dice_score(),
+            "Jaccard Index": self.jaccard_index()
+        }
