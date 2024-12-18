@@ -1,8 +1,7 @@
-from scripts.visualization_utils import visualize_inputs
-from data.scripts.dataloader import DataLoading
-from scripts.transfer_learning import Trainer
-from scripts.evaluate import Evaluator
-from scripts.seed import set_seed
+from src.data.dataloader import DataLoading
+from src.experiments.run_scripts.transfer_learning import Trainer
+from src.scripts.evaluate import Evaluator
+from src.config.seed import set_seed
 
 set_seed()
 if __name__ == '__main__':

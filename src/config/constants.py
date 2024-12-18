@@ -19,7 +19,7 @@ import os
 
 
 class Constants():
-    PROJECT_PATH = "D:/repos/MScThesis/github_repo/"
+    PROJECT_PATH = "//"
     ABS_PATH     = os.path.join(PROJECT_PATH, "data/")
     DATASET_PATH = os.path.join(ABS_PATH, "raw/")
     DST_PATH     = os.path.join(ABS_PATH, "processed/")

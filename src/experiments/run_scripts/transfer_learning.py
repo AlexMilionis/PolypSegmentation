@@ -1,15 +1,12 @@
 import torch
 from torch import optim
-from hyperparameters import Hyperparameters
-from models.unet import UNet
+from src.config.hyperparameters import Hyperparameters
+from src.models.models.unet import UNet
 import warnings
-from constants import Constants
-import os
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
-import time
-from scripts.metrics import Metrics
-from scripts.training_utils import save_model, TrainLogger
+from src.scripts.metrics import Metrics
+from src.scripts.training_utils import save_model, TrainLogger
 
 warnings.filterwarnings('ignore')
 

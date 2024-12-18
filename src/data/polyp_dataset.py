@@ -25,14 +25,13 @@ Class: PolypDataset
 """
 
 
-import torch, torchvision
+import torchvision
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 from torchvision import tv_tensors
-from data.scripts.dataset_utils import create_image_mask_pairs, Transforms
-from torchvision.transforms.functional import to_tensor
-from constants import Constants
-from scripts.seed import set_seed
+from src.data.dataset_utils import create_image_mask_pairs, Transforms
+from src.config.constants import Constants
+
 
 class PolypDataset(Dataset):
     def __init__(self, mode, include_data):

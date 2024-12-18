@@ -1,5 +1,5 @@
 import csv
-from constants import Constants
+from src.config.constants import Constants
 import os
 import torch
 

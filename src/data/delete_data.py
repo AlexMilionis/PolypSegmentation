@@ -11,7 +11,7 @@ Raises:
 
 import shutil
 import os
-from constants import Constants
+from src.config.constants import Constants
 
 
 def delete_data():

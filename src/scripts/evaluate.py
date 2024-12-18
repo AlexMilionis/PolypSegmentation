@@ -1,12 +1,12 @@
 import torch
 import os
-from hyperparameters import Hyperparameters
-from models.unet import UNet
-from scripts.metrics import Metrics
+from src.config.hyperparameters import Hyperparameters
+from src.models.models.unet import UNet
+from src.scripts.metrics import Metrics
 import warnings
 from torch.cuda.amp import autocast
-from constants import Constants
-from scripts.visualization_utils import visualize_outputs
+from src.config.constants import Constants
+from src.scripts.visualization_utils import visualize_outputs
 
 warnings.filterwarnings('ignore')
 

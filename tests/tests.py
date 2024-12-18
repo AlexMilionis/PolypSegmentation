@@ -22,8 +22,8 @@ Testing and Analysis Utilities for Datasets:
 
 
 from torch.utils.data import Subset
-from data.scripts.dataloader import DataLoading
-from constants import Constants
+from src.data.dataloader import DataLoading
+from src.config.constants import Constants
 import os
 import torch
 

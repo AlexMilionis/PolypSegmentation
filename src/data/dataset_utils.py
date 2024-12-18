@@ -33,7 +33,7 @@ Classes:
 
 import os
 from torchvision.transforms import v2 as T
-from constants import Constants
+from src.config.constants import Constants
 import numpy as np
 
 def _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir):

@@ -25,9 +25,7 @@ Visualization Utilities for Dataset and Predictions:
 
 import os
 import matplotlib.pyplot as plt
-import torch
-import random
-from data.scripts.dataset_utils import unnormalize_image
+from src.data.dataset_utils import unnormalize_image
 
 
 def plot_image(ax, image, title, cmap=None):
