@@ -9,6 +9,7 @@ from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 import time
 from scripts.metrics import Metrics
+from scripts.training_utils import save_model, TrainLogger
 
 warnings.filterwarnings('ignore')
 
@@ -24,6 +25,7 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=Hyperparameters.LEARNING_RATE)
         self.scaler = GradScaler()  #   mixed precision training
         self.num_epochs = Hyperparameters.EPOCHS
+        self.logger = None
 
         self.transfer_learning =  transfer_learning
         if self.transfer_learning:
@@ -70,47 +72,17 @@ class Trainer:
                 total_val_loss += loss.item()
         return total_val_loss, val_metrics
 
-    def _compute_metrics(self, total_loss, val_metrics):
-        metrics = {"loss": total_loss / len(self.val_loader),
-                   "recall": val_metrics.recall(),
-                   "precision": val_metrics.precision(),
-                   "specificity": val_metrics.specificity(),
-                   "dice score": val_metrics.dice_score(),
-                   "jaccard index": val_metrics.jaccard_index()}
-        # print(f"Displaying Validation metrics: {metrics}")
-        return metrics
-
-
-    def _save_model(self):
-        #   Save the model checkpoint
-        os.makedirs(Constants.MODEL_CHECKPOINT_DIR, exist_ok=True)
-        checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, self.model.name + "_checkpoint.pth")
-        if os.path.exists(checkpoint_path):
-            os.remove(checkpoint_path)
-        torch.save(self.model.state_dict(), checkpoint_path)
-        return checkpoint_path
-
 
     def train(self):
-        # epoch_bar = tqdm(range(self.num_epochs), desc="Training Epochs", total=self.num_epochs)
-        # with epoch_bar:
-        #     for epoch in epoch_bar:
-        #         torch.cuda.empty_cache()  # Clear GPU memory
-        #         total_train_loss = self._train_loop()
-        #         # Update epoch progress bar with average loss
-        #         avg_train_loss = total_train_loss / len(self.train_loader)
-        #         epoch_bar.set_postfix({"Average Loss": f"{avg_train_loss:.4f}"})
-        #         total_val_loss, val_metrics = self._validation_loop()
-        #         self._display_metrics(total_val_loss, val_metrics)
-        for epoch in tqdm(range(self.num_epochs), desc="Training Epochs"):
-            torch.cuda.empty_cache()  # Clear GPU memory
-            total_train_loss = self._train_loop()
-            total_val_loss, val_metrics = self._validation_loop()
-            val_metrics = self._compute_metrics(total_val_loss, val_metrics)
-
-            tqdm.write(f"\nEpoch {epoch + 1}:")
-            tqdm.write(f"   Train Loss: {total_train_loss / len(self.train_loader):.4f}")
-            tqdm.write(f"   Validation Metrics: {val_metrics}")
-
-
-        self._save_model()
+        with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
+            for epoch in pbar:
+                torch.cuda.empty_cache()  # Clear GPU memory
+                total_train_loss = self._train_loop()
+                total_val_loss, val_metrics = self._validation_loop()
+                val_metrics_dict = val_metrics.compute_metrics(total_train_loss, len(self.train_loader), total_val_loss, len(self.val_loader))
+                if epoch==0:
+                    self.logger = TrainLogger(model_name=self.model.name, metrics=val_metrics_dict)
+                self.logger.log_epoch_metrics(epoch=epoch, metrics=val_metrics_dict)
+                pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
+                                  "Validation Loss": val_metrics_dict["Validation Loss"]})
+        save_model(self.model)
