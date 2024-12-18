@@ -5,9 +5,6 @@
         #   training on notebooks?
         #   gpu sources, mail me slurm
         #   EDA
-        #   make epochs faster
-            #   last epoch is always slower, fix
-            #   make transformations more efficient, for faster training ?
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
@@ -20,6 +17,9 @@
     #   Training
         #   Train
             #   find criterion for training
+            #   make epochs faster
+                #   last epoch is always slower, fix
+                #   make transformations more efficient, for faster training ?
         #   Validation
             #   Implement validation
             #   cross validation?
