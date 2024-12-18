@@ -6,7 +6,7 @@ import warnings
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 from src.scripts.metrics import Metrics
-from src.scripts.training_utils import save_model, TrainLogger
+from src.scripts.training_utils import ExperimentLogger
 
 warnings.filterwarnings('ignore')
 
@@ -78,8 +78,8 @@ class Trainer:
                 total_val_loss, val_metrics = self._validation_loop()
                 val_metrics_dict = val_metrics.compute_metrics(total_train_loss, len(self.train_loader), total_val_loss, len(self.val_loader))
                 if epoch==0:
-                    self.logger = TrainLogger(model_name=self.model.name, metrics=val_metrics_dict)
-                self.logger.log_epoch_metrics(epoch=epoch, metrics=val_metrics_dict)
+                    self.logger = ExperimentLogger(experiment_name=self.model.name, metrics=val_metrics_dict)
+                self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
                                   "Validation Loss": val_metrics_dict["Validation Loss"]})
-        save_model(self.model)
+        self.logger.save_checkpoint(self.model)
