@@ -1,7 +1,7 @@
 import torch
 import os
 from src.config.hyperparameters import Hyperparameters
-from src.models.models.unet import UNet
+from src.models.unet import UNet
 from src.scripts.metrics import Metrics
 import warnings
 from torch.cuda.amp import autocast
