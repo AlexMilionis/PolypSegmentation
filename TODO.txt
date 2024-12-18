@@ -7,7 +7,7 @@
         #   EDA
         #   make epochs faster
             #   last epoch is always slower, fix
-            #   make transformations more efficient, for faster training
+            #   make transformations more efficient, for faster training ?
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
@@ -20,13 +20,10 @@
     #   Training
         #   Train
             #   find criterion for training
-            #   try pin_memory in dataloader for faster training
         #   Validation
             #   Implement validation
-            #   include validation metrics (except loss function) -> recall, specificity, dice score
             #   cross validation?
         #   Test
-            #   evaluation criteria (check paper) -> recall, specificity, dice score, jaccard index
             #   plots to include title the image path
 
 # TODO: Questions:
