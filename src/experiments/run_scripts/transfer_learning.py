@@ -1,7 +1,7 @@
 import torch
 from torch import optim
 from src.config.hyperparameters import Hyperparameters
-from src.models.models.unet import UNet
+from src.models.unet import UNet
 import warnings
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
