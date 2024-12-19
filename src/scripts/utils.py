@@ -2,6 +2,7 @@ import csv
 from src.config.constants import Constants
 import os
 import torch
+import yaml
 
 
 class ExperimentLogger:
@@ -82,3 +83,8 @@ class ExperimentLogger:
             raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
         model.load_state_dict(torch.load(checkpoint_path))
         return model
+
+
+def load_config(config_path):
+    with open(config_path, 'r') as f:
+        return yaml.safe_load(f)
