@@ -6,7 +6,7 @@ import warnings
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 from src.scripts.metrics import Metrics
-from src.scripts.training_utils import ExperimentLogger
+from src.scripts.utils import ExperimentLogger
 
 warnings.filterwarnings('ignore')
 
