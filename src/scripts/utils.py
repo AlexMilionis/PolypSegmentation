@@ -9,17 +9,17 @@ class ExperimentLogger:
     def __init__(self, experiment_name, metrics):
         self.experiment_name = experiment_name
         #   metrics initialization
-        self.metrics_dir = Constants.EXPERIMENT_METRICS_DIR
-        self.metrics_path = os.path.join(self.metrics_dir, f"{experiment_name}_metrics.csv")
+        # self.metrics_dir = Constants.EXPERIMENT_METRICS_DIR
+        self.metrics_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_metrics.csv")
         self._init_metrics_csv(metrics)
 
         #   logs initialization
-        self.logs_dir = Constants.EXPERIMENT_LOGS_DIR
-        self.logs_path = os.path.join(self.logs_dir, f"{experiment_name}_log.log")
+        # self.logs_dir = Constants.EXPERIMENT_LOGS_DIR
+        self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_logs.log")
 
     def _init_metrics_csv(self, metrics):
         # Create directory and log file with headers if it doesn't exist
-        os.makedirs(self.metrics_dir, exist_ok=True)
+        # os.makedirs(self.metrics_dir, exist_ok=True)
         if os.path.exists(self.metrics_path):
             os.remove(self.metrics_path)
         with open(self.metrics_path, "w", newline='') as f:
@@ -38,7 +38,7 @@ class ExperimentLogger:
 
 
     def log_experiment(self, details):
-        os.makedirs(self.logs_dir, exist_ok=True)
+        # os.makedirs(self.logs_dir, exist_ok=True)
 
         #   log format
         """
@@ -67,8 +67,9 @@ class ExperimentLogger:
         """
 
     def save_checkpoint(self, model):
-        os.makedirs(Constants.MODEL_CHECKPOINT_DIR, exist_ok=True)
-        checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
+        os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
+        # checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
+        checkpoint_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_checkpoint.pth")
         if os.path.exists(checkpoint_path):
             os.remove(checkpoint_path)
         torch.save(model.state_dict(), checkpoint_path)
@@ -78,7 +79,7 @@ class ExperimentLogger:
         """
         Loads the model's state dictionary from a checkpoint file.
         """
-        checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, f"{model.name}_checkpoint.pth")
+        checkpoint_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_checkpoint.pth")
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
         model.load_state_dict(torch.load(checkpoint_path))
