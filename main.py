@@ -1,5 +1,5 @@
 from src.data.dataloader import DataLoading
-from src.experiments.run_scripts.run_unet import Trainer
+from src.experiments.exp1.run_unet import Trainer
 from src.scripts.evaluate import Evaluator
 from src.config.seed import set_seed
 from src.scripts.visualization_utils import visualize_inputs
