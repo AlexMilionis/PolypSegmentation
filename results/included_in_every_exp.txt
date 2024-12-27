@@ -1,0 +1,5 @@
+Inside results>exp_i:
+    - experiment logs
+    - experiment checkpoint
+    - experiment metrics (.csv)
+    - experiment visualizations

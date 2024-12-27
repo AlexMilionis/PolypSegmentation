@@ -27,8 +27,10 @@
         #   plots for train error, val error, and metrics -> save to results>visualizations
         #   experiment logs -
         #   cross validation?
+        #   save post train visualizations in results>exp
         #   plots on test set: image, mask, predicted mask -> save to results>visualizations
         #   plots to include title the image path
+        #   save test metrics to a file
     #   Experiments
 
 # TODO: Questions:

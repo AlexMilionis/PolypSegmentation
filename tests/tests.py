@@ -88,5 +88,6 @@ if __name__ == '__main__':
     # for data in ["both", "single_frames", "seq_frames"]:
     #     class_balance("train",include_data=data)
     #     class_balance("test",include_data=data)
+    pass
 
-    print(torch.randperm(5))
+

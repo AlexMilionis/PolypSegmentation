@@ -23,7 +23,7 @@ class Evaluator:
 
     def _load_model(self):
         model = UNet().to(self.device)
-        checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
+        checkpoint_path = os.path.join(Constants.RESULTS_DIR, 'exp1', "checkpoint.pth")
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
         model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))

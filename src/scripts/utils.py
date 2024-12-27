@@ -8,14 +8,28 @@ import yaml
 class ExperimentLogger:
     def __init__(self, experiment_name, metrics):
         self.experiment_name = experiment_name
+        self.exp_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
+        self._create_experiment_directory()
+
         #   metrics initialization
         # self.metrics_dir = Constants.EXPERIMENT_METRICS_DIR
-        self.metrics_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_metrics.csv")
+        self.metrics_path = os.path.join(self.exp_dir, "metrics.csv")
         self._init_metrics_csv(metrics)
 
         #   logs initialization
         # self.logs_dir = Constants.EXPERIMENT_LOGS_DIR
-        self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_logs.log")
+        self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "logs.log")
+
+    def _create_experiment_directory(self):
+        #   delete directory files from previous experiment
+        for filename in os.listdir(self.exp_dir):
+            file_path = os.path.join(self.exp_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        #   delete empty directory from previous experiment
+        os.rmdir(self.exp_dir)
+        #   recreate directory
+        os.makedirs(self.exp_dir, exist_ok=True)
 
     def _init_metrics_csv(self, metrics):
         # Create directory and log file with headers if it doesn't exist
@@ -69,7 +83,7 @@ class ExperimentLogger:
     def save_checkpoint(self, model):
         os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
         # checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
-        checkpoint_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_checkpoint.pth")
+        checkpoint_path = os.path.join(self.exp_dir, "checkpoint.pth")
         if os.path.exists(checkpoint_path):
             os.remove(checkpoint_path)
         torch.save(model.state_dict(), checkpoint_path)
@@ -79,7 +93,7 @@ class ExperimentLogger:
         """
         Loads the model's state dictionary from a checkpoint file.
         """
-        checkpoint_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "_checkpoint.pth")
+        checkpoint_path = os.path.join(self.exp_dir, "checkpoint.pth")
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
         model.load_state_dict(torch.load(checkpoint_path))
