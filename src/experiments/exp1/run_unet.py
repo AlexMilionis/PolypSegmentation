@@ -11,7 +11,7 @@ from src.scripts.utils import ExperimentLogger
 warnings.filterwarnings('ignore')
 
 
-class Trainer:
+class ExperimentImplementation:
     def __init__(self, train_loader, val_loader, transfer_learning=True):
         self.train_loader = train_loader
         self.val_loader = val_loader
