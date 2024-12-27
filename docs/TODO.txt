@@ -32,7 +32,9 @@
         #   plots to include title the image path
         #   save test metrics to a file
     #   Experiments
-
+        #   learn how to create .yaml configuration files
+        #   create train one epoch and separate train experiment files
+        #   all parameters must be taken from confugration file
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
     #   Δουλεύω μονο με single frames ή με single+sequence? Aν both, χρειάζεται να διατηρηθεί το ordering των sequence frames?
