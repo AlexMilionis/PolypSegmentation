@@ -28,22 +28,29 @@ import torch.optim as optim
 
 
 class UNet(nn.Module):
-    def __init__(self, encoder_name="resnet18", encoder_weights="imagenet", in_channels=3, classes=1):
+    def __init__(self, transfer_learning, encoder_name="resnet18", encoder_weights="imagenet", in_channels=3, classes=1):
         super(UNet, self).__init__()
         self.name = "UNet"
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
         self.in_channels = in_channels
         self.classes = classes
+        self.transfer_learning = transfer_learning
         self.model = self._build_model()
 
     def _build_model(self):
-        return smp.Unet(
+        model = smp.Unet(
             encoder_name=self.encoder_name,
             encoder_weights=self.encoder_weights,
             in_channels=self.in_channels,
             classes=self.classes,
         )
+        if self.transfer_learning:
+
+            # Freeze the encoder weights for transfer learning
+            for param in model.encoder.parameters():
+                param.requires_grad = False
+        return model
 
     def forward(self, x):
         return self.model(x)
