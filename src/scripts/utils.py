@@ -8,12 +8,12 @@ import yaml
 class ExperimentLogger:
     def __init__(self, experiment_name, metrics):
         self.experiment_name = experiment_name
-        self.exp_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
+        self.exp_res_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
         self._create_experiment_directory()
 
         #   metrics initialization
         # self.metrics_dir = Constants.EXPERIMENT_METRICS_DIR
-        self.metrics_path = os.path.join(self.exp_dir, "metrics.csv")
+        self.metrics_path = os.path.join(self.exp_res_dir, "metrics.csv")
         self._init_metrics_csv(metrics)
 
         #   logs initialization
@@ -21,21 +21,19 @@ class ExperimentLogger:
         self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "logs.log")
 
     def _create_experiment_directory(self):
-        #   delete directory files from previous experiment
-        for filename in os.listdir(self.exp_dir):
-            file_path = os.path.join(self.exp_dir, filename)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-        #   delete empty directory from previous experiment
-        os.rmdir(self.exp_dir)
-        #   recreate directory
-        os.makedirs(self.exp_dir, exist_ok=True)
+        #   delete directory files from previous experiment, if they exist
+        if os.path.exists(self.exp_res_dir):
+            for filename in os.listdir(self.exp_res_dir):
+                file_path = os.path.join(self.exp_res_dir, filename)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            #   delete empty directory from previous experiment
+            os.rmdir(self.exp_res_dir)
+        #   create directory
+        os.makedirs(self.exp_res_dir, exist_ok=True)
 
     def _init_metrics_csv(self, metrics):
-        # Create directory and log file with headers if it doesn't exist
-        # os.makedirs(self.metrics_dir, exist_ok=True)
-        if os.path.exists(self.metrics_path):
-            os.remove(self.metrics_path)
+
         with open(self.metrics_path, "w", newline='') as f:
             writer = csv.writer(f)
             cols = ["Epoch"]
@@ -80,12 +78,13 @@ class ExperimentLogger:
         Experiment Completed: 2024-12-18 14:23:15
         """
 
+
     def save_checkpoint(self, model):
-        os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
+        # os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
         # checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
-        checkpoint_path = os.path.join(self.exp_dir, "checkpoint.pth")
-        if os.path.exists(checkpoint_path):
-            os.remove(checkpoint_path)
+        checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
+        # if os.path.exists(checkpoint_path):
+        #     os.remove(checkpoint_path)
         torch.save(model.state_dict(), checkpoint_path)
         return checkpoint_path
 
@@ -93,10 +92,11 @@ class ExperimentLogger:
         """
         Loads the model's state dictionary from a checkpoint file.
         """
-        checkpoint_path = os.path.join(self.exp_dir, "checkpoint.pth")
-        if not os.path.exists(checkpoint_path):
-            raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
-        model.load_state_dict(torch.load(checkpoint_path))
+        checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
+        try:
+            model.load_state_dict(torch.load(checkpoint_path))
+        except FileNotFoundError:
+            print(f"Checkpoint not found at {checkpoint_path}")
         return model
 
 
