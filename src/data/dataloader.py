@@ -25,7 +25,7 @@ class DataLoading:
         self.batch_size = Hyperparameters.BATCH_SIZE
         self.shuffle = shuffle  # after we iterate over all batches the data is shuffled
         self.num_workers = Hyperparameters.NUM_WORKERS
-        self.worker_init_fn = worker_init_fn
+        # self.worker_init_fn = worker_init_fn
         self.pin_memory = pin_memory
         self.persistent_workers = persistent_workers
         #   Load datasets
@@ -34,7 +34,6 @@ class DataLoading:
 
 
     def split_datasets(self):
-        # set_seed()
         # Shuffle indices
         train_indices = torch.randperm(len(self.dataset_full_with_train_transformations), generator=set_generator())
         # Calculate sizes
@@ -48,23 +47,8 @@ class DataLoading:
         return train_dataset, val_dataset, test_dataset
 
 
-    def create_loader(self, dataset):
-        return DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=self.shuffle,
-            num_workers=self.num_workers,
-            worker_init_fn=self.worker_init_fn,
-            pin_memory=self.pin_memory,
-            persistent_workers=self.persistent_workers,
-        )
-
-
     def get_loaders(self):
         train_dataset, val_dataset, test_dataset = self.split_datasets()
-        # self.samples_per_class(train_dataset)
-        # self.samples_per_class(val_dataset)
-        # self.samples_per_class(test_dataset)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, pin_memory=self.pin_memory)
         val_loader   = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
         test_loader  = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
