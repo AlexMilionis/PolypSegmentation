@@ -41,7 +41,7 @@ class PolypDataset(Dataset):
         self.include_data = include_data
         assert self.include_data in ['single_frames', 'seq_frames', 'both'], "Use single_frames, seq_frames or both!"
         self.data = create_image_mask_pairs(self.images_dir, self.masks_dir, include_data=self.include_data)
-        self.image_mask_transform = Transforms.image_and_mask_train_transforms() if self.mode == "train_val" else Transforms.image_and_mask_val_test_transforms()
+        self.image_mask_transform = Transforms.image_and_mask_train_transforms() if self.mode == "train" else Transforms.image_and_mask_val_test_transforms()
         self.image_transform      = Transforms.image_train_transforms() if self.mode == "train" else Transforms.image_val_test_transforms()
         self.mask_transform       = Transforms.mask_train_transforms() if self.mode == "train" else Transforms.mask_val_test_transforms()
 
