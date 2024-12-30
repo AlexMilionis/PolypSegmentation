@@ -7,6 +7,7 @@ import warnings
 from torch.cuda.amp import autocast
 from src.config.constants import Constants
 from src.scripts.visualization_utils import visualize_outputs
+from src.scripts.train_utils import ExperimentLogger
 
 warnings.filterwarnings('ignore')
 
@@ -22,16 +23,19 @@ class Evaluator:
 
 
     def _load_model(self):
-        model = UNet().to(self.device)
-        checkpoint_path = os.path.join(Constants.RESULTS_DIR, 'exp1', "checkpoint.pth")
-        if not os.path.exists(checkpoint_path):
-            raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
-        model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))
-        model.eval()
+        # model = UNet(transfer_learning=True).to(self.device)
+        # checkpoint_path = os.path.join(Constants.RESULTS_DIR, 'exp1', "checkpoint.pth")
+        # if not os.path.exists(checkpoint_path):
+        #     raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
+        # model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))
+        model = UNet(transfer_learning=True).to(self.device)
+        model = ExperimentLogger.load_checkpoint(model=model, experiment_name=model.name)
+        model = model.to(self.device)
         return model
 
 
     def _eval_loop(self):
+        self.model.eval()
         total_loss = 0
         eval_metrics = Metrics()
         with torch.no_grad():
