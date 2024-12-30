@@ -6,16 +6,6 @@ import torch
 import numpy as np
 
 
-def samples_per_class(dataset):
-    positives, negatives = 0, 0
-    for _, mask, _ in dataset:
-        if torch.sum(mask == 1).item():
-            positives += 1
-        else:
-            negatives += 1
-    print(f"positives: {positives}, negatives: {negatives}")
-
-
 class DataLoading:
     def __init__(self, include_data="both", shuffle=True, pin_memory=True, persistent_workers=True):
         # set_seed()
