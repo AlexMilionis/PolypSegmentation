@@ -27,10 +27,10 @@ import yaml
 class ExperimentLogger:
     def __init__(self, experiment_name, metrics):
         self.experiment_name = experiment_name
-        self.exp_res_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
+        self.experiment_results_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
         self._create_experiment_directory()
 
-        self.metrics_path = os.path.join(self.exp_res_dir, "metrics.csv")
+        self.metrics_path = os.path.join(self.experiment_results_dir, "metrics.csv")
         self._init_metrics_csv(metrics)
 
         #   logs initialization
@@ -39,15 +39,15 @@ class ExperimentLogger:
 
     def _create_experiment_directory(self):
         #   delete directory files from previous experiment, if they exist
-        if os.path.exists(self.exp_res_dir):
-            for filename in os.listdir(self.exp_res_dir):
-                file_path = os.path.join(self.exp_res_dir, filename)
+        if os.path.exists(self.experiment_results_dir):
+            for filename in os.listdir(self.experiment_results_dir):
+                file_path = os.path.join(self.experiment_results_dir, filename)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
             #   delete empty directory from previous experiment
-            os.rmdir(self.exp_res_dir)
+            os.rmdir(self.experiment_results_dir)
         #   create directory
-        os.makedirs(self.exp_res_dir, exist_ok=True)
+        os.makedirs(self.experiment_results_dir, exist_ok=True)
 
     def _init_metrics_csv(self, metrics):
 
@@ -94,29 +94,6 @@ class ExperimentLogger:
 
         Experiment Completed: 2024-12-18 14:23:15
         """
-
-
-    def save_checkpoint(self, model):
-        # os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
-        # checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
-
-        checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
-        # if os.path.exists(checkpoint_path):
-        #     os.remove(checkpoint_path)
-        torch.save(model.state_dict(), checkpoint_path)
-        return checkpoint_path
-
-
-    def load_checkpoint(self, model):
-        """
-        Loads the model's state dictionary from a checkpoint file.
-        """
-        checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
-        try:
-            model.load_state_dict(torch.load(checkpoint_path))
-        except FileNotFoundError:
-            print(f"Checkpoint not found at {checkpoint_path}")
-        return model
 
 
     def load_config(self, config_name):
