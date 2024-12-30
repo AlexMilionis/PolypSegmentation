@@ -21,10 +21,8 @@ Methods:
 """
 
 
-import torch
 import segmentation_models_pytorch as smp
 import torch.nn as nn
-import torch.optim as optim
 
 
 class UNet(nn.Module):
@@ -46,7 +44,6 @@ class UNet(nn.Module):
             classes=self.classes,
         )
         if self.transfer_learning:
-
             # Freeze the encoder weights for transfer learning
             for param in model.encoder.parameters():
                 param.requires_grad = False
