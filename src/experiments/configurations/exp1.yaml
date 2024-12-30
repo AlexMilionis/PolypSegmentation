@@ -1,0 +1,24 @@
+dataset:
+  include_data: 'single_frames'
+  'train_ratio': 0.8
+  'val_ratio': 0.1
+  'test_ratio': 0.1
+
+model:
+  name: UNet
+  transfer_learning: True
+  encoder: 'resnet18'
+  encoder_weights: 'imagenet'
+  input_channels: 3
+  num_classes: 1  #num_outputs
+
+training:
+  batch_size: 32
+  epochs: 1
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+
+#data:
+#  include_data: single_frames
+#  train_ratio: 0.8
+#  val_ratio: 0.1
