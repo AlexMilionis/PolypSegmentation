@@ -28,6 +28,4 @@ class Constants():
     IMAGENET_COLOR_MEANS = [0.485, 0.456, 0.406]
     IMAGENET_COLOR_STDS = [0.229, 0.224, 0.225]
     RESULTS_DIR = os.path.join(PROJECT_PATH, "results/")
-    # MODEL_CHECKPOINT_DIR = os.path.join(PROJECT_PATH, "results/checkpoints/")
-    # EXPERIMENT_METRICS_DIR = os.path.join(PROJECT_PATH, "results/metrics/")
-    # EXPERIMENT_LOGS_DIR = os.path.join(PROJECT_PATH, "results/logs/")
+    CONFIG_DIR = os.path.join(PROJECT_PATH, "src/experiments/configurations/")
