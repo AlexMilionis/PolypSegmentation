@@ -78,21 +78,23 @@ class ExperimentLogger:
         Experiment Completed: 2024-12-18 14:23:15
         """
 
-
     def save_checkpoint(self, model):
         # os.makedirs(Constants.RESULTS_DIR ,exist_ok=True)
         # checkpoint_path = os.path.join(Constants.MODEL_CHECKPOINT_DIR, model.name + "_checkpoint.pth")
+
         checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
         # if os.path.exists(checkpoint_path):
         #     os.remove(checkpoint_path)
         torch.save(model.state_dict(), checkpoint_path)
         return checkpoint_path
 
-    def load_checkpoint(self, model):
+    @staticmethod
+    def load_checkpoint(model, experiment_name):
         """
         Loads the model's state dictionary from a checkpoint file.
         """
-        checkpoint_path = os.path.join(self.exp_res_dir, "checkpoint.pth")
+        exp_res_dir = os.path.join(Constants.RESULTS_DIR, experiment_name)
+        checkpoint_path = os.path.join(exp_res_dir, "checkpoint.pth")
         try:
             model.load_state_dict(torch.load(checkpoint_path))
         except FileNotFoundError:
