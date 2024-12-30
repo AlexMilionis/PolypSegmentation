@@ -6,33 +6,31 @@ import warnings
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 from src.scripts.metrics import Metrics
-from src.scripts.utils import ExperimentLogger
+from src.scripts.train_utils import ExperimentLogger
 
 warnings.filterwarnings('ignore')
 
 
+
+
+
 class ExperimentImplementation:
-    def __init__(self, train_loader, val_loader, transfer_learning=True):
+    def __init__(self, train_loader, val_loader):
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         self.model = self._load_model()
+        self.exp_name = self.model.name
         self.criterion = Hyperparameters.LOSS_FUNCTIONS['binary_crossentropy_with_logits']
         self.optimizer = optim.Adam(self.model.parameters(), lr=Hyperparameters.LEARNING_RATE)
         self.scaler = GradScaler()  #   mixed precision training
         self.num_epochs = Hyperparameters.EPOCHS
         self.logger = None
 
-        self.transfer_learning =  transfer_learning
-        if self.transfer_learning:
-            # Freeze the encoder weights for transfer learning
-            for param in self.model.model.encoder.parameters():
-                param.requires_grad = False
-
 
     def _load_model(self):
-        model = UNet().to(self.device)
+        model = UNet(transfer_learning=True).to(self.device)
         return model
 
 
@@ -78,7 +76,7 @@ class ExperimentImplementation:
                 total_val_loss, val_metrics = self._validation_loop()
                 val_metrics_dict = val_metrics.compute_metrics(total_train_loss, len(self.train_loader), total_val_loss, len(self.val_loader))
                 if epoch==0:
-                    self.logger = ExperimentLogger(experiment_name='exp1', metrics=val_metrics_dict)
+                    self.logger = ExperimentLogger(experiment_name=self.exp_name, metrics=val_metrics_dict)
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
                                   "Validation Loss": val_metrics_dict["Validation Loss"]})
