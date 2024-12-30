@@ -1,36 +1,3 @@
-"""
-Dataset Utilities and Transformations
--------------------------------------
-
-This script provides utility functions for creating image-mask pairs and defining transformations for training and testing datasets.
-
-Functions:
-    _create_tuple(image, base_image_name, image_mask_pairs, images_dir, masks_dir):
-        Helper function to pair an image with its corresponding mask based on naming conventions.
-
-    create_image_mask_pairs(images_dir, masks_dir, include_data="single_frames"):
-        Creates a list of tuples containing paths to images and their corresponding masks based on the specified data inclusion mode.
-
-    unnormalize_image(image):
-        Reverses the normalization of an image for visualization purposes.
-
-Classes:
-    Transforms:
-        A class containing static methods for various transformations applied to images and masks during training and testing.
-
-        Methods:
-            identity_transform(x): Returns the input unchanged.
-            binarize_mask(mask): Binarizes a grayscale mask tensor to values 0 or 1.
-            convert_to_01_range(image): Converts image pixel values to the range [0, 1].
-            image_and_mask_train_transforms(): Combined transformations for training images and masks.
-            image_train_transforms(): Transformations for training images.
-            mask_train_transforms(): Transformations for training masks.
-            image_and_mask_test_transforms(): Combined transformations for testing images and masks.
-            image_test_transforms(): Transformations for testing images.
-            mask_test_transforms(): Transformations for testing masks.
-"""
-
-
 import os
 from torchvision.transforms import v2 as T
 from src.config.constants import Constants
@@ -92,25 +59,8 @@ class Transforms():
     @staticmethod
     def image_and_mask_train_transforms():
         return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
+            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 1.0)),
             T.RandomHorizontalFlip(p=0.5),
-            T.RandomCrop(size=(512, 512)),
-        ])
-
-    @staticmethod
-    def image_train_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.convert_to_float),
-            T.RandomApply([T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)], p=0.2),
-            T.RandomApply([T.GaussianNoise(mean=0.0, sigma=0.1)], p = 0.2),
-            T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
-        ])
-
-    @staticmethod
-    def mask_train_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.binarize_mask),
         ])
 
     @staticmethod
@@ -120,10 +70,25 @@ class Transforms():
         ])
 
     @staticmethod
+    def image_train_transforms():
+        return T.Compose([
+            T.Lambda(Transforms.convert_to_float),
+            T.ColorJitter(),
+            T.Lambda(Transforms.convert_to_01_range),
+            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+        ])
+
+    @staticmethod
     def image_val_test_transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_01_range),
             T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+        ])
+
+    @staticmethod
+    def mask_train_transforms():
+        return T.Compose([
+            T.Lambda(Transforms.binarize_mask),
         ])
 
     @staticmethod
