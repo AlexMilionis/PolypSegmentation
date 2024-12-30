@@ -1,9 +1,4 @@
-import torch
-from tqdm import tqdm
-from src.scripts.metrics import Metrics
-from src.scripts.train_utils import ExperimentLogger
-from src.experiments.exp1.run_experiment import ExperimentImplementation
-from torch.cuda.amp import autocast, GradScaler
+from src.experiments.run_experiment import ExperimentImplementation
 
 
 class Trainer(ExperimentImplementation):
