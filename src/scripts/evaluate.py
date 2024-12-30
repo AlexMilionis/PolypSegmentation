@@ -7,7 +7,7 @@ import warnings
 from torch.cuda.amp import autocast
 from src.config.constants import Constants
 from src.scripts.visualization_utils import visualize_outputs
-from src.scripts.experiment_utils import ExperimentLogger
+from src.models.model_utils import ModelCheckpoint
 
 warnings.filterwarnings('ignore')
 
@@ -29,7 +29,8 @@ class Evaluator:
         #     raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
         # model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))
         model = UNet(transfer_learning=True).to(self.device)
-        model = ExperimentLogger.load_checkpoint(model=model, experiment_name=model.name)
+        # TODO: change next line
+        model = ModelCheckpoint.load(model=model, experiment_results_dir=os.path.join(Constants.RESULTS_DIR, model.name))
         model = model.to(self.device)
         return model
 

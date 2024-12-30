@@ -2,11 +2,13 @@ import torch
 from torch import optim
 from src.config.hyperparameters import Hyperparameters
 from src.models.unet import UNet
+from src.models.model_utils import ModelCheckpoint
 import warnings
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 from src.scripts.metrics import Metrics
 from src.scripts.experiment_utils import ExperimentLogger
+
 
 warnings.filterwarnings('ignore')
 
@@ -77,4 +79,4 @@ class ExperimentImplementation:
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
                                   "Validation Loss": val_metrics_dict["Validation Loss"]})
-        self.logger.save_checkpoint(self.model)
+        ModelCheckpoint.save(self.model, self.logger.experiment_results_dir)
