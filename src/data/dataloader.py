@@ -29,7 +29,7 @@ class DataLoading:
         # Calculate sizes
         train_size = int(np.floor(self.train_ratio * len(self.dataset_full_with_train_transformations)))
         val_size = int(np.floor(self.val_ratio * len(self.dataset_full_with_val_test_transformations)))
-        test_size = len(self.dataset_full_with_val_test_transformations) - val_size
+
         # Split datasets
         train_dataset = Subset(self.dataset_full_with_train_transformations, train_indices[:train_size])
         val_dataset = Subset(self.dataset_full_with_val_test_transformations, train_indices[train_size:train_size + val_size])
