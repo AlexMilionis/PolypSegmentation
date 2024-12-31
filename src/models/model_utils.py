@@ -9,6 +9,7 @@ class ModelCheckpoint:
         """
         Saves the model's state dictionary to a checkpoint file.
         """
+        #   TODO: fix next line
         checkpoint_path = os.path.join(experiment_results_dir, "checkpoint.pth")
         # if os.path.exists(checkpoint_path):
         #     os.remove(checkpoint_path)
@@ -20,6 +21,7 @@ class ModelCheckpoint:
         """
         Loads the model's state dictionary from a checkpoint file.
         """
+        #   TODO: fix next line
         checkpoint_path = os.path.join(experiment_results_dir, "checkpoint.pth")
         try:
             model.load_state_dict(torch.load(checkpoint_path))
