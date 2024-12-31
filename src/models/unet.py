@@ -36,7 +36,6 @@ class UNet(nn.Module):
         self.transfer_learning = transfer_learning
         self.model = self._build_model()
 
-
     def _build_model(self):
         model = smp.Unet(
             encoder_name=self.encoder_name,
@@ -50,10 +49,8 @@ class UNet(nn.Module):
                 param.requires_grad = False
         return model
 
-
     def forward(self, x):
         return self.model(x)
-
 
     def summary(self):
         print(self.model)
