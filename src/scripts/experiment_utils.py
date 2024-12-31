@@ -29,13 +29,12 @@ class ExperimentLogger:
         self.experiment_name = experiment_name
         self.experiment_results_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
         self._create_experiment_directory()
-
         self.metrics_path = os.path.join(self.experiment_results_dir, "metrics.csv")
         self._init_metrics_csv(metrics)
-
         #   logs initialization
         self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "logs.log")
-        self.config_dir = os.path.join(Constants.CONFIG_DIR, self.experiment_name)
+
+
 
     def _create_experiment_directory(self):
         #   delete directory files from previous experiment, if they exist
@@ -49,13 +48,14 @@ class ExperimentLogger:
         #   create directory
         os.makedirs(self.experiment_results_dir, exist_ok=True)
 
-    def _init_metrics_csv(self, metrics):
 
+    def _init_metrics_csv(self, metrics):
         with open(self.metrics_path, "w", newline='') as f:
             writer = csv.writer(f)
             cols = ["Epoch"]
             cols.extend(list(metrics.keys()))
             writer.writerow(cols)
+
 
     def log_metrics(self, epoch, metrics):
         # Append metrics to the log file
@@ -95,11 +95,24 @@ class ExperimentLogger:
         Experiment Completed: 2024-12-18 14:23:15
         """
 
-
-    def load_config(self, config_name):
+    @staticmethod
+    def load_config(config_name):
         """
         Loads the experiment's configuration file from path.
         """
-        config_path = os.path.join(self.config_dir, config_name)
-        with open(config_path, 'r') as f:
-            return yaml.safe_load(f)
+        config_name = config_name+'.yaml'
+        try:
+            config_path = os.path.join(Constants.CONFIG_DIR, config_name)
+            with open(config_path, 'r') as f:
+                return yaml.safe_load(f)
+        except FileNotFoundError:
+            print("Configuration not found.")
+        # if config_name not in os.listdir(Constants.CONFIG_DIR):
+        #     print("Config not found")
+        #     return None
+        # else:
+        #     config_path = os.path.join(Constants.CONFIG_DIR, config_name)
+        #     with open(config_path, 'r') as f:
+        #         return yaml.safe_load(f)
+
+
