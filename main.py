@@ -13,6 +13,6 @@ if __name__ == '__main__':
 
     config = ExperimentLogger.load_config(config_name)
     train_loader, val_loader, test_loader = DataLoading(config).get_loaders()
-    # visualize_inputs(train_loader, num_samples = 5)
-    Experiment(train_loader, val_loader, config).train()
-    Evaluator(test_loader, visualize_predictions=True).evaluate()
+    visualize_inputs(train_loader, num_samples = 3)
+    Experiment(train_loader, val_loader, config).execute_training()
+    # Evaluator(test_loader, visualize_predictions=True).evaluate()
