@@ -91,6 +91,7 @@ class Experiment:
                                   "Validation Loss": val_metrics_dict["Validation Loss"]})
         ModelCheckpoint.save(self.model, self.logger.experiment_results_dir)
 
+
     def execute_evaluation(self):
         total_test_loss, test_metrics = self._validate_one_epoch(test_mode=True)
         test_metrics_dict = test_metrics.compute_metrics(total_test_loss, len(self.test_loader))
