@@ -7,14 +7,14 @@ import numpy as np
 
 
 class DataLoading:
-    def __init__(self, include_data="both", shuffle=True, pin_memory=True, persistent_workers=True):
+    def __init__(self, config, shuffle_train_data=True, pin_memory=True, persistent_workers=True):
         # set_seed()
-        self.include_data = include_data
-        self.train_ratio = Hyperparameters.TRAIN_RATIO
-        self.val_ratio = Hyperparameters.VAL_RATIO
-        self.batch_size = Hyperparameters.BATCH_SIZE
-        self.shuffle = shuffle  # after we iterate over all batches the data is shuffled
-        self.num_workers = Hyperparameters.NUM_WORKERS
+        self.include_data = config['dataset']['include_data']
+        self.train_ratio = config['dataset']['train_ratio']
+        self.val_ratio = config['dataset']['val_ratio']
+        self.batch_size = config['training']['batch_size']
+        self.shuffle_train_data = shuffle_train_data  # after we iterate over all batches the data is shuffled
+        self.num_workers = config['training']['batch_size']
         # self.worker_init_fn = worker_init_fn
         self.pin_memory = pin_memory
         self.persistent_workers = persistent_workers
@@ -39,7 +39,7 @@ class DataLoading:
 
     def get_loaders(self):
         train_dataset, val_dataset, test_dataset = self.split_datasets()
-        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle, num_workers=self.num_workers, pin_memory=self.pin_memory)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle_train_data, num_workers=self.num_workers, pin_memory=self.pin_memory)
         val_loader   = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
         test_loader  = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
         return train_loader, val_loader, test_loader
