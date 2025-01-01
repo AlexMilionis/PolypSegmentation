@@ -100,7 +100,7 @@ class ExperimentLogger:
         """
         Loads the experiment's configuration file from path.
         """
-        config_name = config_name+'.yaml'
+        config_name = config_name + '.yaml'
         try:
             config_path = os.path.join(Constants.CONFIG_DIR, config_name)
             with open(config_path, 'r') as f:
