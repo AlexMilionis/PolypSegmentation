@@ -15,26 +15,23 @@
         #   write report
         #   check segmentation models from huggingface
     #   Training
-        #   Create run_unet.py
-        #   Create unet_config.yaml
-        #   create train.py
         #   Create hyperparameter_search.py
         #   find criterion for training
         #   make epochs faster
         #   last epoch is always slower, fix
         #   make transformations more efficient, for faster training ?
+        #   cross validation?
+    #   Experiments
+        #   create train one epoch and separate train experiment files
         #   Implement log file for training
         #   plots for train error, val error, and metrics -> save to results>visualizations
-        #   experiment logs -
-        #   cross validation?
+        #   experiment logs
         #   save post train visualizations in results>exp
         #   plots on test set: image, mask, predicted mask -> save to results>visualizations
         #   plots to include title the image path
         #   save test metrics to a file
-    #   Experiments
-        #   learn how to create .yaml configuration files
-        #   create train one epoch and separate train experiment files
-        #   all parameters must be taken from confugration file
+        # compute_metrics to work on both test and train_val
+
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
     #   Δουλεύω μονο με single frames ή με single+sequence? Aν both, χρειάζεται να διατηρηθεί το ordering των sequence frames?
