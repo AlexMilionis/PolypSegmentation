@@ -14,10 +14,12 @@ warnings.filterwarnings('ignore')
 
 
 class Experiment:
-    def __init__(self, train_loader, val_loader, config):
+    def __init__(self, train_loader, val_loader, test_loader, config):
         self.config = config
+
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.test_loader = test_loader
 
         self.scaler = GradScaler()  # mixed precision training
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -25,13 +27,12 @@ class Experiment:
 
         self.model = self._load_model()
 
-        self.num_epochs = config['training']['epochs']
-        self.criterion = getattr(nn, self.config['training']['criterion'])()
-        optimizer_type = getattr(optim, self.config['training']['optimizer']['type'])
+        self.num_epochs = config['epochs']
+        self.criterion = getattr(nn, self.config['loss_function'])()
+        optimizer_type = getattr(optim, self.config['optimizer']['type'])
         self.optimizer = optimizer_type(self.model.parameters(),
-                                        lr=self.config['training']['optimizer']['learning_rate'],
+                                        lr=self.config['optimizer']['learning_rate'],
                                         )
-
 
     def _load_model(self):
         model = UNet(self.config).to(self.device)
@@ -55,12 +56,16 @@ class Experiment:
         return total_loss / len(self.train_loader)
 
 
-    def _validate_one_epoch(self):
+    def _validate_one_epoch(self, test_mode=False):
         self.model.eval()
         total_val_loss = 0
         val_metrics = Metrics()
         with torch.no_grad():
-            for images, masks, _ in self.val_loader:
+            if test_mode:
+                loader = self.test_loader
+            else:
+                loader = self.val_loader
+            for images, masks, _ in loader:
                 images, masks = images.to(self.device), masks.to(self.device)
                 with autocast():
                     outputs = self.model(images)
@@ -72,18 +77,21 @@ class Experiment:
         return total_val_loss, val_metrics
 
 
-    def train(self):
+    def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             for epoch in pbar:
                 torch.cuda.empty_cache()  # Clear GPU memory
                 total_train_loss = self._train_one_epoch()
-                # total_train_loss = Trainer.train_one_epoch(self)
                 total_val_loss, val_metrics = self._validate_one_epoch()
-                # total_val_loss, val_metrics = Trainer.validate_one_epoch(self)
                 val_metrics_dict = val_metrics.compute_metrics(total_train_loss, len(self.train_loader), total_val_loss, len(self.val_loader))
                 if epoch==0:
-                    self.logger = ExperimentLogger(experiment_name=self.model.name, metrics=val_metrics_dict)
+                    self.logger = ExperimentLogger(experiment_name=self.config['experiment_name'], metrics=val_metrics_dict)
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
                                   "Validation Loss": val_metrics_dict["Validation Loss"]})
         ModelCheckpoint.save(self.model, self.logger.experiment_results_dir)
+
+    def execute_evaluation(self):
+        total_test_loss, test_metrics = self._validate_one_epoch(test_mode=True)
+        test_metrics_dict = test_metrics.compute_metrics(total_test_loss, len(self.test_loader))
+        print(test_metrics_dict)
