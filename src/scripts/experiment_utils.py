@@ -1,28 +1,8 @@
 import csv
 from src.config.constants import Constants
 import os
-import torch
 import yaml
 
-# class X:
-#     def save_checkpoint():
-#         pass
-#     def load_checkpoint:
-#         pass
-#     def load_config:
-#         pass
-
-# class X:
-#     def __init__(self):
-#         pass
-#     def _create_experiment_directory:
-#         pass
-#     def _init_metrics_csv:
-#         pass
-#     def log_metrics:
-#         pass
-#     def log_experiment:
-#         pass
 
 class ExperimentLogger:
     def __init__(self, experiment_name, metrics):
@@ -33,7 +13,6 @@ class ExperimentLogger:
         self._init_metrics_csv(metrics)
         #   logs initialization
         self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "logs.log")
-
 
 
     def _create_experiment_directory(self):
@@ -104,17 +83,12 @@ class ExperimentLogger:
             config_name = config_name + '.yaml'
         try:
             config_path = os.path.join(Constants.CONFIG_DIR, config_name)
-            print(config_path)
+            # print(config_path)
             with open(config_path, 'r') as f:
                 return yaml.safe_load(f)
         except FileNotFoundError:
             print("Configuration not found.")
-        # if config_name not in os.listdir(Constants.CONFIG_DIR):
-        #     print("Config not found")
-        #     return None
-        # else:
-        #     config_path = os.path.join(Constants.CONFIG_DIR, config_name)
-        #     with open(config_path, 'r') as f:
-        #         return yaml.safe_load(f)
+            exit()
+
 
 
