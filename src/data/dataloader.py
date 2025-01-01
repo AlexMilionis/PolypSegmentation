@@ -7,17 +7,17 @@ import numpy as np
 
 
 class DataLoading:
-    def __init__(self, config, shuffle_train_data=True, pin_memory=True, persistent_workers=True):
+    def __init__(self, config, shuffle_train_data=True):
         # set_seed()
         self.include_data = config['dataset']['include_data']
         self.train_ratio = config['dataset']['train_ratio']
         self.val_ratio = config['dataset']['val_ratio']
-        self.batch_size = config['training']['batch_size']
+        self.batch_size = config['batch_size']
         self.shuffle_train_data = shuffle_train_data  # after we iterate over all batches the data is shuffled
-        self.num_workers = config['training']['batch_size']
+        self.num_workers = config['num_workers']
         # self.worker_init_fn = worker_init_fn
-        self.pin_memory = pin_memory
-        self.persistent_workers = persistent_workers
+        self.pin_memory = config['pin_memory']
+        self.persistent_workers = config['persistent_workers']
         #   Load datasets
         self.dataset_full_with_train_transformations = PolypDataset(mode="train", include_data=self.include_data)
         self.dataset_full_with_val_test_transformations = PolypDataset(mode="val_test", include_data=self.include_data)
