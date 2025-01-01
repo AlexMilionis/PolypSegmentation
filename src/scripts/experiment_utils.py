@@ -100,9 +100,11 @@ class ExperimentLogger:
         """
         Loads the experiment's configuration file from path.
         """
-        config_name = config_name + '.yaml'
+        if not(config_name.endswith(".yaml")):
+            config_name = config_name + '.yaml'
         try:
             config_path = os.path.join(Constants.CONFIG_DIR, config_name)
+            print(config_path)
             with open(config_path, 'r') as f:
                 return yaml.safe_load(f)
         except FileNotFoundError:
