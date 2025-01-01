@@ -1,12 +1,20 @@
+experiment_name: 'UNet'
+
+paths:
+  results_dir: "D:/repos/MScThesis/github_repo/results"
+  config_dir : "D:/repos/MScThesis/github_repo/src/experiments/configurations/"
+
 dataset:
   include_data: 'single_frames'
-  'train_ratio': 0.8
-  'val_ratio': 0.1
-  'test_ratio': 0.1
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  imagenet_color_means: [0.485, 0.456, 0.406]
+  imagenet_color_stds : [0.229, 0.224, 0.225]
 
 model:
-  name: UNet
-  transfer_learning: True
+  filename: 'unet.py'
+  use_transfer_learning: True
   encoder: 'resnet18'
   encoder_weights: 'imagenet'
   input_channels: 3
@@ -14,11 +22,14 @@ model:
 
 training:
   batch_size: 32
+  num_workers: 2
+  pin memory: True
+  persistent workers: True
   epochs: 1
-  learning_rate: 1e-4
-  weight_decay: 1e-5
+  criterion: 'BCEWithLogitsLoss'
+  optimizer:
+    type: 'Adam'
+    learning_rate: 0.0001
+    weight_decay: 0.00001
 
-#data:
-#  include_data: single_frames
-#  train_ratio: 0.8
-#  val_ratio: 0.1
+
