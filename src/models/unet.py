@@ -47,6 +47,7 @@ class UNet(nn.Module):
             self._freeze_encoder(model)
         return model
 
+
     @staticmethod
     def _freeze_encoder(model):
         for param in model.encoder.parameters():
