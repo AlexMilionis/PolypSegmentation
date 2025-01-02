@@ -19,18 +19,11 @@
         #   find criterion for training
         #   make epochs faster
         #   last epoch is always slower, fix
-        #   make transformations more efficient, for faster training ?
         #   cross validation?
     #   Experiments
-        #   create train one epoch and separate train experiment files
-        #   Implement log file for training
         #   plots for train error, val error, and metrics -> save to results>visualizations
         #   experiment logs
-        #   save post train visualizations in results>exp
-        #   plots on test set: image, mask, predicted mask -> save to results>visualizations
-        #   plots to include title the image path
-        #   save test metrics to a file
-        # compute_metrics to work on both test and train_val
+        #   create shared dependencies
 
 # TODO: Questions:
     #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
