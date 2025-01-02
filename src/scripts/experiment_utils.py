@@ -5,31 +5,28 @@ import yaml
 
 
 class ExperimentLogger:
-    def __init__(self, experiment_name, metrics):
-        self.experiment_name = experiment_name
-        self.experiment_results_dir = os.path.join(Constants.RESULTS_DIR, self.experiment_name)
-        self._create_experiment_directory()
+
+    def __init__(self, config, metrics):
+        self.experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
+        self._create_experiment_directory(self.experiment_results_dir)
         self.metrics_path = os.path.join(self.experiment_results_dir, "metrics.csv")
-        self._init_metrics_csv(metrics)
-        #   logs initialization
-        self.logs_path = os.path.join(Constants.RESULTS_DIR, self.experiment_name, "logs.log")
+        self._init_metrics_csv(self.metrics_path, metrics)  # metrics initialization
+        # self.logs_path = os.path.join(self.experiment_results_dir, "logs.log")    # logs initialization
 
-
-    def _create_experiment_directory(self):
+    @staticmethod
+    def _create_experiment_directory(experiment_results_dir):
         #   delete directory files from previous experiment, if they exist
-        if os.path.exists(self.experiment_results_dir):
-            for filename in os.listdir(self.experiment_results_dir):
-                file_path = os.path.join(self.experiment_results_dir, filename)
+        if os.path.exists(experiment_results_dir):
+            for filename in os.listdir(experiment_results_dir):
+                file_path = os.path.join(experiment_results_dir, filename)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-            #   delete empty directory from previous experiment
-            os.rmdir(self.experiment_results_dir)
-        #   create directory
-        os.makedirs(self.experiment_results_dir, exist_ok=True)
+            os.rmdir(experiment_results_dir)    #   delete empty directory from previous experiment
+        os.makedirs(experiment_results_dir, exist_ok=True)  #   create directory
 
-
-    def _init_metrics_csv(self, metrics):
-        with open(self.metrics_path, "w", newline='') as f:
+    @staticmethod
+    def _init_metrics_csv(metrics_path, metrics):
+        with open(metrics_path, "w", newline='') as f:
             writer = csv.writer(f)
             cols = ["Epoch"]
             cols.extend(list(metrics.keys()))
