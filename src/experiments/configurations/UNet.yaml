@@ -30,5 +30,5 @@ optimizer:
   learning_rate: 0.0001
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
-metrics: ['recall','precision','specificity','dice_score','jaccard_index']
+metrics: ['recall','precision','specificity','f1_score','dice_score','jaccard_index']
 
