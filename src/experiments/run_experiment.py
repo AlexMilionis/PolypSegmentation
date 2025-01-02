@@ -1,18 +1,11 @@
 import torch
-from src.config.hyperparameters import Hyperparameters
-from src.models.unet import UNet
-from src.models.model_utils import ModelCheckpoint
+from src.scripts.model_utils import ModelManager
 import warnings
 from tqdm import tqdm
-from torch.cuda.amp import autocast, GradScaler
+from torch.cuda.amp import GradScaler
 from src.scripts.experiment_utils import ExperimentLogger
-from src.scripts.metrics import Metrics
 from torch import nn, optim
-from torch.nn import BCEWithLogitsLoss
 from src.scripts.trainer import Trainer
-import os
-import importlib
-
 warnings.filterwarnings('ignore')
 
 
@@ -28,7 +21,7 @@ class Experiment:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.logger = None
 
-        self.model = self._load_model()
+        self.model = ModelManager.load_model(self.config, self.device)
         self.num_epochs = config['epochs']
         self.criterion = getattr(nn, self.config['loss_function'])()
         optimizer_type = getattr(optim, self.config['optimizer']['type'])
@@ -36,18 +29,6 @@ class Experiment:
                                         lr=self.config['optimizer']['learning_rate'],
                                         )
         self.trainer = Trainer(self.model, self.optimizer, self.criterion, self.scaler, self.device)
-
-    def _load_model(self):
-        model_filename = self.config['model']['filename']
-        model_dir = self.config['paths']['model_dir']
-        for filename in os.listdir(model_dir):
-            if filename == model_filename:
-                module_name = f"src.models.{os.path.splitext(filename)[0]}"  # remove .py
-                module = importlib.import_module(module_name)
-                class_name = self.config['model']['class_name']
-                model_class = getattr(module, class_name)
-                model = model_class(self.config).to(self.device)
-                return model
 
 
     def execute_training(self):
@@ -65,11 +46,11 @@ class Experiment:
                     config_metrics = self.config['metrics']
                 )
                 if epoch==0:
-                    self.logger = ExperimentLogger(experiment_name=self.config['experiment_name'], metrics=val_metrics_dict)
+                    self.logger = ExperimentLogger(self.config, metrics=val_metrics_dict)
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["TrainLoss"],
                                   "Validation Loss": val_metrics_dict["ValLoss"]})
-        ModelCheckpoint.save(self.model, self.logger.experiment_results_dir)
+        ModelManager.save_checkpoint(self.model, self.logger.experiment_results_dir)
 
 
     def execute_evaluation(self):
