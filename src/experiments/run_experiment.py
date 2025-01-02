@@ -10,6 +10,8 @@ from src.scripts.metrics import Metrics
 from torch import nn, optim
 from torch.nn import BCEWithLogitsLoss
 from src.scripts.trainer import Trainer
+import os
+import importlib
 
 warnings.filterwarnings('ignore')
 
@@ -36,8 +38,16 @@ class Experiment:
         self.trainer = Trainer(self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
     def _load_model(self):
-        model = UNet(self.config).to(self.device)
-        return model
+        model_filename = self.config['model']['filename']
+        model_dir = self.config['paths']['model_dir']
+        for filename in os.listdir(model_dir):
+            if filename == model_filename:
+                module_name = f"src.models.{os.path.splitext(filename)[0]}"  # remove .py
+                module = importlib.import_module(module_name)
+                class_name = self.config['model']['class_name']
+                model_class = getattr(module, class_name)
+                model = model_class(self.config).to(self.device)
+                return model
 
 
     def execute_training(self):
