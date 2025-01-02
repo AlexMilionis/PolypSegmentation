@@ -9,6 +9,7 @@ from src.scripts.experiment_utils import ExperimentLogger
 from src.scripts.metrics import Metrics
 from torch import nn, optim
 from torch.nn import BCEWithLogitsLoss
+from src.scripts.trainer import Trainer
 
 warnings.filterwarnings('ignore')
 
@@ -26,73 +27,47 @@ class Experiment:
         self.logger = None
 
         self.model = self._load_model()
-
         self.num_epochs = config['epochs']
         self.criterion = getattr(nn, self.config['loss_function'])()
         optimizer_type = getattr(optim, self.config['optimizer']['type'])
         self.optimizer = optimizer_type(self.model.parameters(),
                                         lr=self.config['optimizer']['learning_rate'],
                                         )
+        self.trainer = Trainer(self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
     def _load_model(self):
         model = UNet(self.config).to(self.device)
         return model
 
 
-    def _train_one_epoch(self):
-        self.model.train()
-        total_loss = 0
-        for images, masks, _ in self.train_loader:
-            images, masks = images.to(self.device), masks.to(self.device)
-            self.optimizer.zero_grad()
-            # Mixed precision forward pass
-            with autocast():
-                outputs = self.model(images)
-                loss = self.criterion(outputs, masks)
-            self.scaler.scale(loss).backward()
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
-            total_loss += loss.item()
-        return total_loss / len(self.train_loader)
-
-
-    def _validate_one_epoch(self, test_mode=False):
-        self.model.eval()
-        total_val_loss = 0
-        val_metrics = Metrics()
-        with torch.no_grad():
-            if test_mode:
-                loader = self.test_loader
-            else:
-                loader = self.val_loader
-            for images, masks, _ in loader:
-                images, masks = images.to(self.device), masks.to(self.device)
-                with autocast():
-                    outputs = self.model(images)
-                    loss = self.criterion(outputs, masks)
-                probs = torch.sigmoid(outputs)
-                preds = (probs > 0.5).float()
-                val_metrics.add_batch(preds, masks)
-                total_val_loss += loss.item()
-        return total_val_loss, val_metrics
-
-
     def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             for epoch in pbar:
                 torch.cuda.empty_cache()  # Clear GPU memory
-                total_train_loss = self._train_one_epoch()
-                total_val_loss, val_metrics = self._validate_one_epoch()
-                val_metrics_dict = val_metrics.compute_metrics(total_train_loss, len(self.train_loader), total_val_loss, len(self.val_loader))
+                total_train_loss = self.trainer.train_one_epoch(self.train_loader)
+                total_val_loss, val_metrics = self.trainer.validate_one_epoch(self.val_loader)
+                val_metrics_dict = val_metrics.compute_metrics(
+                    test_mode = False,
+                    train_loss = total_train_loss,
+                    len_train_loader = len(self.train_loader),
+                    val_loss = total_val_loss,
+                    len_val_loader = len(self.val_loader),
+                    config_metrics = self.config['metrics']
+                )
                 if epoch==0:
                     self.logger = ExperimentLogger(experiment_name=self.config['experiment_name'], metrics=val_metrics_dict)
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
-                pbar.set_postfix({"Train Loss": val_metrics_dict["Training Loss"],
-                                  "Validation Loss": val_metrics_dict["Validation Loss"]})
+                pbar.set_postfix({"Train Loss": val_metrics_dict["TrainLoss"],
+                                  "Validation Loss": val_metrics_dict["ValLoss"]})
         ModelCheckpoint.save(self.model, self.logger.experiment_results_dir)
 
 
     def execute_evaluation(self):
-        total_test_loss, test_metrics = self._validate_one_epoch(test_mode=True)
-        test_metrics_dict = test_metrics.compute_metrics(total_test_loss, len(self.test_loader))
+        total_test_loss, test_metrics = self.trainer.validate_one_epoch(self.test_loader)
+        test_metrics_dict = test_metrics.compute_metrics(
+            test_mode = True,
+            test_loss = total_test_loss,
+            len_test_loader = len(self.test_loader),
+            config_metrics = self.config['metrics']
+            )
         print(test_metrics_dict)
