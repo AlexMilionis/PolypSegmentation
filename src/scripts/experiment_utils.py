@@ -32,7 +32,6 @@ class ExperimentLogger:
             cols.extend(list(metrics.keys()))
             writer.writerow(cols)
 
-
     def log_metrics(self, epoch, metrics):
         # Append metrics to the log file
         with open(self.metrics_path, "a", newline='') as f:
@@ -41,6 +40,13 @@ class ExperimentLogger:
             cols.extend(list(metrics.values()))
             writer.writerow(cols)
 
+    @staticmethod
+    def log_test_metrics(config, metrics):
+        metrics_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "metrics_test.csv")
+        with open(metrics_path, "a", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(metrics.keys())
+            writer.writerow(metrics.values())
 
     def log_experiment(self, details):
         # os.makedirs(self.logs_dir, exist_ok=True)
@@ -86,6 +92,3 @@ class ExperimentLogger:
         except FileNotFoundError:
             print("Configuration not found.")
             exit()
-
-
-
