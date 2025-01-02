@@ -4,7 +4,7 @@ paths:
   results_dir: "D:/repos/MScThesis/github_repo/results"
   config_dir : "D:/repos/MScThesis/github_repo/src/experiments/configurations/"
   model_dir: "D:/repos/MScThesis/github_repo/src/models/"
-
+  data_visualizations_dir: "D:/repos/MScThesis/github_repo/data/visualizations/"
 dataset:
   include_data: 'single_frames'
   train_ratio: 0.8

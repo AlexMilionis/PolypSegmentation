@@ -28,7 +28,7 @@ class Experiment:
         self.optimizer = optimizer_type(self.model.parameters(),
                                         lr=self.config['optimizer']['learning_rate'],
                                         )
-        self.trainer = Trainer(self.model, self.optimizer, self.criterion, self.scaler, self.device)
+        self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
 
     def execute_training(self):
@@ -54,7 +54,7 @@ class Experiment:
 
 
     def execute_evaluation(self):
-        total_test_loss, test_metrics = self.trainer.validate_one_epoch(self.test_loader)
+        total_test_loss, test_metrics = self.trainer.validate_one_epoch(self.test_loader, to_visualize=True)
         test_metrics_dict = test_metrics.compute_metrics(
             test_mode = True,
             test_loss = total_test_loss,

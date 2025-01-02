@@ -1,10 +1,11 @@
 import torch
 from torch.cuda.amp import autocast
 from src.scripts.metrics import Metrics
-
+from src.scripts.visualization_utils import visualize_outputs
 
 class Trainer:
-    def __init__(self, model, optimizer, criterion, scaler, device):
+    def __init__(self, config, model, optimizer, criterion, scaler, device):
+        self.config = config
         self.model = model
         self.optimizer = optimizer
         self.criterion = criterion
@@ -28,12 +29,13 @@ class Trainer:
         return total_loss / len(train_loader)
 
 
-    def validate_one_epoch(self, loader):
+    def validate_one_epoch(self, loader, to_visualize=False):
         self.model.eval()
         total_val_loss = 0
         val_metrics = Metrics()
+        already_visualized = False
         with torch.no_grad():
-            for images, masks, _ in loader:
+            for images, masks, paths in loader:
                 images, masks = images.to(self.device), masks.to(self.device)
                 with autocast():
                     outputs = self.model(images)
@@ -42,4 +44,7 @@ class Trainer:
                 preds = (probs > 0.5).float()
                 val_metrics.add_batch(preds, masks)
                 total_val_loss += loss.item()
+                if to_visualize and not already_visualized:
+                    visualize_outputs(self.config, images, masks, preds, paths)
+                    already_visualized = True
         return total_val_loss, val_metrics

@@ -38,28 +38,8 @@ def process_image(image_tensor):
     image = image_tensor.permute(1, 2, 0).numpy()  # Convert (C, H, W) -> (H, W, C)
     return unnormalize_image(image)
 
-# def visualize_inputs(dataloader, num_samples=2):
-#     # Fetch the N=9th batch from the DataLoader
-#     dl = iter(dataloader)
-#     for _ in range(1):
-#         image_batch, mask_batch, paths_batch = next(dl)
-#
-#     # Limit samples to the batch size if necessary
-#     num_samples = min(num_samples, len(image_batch))
-#     random_indices = random.sample(range(len(image_batch)), num_samples)
-#     # Create a figure for visualizing the images and masks
-#     fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
-#     for i, idx in enumerate(random_indices):
-#         image = process_image(image_batch[idx])
-#         mask = mask_batch[idx].squeeze().numpy()  # Convert (1, H, W) -> (H, W)
-#         img_path, mask_path = paths_batch[0][idx], paths_batch[1][idx]
-#         # Plot the image and mask
-#         plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
-#         plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
-#     plt.tight_layout()
-#     plt.show()
 
-def visualize_inputs(dataloader, num_samples=3):
+def visualize_data(config, dataloader, num_samples=3, outputs=False):
     batch_images, batch_masks, batch_paths = next(iter(dataloader))
     num_samples = min(num_samples, len(batch_images))
     fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
@@ -71,18 +51,24 @@ def visualize_inputs(dataloader, num_samples=3):
         plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
         plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
     plt.tight_layout()
-    plt.show()
+    save_path = os.path.join(config['paths']['data_visualizations_dir'], "visualizations.png")
+    plt.savefig(save_path)
+    plt.close(fig)
 
 
-def visualize_outputs(batch_images, batch_masks, batch_predictions, num_samples=3):
+def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=3):
     num_samples = min(num_samples, len(batch_images))  # Ensure we don't exceed batch size
     fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
     for i in range(num_samples):
         image = process_image(batch_images[i].cpu())
         mask = batch_masks[i].squeeze().cpu().numpy()
         predicted_mask = (batch_predictions[i].squeeze().cpu().numpy() > 0.5).astype(int)
-        plot_image(axes[i][0], image, "Image")
-        plot_image(axes[i][1], mask, "Ground Truth Mask", cmap="gray")
+        img_path, mask_path = batch_paths[0][i], batch_paths[1][i]
+        plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
+        plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
         plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
     plt.tight_layout()
-    plt.show()
+
+    save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
+    plt.savefig(save_path)
+    plt.close(fig)
