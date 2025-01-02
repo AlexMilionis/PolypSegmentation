@@ -61,4 +61,4 @@ class Experiment:
             len_test_loader = len(self.test_loader),
             config_metrics = self.config['metrics']
             )
-        print(test_metrics_dict)
+        self.logger.log_test_metrics(self.config, test_metrics_dict)
