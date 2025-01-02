@@ -7,14 +7,13 @@ class ModelManager:
 
     @staticmethod
     def save_checkpoint(model, config):
-        checkpoint_path = os.path.join(config['results_dir'], config['experiment_name'], "checkpoint.pth")
+        checkpoint_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "checkpoint.pth")
         torch.save(model.state_dict(), checkpoint_path)
         return checkpoint_path
 
     @staticmethod
     def load_checkpoint(model, config):
-        #   TODO: fix next line
-        checkpoint_path = os.path.join(config['results_dir'], config['experiment_name'], "checkpoint.pth")
+        checkpoint_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "checkpoint.pth")
         try:
             model.load_state_dict(torch.load(checkpoint_path))
         except FileNotFoundError:
