@@ -50,7 +50,7 @@ class Experiment:
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
                 pbar.set_postfix({"Train Loss": val_metrics_dict["TrainLoss"],
                                   "Validation Loss": val_metrics_dict["ValLoss"]})
-        ModelManager.save_checkpoint(self.model, self.logger.experiment_results_dir)
+        ModelManager.save_checkpoint(self.model, self.config)
 
 
     def execute_evaluation(self):
