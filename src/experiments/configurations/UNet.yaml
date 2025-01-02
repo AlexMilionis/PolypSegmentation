@@ -1,8 +1,9 @@
-experiment_name: 'UNet'
+experiment_name: 'Transfer learning with UNet'
 
 paths:
   results_dir: "D:/repos/MScThesis/github_repo/results"
   config_dir : "D:/repos/MScThesis/github_repo/src/experiments/configurations/"
+  model_dir: "D:/repos/MScThesis/github_repo/src/models/"
 
 dataset:
   include_data: 'single_frames'
@@ -14,6 +15,7 @@ dataset:
 
 model:
   filename: 'unet.py'
+  class_name: 'UNet'
   use_transfer_learning: True
   encoder: 'resnet18'
   encoder_weights: 'imagenet'
