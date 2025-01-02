@@ -1,5 +1,5 @@
-experiment_name: 'Transfer learning with UNet'
-
+experiment_name: 'exp1'
+experiment_description: "Transfer Learning with torch's UNet segmentation model."
 paths:
   results_dir: "D:/repos/MScThesis/github_repo/results"
   config_dir : "D:/repos/MScThesis/github_repo/src/experiments/configurations/"
