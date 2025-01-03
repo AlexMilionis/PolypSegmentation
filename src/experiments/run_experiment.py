@@ -48,12 +48,13 @@ class Experiment:
                 if epoch==0:
                     self.logger = ExperimentLogger(self.config, metrics=val_metrics_dict)
                 self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
-                pbar.set_postfix({"Train Loss": val_metrics_dict["TrainLoss"],
-                                  "Validation Loss": val_metrics_dict["ValLoss"]})
+                # pbar.set_postfix({"Train Loss": val_metrics_dict["TrainLoss"],
+                #                   "Validation Loss": val_metrics_dict["ValLoss"]})
         ModelManager.save_checkpoint(self.model, self.config)
 
 
     def execute_evaluation(self):
+        print('Evaluating...')
         total_test_loss, test_metrics = self.trainer.validate_one_epoch(self.test_loader, to_visualize=True)
         test_metrics_dict = test_metrics.compute_metrics(
             test_mode = True,
