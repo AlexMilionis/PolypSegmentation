@@ -21,7 +21,7 @@ class ModelManager:
         return model
 
     @staticmethod
-    def load_model(config, device):
+    def load_model(config):
         model_filename = config['model']['filename']
         model_dir = config['paths']['model_dir']
         for filename in os.listdir(model_dir):
@@ -30,5 +30,4 @@ class ModelManager:
                 module = importlib.import_module(module_name)
                 class_name = config['model']['class_name']
                 model_class = getattr(module, class_name)
-                model = model_class(config).to(device)
-                return model
+                return model_class(config)

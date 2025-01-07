@@ -23,13 +23,17 @@ class Experiment:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.logger = None
 
-        self.model = ModelManager.load_model(self.config, self.device)
+        self.model = ModelManager.load_model(self.config).to(self.device)
+        # for i in self.model.named_parameters():
+        #     print(f"{i[0]} -> {i[1].device}")
+
         self.num_epochs = config['epochs']
         self.criterion = getattr(nn, self.config['loss_function'])()
         optimizer_type = getattr(optim, self.config['optimizer']['type'])
         self.optimizer = optimizer_type(self.model.parameters(),
                                         lr=self.config['optimizer']['learning_rate'],
                                         )
+
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
 
