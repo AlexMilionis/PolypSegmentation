@@ -37,14 +37,7 @@ class Experiment:
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             for epoch in pbar:
                 # torch.cuda.empty_cache()  # Clear GPU memory
-                with profile(
-                        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-                        # on_trace_ready=tensorboard_trace_handler(f'./log/epoch_{epoch}'),
-                        record_shapes=True,
-                        profile_memory=True,
-                ) as prof:
-                    total_train_loss = self.trainer.train_one_epoch(self.train_loader)
-                print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+                total_train_loss = ExperimentLogger.use_profiler(self.trainer, self.train_loader, epoch)
                 # total_train_loss = self.trainer.train_one_epoch(self.train_loader)
                 total_val_loss, val_metrics = self.trainer.validate_one_epoch(self.val_loader)
                 val_metrics_dict = val_metrics.compute_metrics(

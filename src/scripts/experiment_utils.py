@@ -2,6 +2,8 @@ import csv
 from src.config.constants import Constants
 import os
 import yaml
+from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
+import csv
 
 
 class ExperimentLogger:
@@ -92,3 +94,38 @@ class ExperimentLogger:
         except FileNotFoundError:
             print("Configuration not found.")
             exit()
+
+
+    # @staticmethod
+    # def use_profiler(config, trainer, train_loader):
+    #     with profile(
+    #             activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+    #             # on_trace_ready=tensorboard_trace_handler(f'./log/epoch_{epoch}'),
+    #             record_shapes=True,
+    #             profile_memory=True,
+    #     ) as prof:
+    #         total_train_loss = trainer.train_one_epoch(train_loader)
+    #     print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+    #     return total_train_loss
+
+    @staticmethod
+    def use_profiler(trainer, train_loader, epoch):
+        log_dir = './log'
+        os.makedirs(log_dir, exist_ok=True)
+
+        log_file_path = os.path.join(log_dir, f'epoch_{epoch}.log')
+
+        # Start profiling for the current epoch
+        with profile(
+                activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+                on_trace_ready=tensorboard_trace_handler('./log/epoch_{}'.format(epoch)),
+                record_shapes=True,
+                profile_memory=True,
+        ) as prof:
+            total_train_loss = trainer.train_one_epoch(train_loader)
+
+        # Save profiling results to a .log file
+        with open(log_file_path, 'w') as log_file:
+            log_file.write(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+
+        return total_train_loss
