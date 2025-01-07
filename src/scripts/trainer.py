@@ -34,7 +34,7 @@ class Trainer:
     def validate_one_epoch(self, loader, to_visualize=False):
         self.model.eval()
         total_val_loss = 0
-        val_metrics = Metrics()
+        val_metrics = Metrics(self.device)
         already_visualized = False
         with torch.no_grad():
             for images, masks, paths in loader:
