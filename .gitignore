@@ -6,4 +6,5 @@ data/raw/
 docs/dataset_paper.pdf
 *.pth
 *.csv
-*png
+*.png
+log/
