@@ -1,20 +1,21 @@
 import torch
 
 class Metrics():
-    def __init__(self):
-        self.true_positives  = 0
-        self.false_negatives = 0
-        self.false_positives = 0
-        self.true_negatives  = 0
+    def __init__(self, device):
+        self.true_positives = torch.tensor(0, dtype=torch.long, device=device)
+        self.false_negatives = torch.tensor(0, dtype=torch.long, device=device)
+        self.false_positives = torch.tensor(0, dtype=torch.long, device=device)
+        self.true_negatives = torch.tensor(0, dtype=torch.long, device=device)
+
 
     def add_batch(self, batch_predictions, batch_ground_truths):
-        predictions = (batch_predictions > 0.5).float()
-        ground_truths = batch_ground_truths.float()
-        # Calculate metrics efficiently
-        self.true_positives  += torch.sum((predictions == 1) & (ground_truths == 1)).item()
-        self.false_negatives += torch.sum((predictions == 0) & (ground_truths == 1)).item()
-        self.false_positives += torch.sum((predictions == 1) & (ground_truths == 0)).item()
-        self.true_negatives  += torch.sum((predictions == 0) & (ground_truths == 0)).item()
+        predictions = (batch_predictions > 0.5).long()
+        ground_truths = batch_ground_truths.long()
+
+        self.true_positives += torch.sum((predictions == 1) & (ground_truths == 1))
+        self.false_negatives += torch.sum((predictions == 0) & (ground_truths == 1))
+        self.false_positives += torch.sum((predictions == 1) & (ground_truths == 0))
+        self.true_negatives += torch.sum((predictions == 0) & (ground_truths == 0))
 
     def _recall(self):
         return self.true_positives / (self.true_positives + self.false_negatives)
