@@ -59,7 +59,7 @@ class Transforms():
     @staticmethod
     def image_and_mask_train_transforms():
         return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 1.0)),
+            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
             T.RandomHorizontalFlip(p=0.5),
         ])
 
