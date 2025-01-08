@@ -32,6 +32,7 @@ class Experiment:
         optimizer_type = getattr(optim, self.config['optimizer']['type'])
         self.optimizer = optimizer_type(self.model.parameters(),
                                         lr=self.config['optimizer']['learning_rate'],
+                                        weight_decay=self.config['optimizer']['weight_decay']
                                         )
 
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
