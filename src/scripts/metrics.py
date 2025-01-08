@@ -2,38 +2,51 @@ import torch
 
 class Metrics():
     def __init__(self, device):
-        self.true_positives = torch.tensor(0, dtype=torch.long, device=device)
-        self.false_negatives = torch.tensor(0, dtype=torch.long, device=device)
-        self.false_positives = torch.tensor(0, dtype=torch.long, device=device)
-        self.true_negatives = torch.tensor(0, dtype=torch.long, device=device)
+        self.tp = torch.tensor(0, dtype=torch.long, device=device)
+        self.fn = torch.tensor(0, dtype=torch.long, device=device)
+        self.fp = torch.tensor(0, dtype=torch.long, device=device)
+        self.tn = torch.tensor(0, dtype=torch.long, device=device)
 
 
     def add_batch(self, batch_predictions, batch_ground_truths):
         predictions = (batch_predictions > 0.5).long()
         ground_truths = batch_ground_truths.long()
 
-        self.true_positives += torch.sum((predictions == 1) & (ground_truths == 1))
-        self.false_negatives += torch.sum((predictions == 0) & (ground_truths == 1))
-        self.false_positives += torch.sum((predictions == 1) & (ground_truths == 0))
-        self.true_negatives += torch.sum((predictions == 0) & (ground_truths == 0))
+        self.tp += torch.sum((predictions == 1) & (ground_truths == 1))
+        self.fn += torch.sum((predictions == 0) & (ground_truths == 1))
+        self.fp += torch.sum((predictions == 1) & (ground_truths == 0))
+        self.tn += torch.sum((predictions == 0) & (ground_truths == 0))
 
     def _recall(self):
-        return self.true_positives / (self.true_positives + self.false_negatives)
+        return self.tp / (self.tp + self.fn)
 
     def _precision(self):
-        return self.true_positives / (self.true_positives + self.false_positives)
+        return self.tp / (self.tp + self.fp)
 
     def _specificity(self):
-        return self.true_negatives / (self.true_negatives + self.false_positives)
+        return self.tn / (self.tn + self.fp)
 
     def _f1_score(self):
-        return 2*(self._precision() * self._recall())/(self._precision() + self._recall())
+        # return 2*(self._precision() * self._recall())/(self._precision() + self._recall())
+        return 2*self.tp / (2 * self.tp + self.fp + self.fn)
 
-    def _dice_score(self):
-        return 2*self.true_positives / (2*self.true_positives + self.false_positives + self.false_negatives)
+    def _f2_score(self):
+        return 5*self.tp / (5 * self.tp + self.fp + 4 * self.fn)
 
     def _jaccard_index(self):
-        return self.true_positives / (self.true_positives + self.false_positives + self.false_negatives)
+        return self.tp / (self.tp + self.fp + self.fn)
+
+    def _accuracy(self):
+        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+
+    def _average_hausdorff_distance(self):
+        pass
+
+    def _average_surface_distance(self):
+        pass
+
+    def _normalized_surface_distance(self):
+        pass
 
     def compute_metrics(self, test_mode, **kwargs):
         metrics_config = kwargs.get("config_metrics", [])
