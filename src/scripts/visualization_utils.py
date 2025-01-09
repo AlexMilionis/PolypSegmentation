@@ -25,7 +25,8 @@ Visualization Utilities for Dataset and Predictions:
 
 import os
 import matplotlib.pyplot as plt
-from src.data.dataset_utils import unnormalize_image
+import numpy as np
+from src.config.constants import Constants
 
 
 def plot_image(ax, image, title, cmap=None):
@@ -37,6 +38,15 @@ def plot_image(ax, image, title, cmap=None):
 def process_image(image_tensor):
     image = image_tensor.permute(1, 2, 0).numpy()  # Convert (C, H, W) -> (H, W, C)
     return unnormalize_image(image)
+
+
+def unnormalize_image(image):
+    mean = np.array(Constants.IMAGENET_COLOR_MEANS)
+    std = np.array(Constants.IMAGENET_COLOR_STDS)
+    # reverse normalization
+    unnormalized_image = (image * std) + mean
+    unnormalized_image = np.clip(unnormalized_image, a_min = 0, a_max = 1)
+    return unnormalized_image
 
 
 def visualize_data(config, dataloader, num_samples=3, outputs=False):
