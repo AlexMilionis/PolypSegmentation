@@ -19,8 +19,8 @@ class DataLoading:
         self.pin_memory = config['pin_memory']
         self.persistent_workers = config['persistent_workers']
         #   Load datasets
-        self.dataset_full_with_train_transformations = PolypDataset(mode="train", include_data=self.include_data)
-        self.dataset_full_with_val_test_transformations = PolypDataset(mode="val_test", include_data=self.include_data)
+        self.dataset_full_with_train_transformations = PolypDataset(config, mode="train", include_data=self.include_data)
+        self.dataset_full_with_val_test_transformations = PolypDataset(config, mode="val_test", include_data=self.include_data)
 
 
     def split_datasets(self):
