@@ -41,6 +41,7 @@ class UNet(nn.Module):
             encoder_weights=self.encoder_weights,
             in_channels=self.in_channels,
             classes=self.classes,
+            # activation='sigmoid',
         )
         # Freeze the encoder weights for transfer learning
         if self.use_transfer_learning:
