@@ -22,15 +22,15 @@ model:
   input_channels: 3
   num_classes: 1  #num_outputs
 
-batch_size: 32
-num_workers: 2
+batch_size: 16
+num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 1
+epochs: 5
 optimizer:
   type: 'Adam'
-  learning_rate: 0.0001
+  learning_rate: 0.01
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
-metrics: ['recall','precision','specificity','f1_score','dice_score','jaccard_index']
+metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall',]
 
