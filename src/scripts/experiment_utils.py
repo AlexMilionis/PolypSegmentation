@@ -80,14 +80,11 @@ class ExperimentLogger:
         """
 
     @staticmethod
-    def load_config(config_name):
-        """
-        Loads the experiment's configuration file from path.
-        """
+    def load_config(config_name, config_dir="src/experiments/configurations/"):
         if not(config_name.endswith(".yaml")):
             config_name = config_name + '.yaml'
         try:
-            config_path = os.path.join(Constants.CONFIG_DIR, config_name)
+            config_path = os.path.join(config_dir, config_name)
             # print(config_path)
             with open(config_path, 'r') as f:
                 return yaml.safe_load(f)
@@ -96,17 +93,6 @@ class ExperimentLogger:
             exit()
 
 
-    # @staticmethod
-    # def use_profiler(config, trainer, train_loader):
-    #     with profile(
-    #             activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-    #             # on_trace_ready=tensorboard_trace_handler(f'./log/epoch_{epoch}'),
-    #             record_shapes=True,
-    #             profile_memory=True,
-    #     ) as prof:
-    #         total_train_loss = trainer.train_one_epoch(train_loader)
-    #     print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
-    #     return total_train_loss
 
     @staticmethod
     def use_profiler(trainer, train_loader, epoch):
