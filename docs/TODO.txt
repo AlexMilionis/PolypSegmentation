@@ -5,26 +5,26 @@
         #   training on notebooks?
         #   gpu sources, mail me slurm
         #   EDA
+        #   implement transformations in main
+        #   create separate dataloaders
+        #   check that visualizations are reproducible (randomness is fixed)
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
-        #   dataset both single frames and sequence frames
+        #   change to create folder with only single_frames, and change create_tuples in dataset_utils.py
     #   Models
+        #   check https://github.com/milesial/Pytorch-UNet
         #   implement UNet
         #   study UNet (with resnet backbone)
         #   write report
         #   check segmentation models from huggingface
     #   Training
+        #   Convert bceloss back to bcewithlogits
         #   Create hyperparameter_search.py
         #   find criterion for training
         #   make epochs faster
-        #   last epoch is always slower, fix
         #   cross validation?
     #   Experiments
         #   plots for train error, val error, and metrics -> save to results>visualizations
         #   experiment logs
-        #   create shared dependencies
 
-# TODO: Questions:
-    #   Να έχω σταθερό μέγεθος για όλες τις εικόνες? εναλλακτικά (custom collate function για μεταβλητού μήκος εικόνες)
-    #   Δουλεύω μονο με single frames ή με single+sequence? Aν both, χρειάζεται να διατηρηθεί το ordering των sequence frames?
