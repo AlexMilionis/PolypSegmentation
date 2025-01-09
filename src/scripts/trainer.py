@@ -25,7 +25,6 @@ class Trainer:
             self.scaler.scale(loss).backward()
             self.scaler.step(self.optimizer)
             self.scaler.update()
-            # total_loss += loss.item()
             total_loss += loss
         return total_loss / len(train_loader)
         # return total_loss.item() / len(train_loader)
@@ -36,6 +35,7 @@ class Trainer:
         total_val_loss = 0
         val_metrics = Metrics(self.device)
         already_visualized = False
+        threshold = 0.5
         with torch.no_grad():
             for images, masks, paths in loader:
                 images, masks = images.to(self.device), masks.to(self.device)
@@ -43,9 +43,8 @@ class Trainer:
                     outputs = self.model(images)
                     loss = self.criterion(outputs, masks)
                 probs = torch.sigmoid(outputs)
-                preds = (probs > 0.5).float()
+                preds = (probs > threshold).float()
                 val_metrics.add_batch(preds, masks)
-                # total_val_loss += loss.item()
                 total_val_loss += loss
                 if to_visualize and not already_visualized:
                     visualize_outputs(self.config, images, masks, preds, paths)
