@@ -23,7 +23,6 @@ Testing and Analysis Utilities for Datasets:
 
 from torch.utils.data import Subset
 from src.data.dataloader import DataLoading
-from src.config.constants import Constants
 import os
 import torch
 
@@ -49,16 +48,16 @@ def test_for_overlaps_in_datasets():
         print(f"Overlap between train and test sets: {overlap}")
 
 
-def count_images():
+def count_images(config):
     singleframe_images_count, seqframe_images_count = 0,0
     singleframe_masks_count, seqframe_masks_count   = 0,0
-    for img in os.listdir(Constants.IMAGE_DIR):
+    for img in os.listdir(config['paths']['images_dir']):
         if "seq_" in img:
             seqframe_images_count += 1
         else:
             singleframe_images_count += 1
     print(f"Singleframe images count: {singleframe_images_count}, Sequence images count: {seqframe_images_count}")
-    for mask in os.listdir(Constants.MASK_DIR):
+    for mask in os.listdir(config['paths']['masks_dir']):
         if "seq_" in mask:
             seqframe_masks_count += 1
         else:
