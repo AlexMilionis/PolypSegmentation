@@ -32,5 +32,5 @@ optimizer:
   learning_rate: 0.01
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
-metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall',]
+metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall', 'average_hausdorff_distance', 'average_surface_distance', 'normalized_surface_distance']
 
