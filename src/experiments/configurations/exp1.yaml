@@ -1,10 +1,16 @@
 experiment_name: 'exp1'
 experiment_description: "Transfer Learning with torch's UNet segmentation model."
 paths:
-  results_dir: "D:/repos/MScThesis/github_repo/results"
-  config_dir : "D:/repos/MScThesis/github_repo/src/experiments/configurations/"
-  model_dir: "D:/repos/MScThesis/github_repo/src/models/"
-  data_visualizations_dir: "D:/repos/MScThesis/github_repo/data/visualizations/"
+  raw_dataset_dir: "data/raw/"
+  initial_dataset_dir: "data/initial"
+  processed_dataset_dir: "data/processed"
+  images_dir: "data/initial/AllImages"
+  masks_dir: "data/initial/AllMasks"
+  results_dir: "results"
+#  config_dir : "src/experiments/configurations/"
+  model_dir: "src/models/"
+  data_visualizations_dir: "data/visualizations/"
+
 dataset:
   include_data: 'single_frames'
   train_ratio: 0.8
@@ -26,7 +32,7 @@ batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 5
+epochs: 1
 optimizer:
   type: 'Adam'
   learning_rate: 0.01
