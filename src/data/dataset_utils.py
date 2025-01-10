@@ -2,9 +2,6 @@ import os
 import shutil
 from typing import List
 from PIL import Image
-from torchvision.transforms import v2 as T
-from src.config.constants import Constants
-import numpy as np
 import random
 
 
@@ -77,26 +74,16 @@ class CreateDataset:
                         black_mask_path = os.path.join(all_masks_path, black_mask_name)
                         CreateDataset._create_black_mask(file_path, black_mask_path)
 
-        print(f"Dataset creation complete. Check the '{dst_path}' folder.")
-
-
     @staticmethod
     def create_processed_datasets(config):
         assert config['dataset']['train_ratio'] + config['dataset']['val_ratio'] + config['dataset']['test_ratio'] == 1.0, "Ratios must sum to 1.0"
         split_dirs = ["train/images", "train/masks",
-                  "validation/images", "validation/masks",
+                  "val/images", "val/masks",
                   "test/images", "test/masks"]
         for split_dir in split_dirs:
             os.makedirs(os.path.join(config['paths']['processed_dataset_dir'], split_dir), exist_ok=True)
 
-        all_images_dir = config['paths']['images_dir']
-        all_masks_dir = config['paths']['masks_dir']
-        image_files = os.listdir(all_images_dir)
-        mask_files = os.listdir(all_masks_dir)
-
-        image_mask_pairs = _create_image_mask_pairs(config['paths']['images_dir'], config['paths']['masks_dir'], config['dataset']['include_data'])
-        # image_mask_pairs = [(img, os.path.join(all_images_dir, img), os.path.join(all_masks_dir, img))
-        #                     for img in image_files if img in mask_files]
+        image_mask_pairs = CreateDataset._create_image_mask_pairs(config['paths']['images_dir'], config['paths']['masks_dir'], config['dataset']['include_data'])
 
         random.shuffle(image_mask_pairs)
         train_count = int(len(image_mask_pairs) * config['dataset']['train_ratio'])
@@ -106,103 +93,54 @@ class CreateDataset:
         val_data = image_mask_pairs[train_count:train_count + val_count]
         test_data = image_mask_pairs[train_count + val_count:]
 
-        for split, data in zip(["train", "validation", "test"], [train_data, val_data, test_data]):
+        for split, data in zip(["train", "val", "test"], [train_data, val_data, test_data]):
+            image_dir = os.path.join(config['paths']['processed_dataset_dir'], split, 'images')
+            mask_dir = os.path.join(config['paths']['processed_dataset_dir'], split, 'masks')
             for img_path, mask_path in data:
                 img_name = os.path.basename(img_path)
                 mask_name = os.path.basename(mask_path)
-                shutil.copy(img_path, os.path.join(config['paths']['processed_dataset_dir'], f"{split}/images", img_name))
-                shutil.copy(mask_path, os.path.join(config['paths']['processed_dataset_dir'], f"{split}/masks", mask_name))
+                shutil.copy(img_path, os.path.join(image_dir, img_name))
+                shutil.copy(mask_path, os.path.join(mask_dir, mask_name))
 
-        print(f"Dataset split complete. Check the '{config['paths']['processed_dataset_dir']}' folder.")
+            CreateDataset._log_split_to_file(data, split)
 
-
-def _create_image_mask_pairs(images_dir, masks_dir, include_data="single_frames"):
-    images = sorted(os.listdir(images_dir))
-    masks_set = set(os.listdir(masks_dir))
-    image_mask_pairs = []
-
-    for image in images:
-        base_image_name, ext = os.path.splitext(image)
-        if ext.lower() not in ['.jpg', '.png', '.jpeg']:
-            continue
-        if include_data == "single_frames" and "seq_" in base_image_name:
-            continue
-        elif include_data == "seq_frames" and "seq_" not in base_image_name:
-            continue
-
-        expected_mask_name = f"{base_image_name}_mask.jpg"
-        if expected_mask_name in masks_set:
-            image_path = os.path.join(images_dir, image)
-            mask_path = os.path.join(masks_dir, expected_mask_name)
-            image_mask_pairs.append((image_path, mask_path))
-        else:
-            raise ValueError(f"No matching mask found for image {image}")
-
-    return image_mask_pairs
-
-
-
-class Transforms():
-    def __init__(self):
-        pass
 
     @staticmethod
-    def identity_transform(x):
-        return x
+    def _create_image_mask_pairs(images_dir, masks_dir, include_data="single_frames"):
+        images = sorted(os.listdir(images_dir))
+        masks_set = set(os.listdir(masks_dir))
+        image_mask_pairs = []
+        for image in images:
+            base_image_name, ext = os.path.splitext(image)
+            if ext.lower() not in ['.jpg', '.png', '.jpeg']:
+                continue
+            if include_data == "single_frames" and "seq_" in base_image_name:
+                continue
+            elif include_data == "seq_frames" and "seq_" not in base_image_name:
+                continue
+            expected_mask_name = f"{base_image_name}_mask.jpg"
+            if expected_mask_name in masks_set:
+                image_path = os.path.join(images_dir, image)
+                mask_path = os.path.join(masks_dir, expected_mask_name)
+                image_mask_pairs.append((image_path, mask_path))
+            else:
+                raise ValueError(f"No matching mask found for image {image}")
+        return image_mask_pairs
 
     @staticmethod
-    def binarize_mask(mask):
-        return (mask > 128).float()
+    def _log_split_to_file(data, split):
+        os.makedirs(f'data/splits', exist_ok=True)
+        filename = f'data/splits/{split}.txt'
+        with open(filename, 'w') as file:
+            for img_path, mask_path in data:
+                file.write(f"{img_path},{mask_path}\n")
 
     @staticmethod
-    def convert_to_float(image):
-        return image.float()
-
-    @staticmethod
-    def convert_to_01_range(image):
-        return image / 255.0
-
-    @staticmethod
-    def image_and_mask_train_transforms():
-        return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
-            T.RandomHorizontalFlip(p=0.5),
-        ])
-
-    @staticmethod
-    def image_and_mask_val_test_transforms():
-        return T.Compose([
-            T.Resize(size=(512, 512)),
-        ])
-
-    @staticmethod
-    def image_train_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.convert_to_float),
-            T.ColorJitter(),
-            T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
-        ])
-
-    @staticmethod
-    def image_val_test_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
-        ])
-
-    @staticmethod
-    def mask_train_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.binarize_mask),
-        ])
-
-    @staticmethod
-    def mask_val_test_transforms():
-        return T.Compose([
-            T.Lambda(Transforms.binarize_mask),
-        ])
-
-
-
-
+    def read_split_from_file(mode):
+        filename = f'data/splits/{mode}.txt'
+        data = []
+        with open(filename, 'r') as file:
+            for line in file:
+                img_path, mask_path = line.strip().split(',')
+                data.append((img_path, mask_path))
+        return data
