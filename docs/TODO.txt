@@ -5,13 +5,9 @@
         #   training on notebooks?
         #   gpu sources, mail me slurm
         #   EDA
-        #   implement transformations in main
-        #   create separate dataloaders
-        #   check that visualizations are reproducible (randomness is fixed)
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
         #   cross validation ?
-        #   change to create folder with only single_frames, and change create_tuples in dataset_utils.py
     #   Models
         #   check https://github.com/milesial/Pytorch-UNet
         #   implement UNet
@@ -19,7 +15,6 @@
         #   write report
         #   check segmentation models from huggingface
     #   Training
-        #   Convert bceloss back to bcewithlogits
         #   Create hyperparameter_search.py
         #   find criterion for training
         #   make epochs faster
