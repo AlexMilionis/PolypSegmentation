@@ -9,3 +9,4 @@ docs/dataset_paper.pdf
 *.csv
 *.png
 log/
+docs/credentials.txt

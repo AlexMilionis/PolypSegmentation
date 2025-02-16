@@ -8,6 +8,7 @@ from src.data.dataset_utils import CreateDataset
 
 set_seed()
 if __name__ == '__main__':
+    print('To run the script use: python main.py <experiment_name>\n')
     #   Receive experiment name from command prompt and load configuration
     if len(sys.argv) > 1:
         config_name = sys.argv[1]

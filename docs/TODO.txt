@@ -1,4 +1,7 @@
 # TODO:
+    #   SLURM
+    install pacman on git bash > install rsync on gitbash >
+    upload project folder to server > run main.py for epochs >
     #   General
         #   write down all processes before continuing further
         #   check MONAI
