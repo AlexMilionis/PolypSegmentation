@@ -1,11 +1,11 @@
 experiment_name: 'exp1'
 experiment_description: "Transfer Learning with torch's UNet segmentation model."
 paths:
-  raw_dataset_dir: "data/raw/"
-  initial_dataset_dir: "data/initial"
+  raw_dataset_dir: "data/raw/"  # these need to change, if ran locally again
+  initial_dataset_dir: "data/initial" # these need to change, if ran locally again
   processed_dataset_dir: "data/processed"
-  images_dir: "data/initial/AllImages"
-  masks_dir: "data/initial/AllMasks"
+  images_dir: "data/initial/AllImages"  # these need to change, if ran locally again
+  masks_dir: "data/initial/AllMasks"  # these need to change, if ran locally again
   results_dir: "results"
   model_dir: "src/models/"
   data_visualizations_dir: "data/visualizations/"
