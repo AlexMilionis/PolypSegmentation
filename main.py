@@ -13,12 +13,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         config_name = sys.argv[1]
     config = ExperimentLogger.load_config(config_name)
-    #   create initial dataset (allimages, allmasks)
-    CreateDataset.create_initial_dataset(config, include_seq_frames=False)
-    #   create processed dataset (train, val, test)
-    CreateDataset.create_processed_datasets(config)
-    #    apply transformations to every dataset separately + create 3 separate data loaders
-    train_loader, val_loader, test_loader = DataLoading(config).get_loaders()
+    # TODO:  in the 2 following lines: need to change the directory for initial dataset, raw dataset
+    CreateDataset.create_initial_dataset(config, include_seq_frames=False)  #   create initial dataset (allimages, allmasks)
+    CreateDataset.create_processed_datasets(config) #   create processed dataset (train, val, test)
+    train_loader, val_loader, test_loader = DataLoading(config).get_loaders()   #    apply transformations to every dataset separately + create 3 separate data loaders
     visualize_data(config, train_loader, num_samples = 3)
     exp = Experiment(train_loader, val_loader, test_loader, config)
     exp.execute_training()
