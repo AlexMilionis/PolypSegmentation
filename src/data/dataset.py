@@ -21,10 +21,10 @@ class PolypDataset(Dataset):
         self.preload = preload
         if self.preload:
             self.data = [
-                self._apply_transforms(read_image(img_path), read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY), img_path, mask_path) for img_path, mask_path in CreateDataset.read_split_from_file(self.mode)
+                self._apply_transforms(read_image(img_path), read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY), img_path, mask_path) for img_path, mask_path in CreateDataset.get_image_mask_pairs(self.mode)
             ]
         else:
-            self.data = CreateDataset.read_split_from_file(self.mode)
+            self.data = CreateDataset.get_image_mask_pairs(self.mode)
 
     def _apply_transforms(self, image, mask, img_path, mask_path):
         # Convert to tv_tensors

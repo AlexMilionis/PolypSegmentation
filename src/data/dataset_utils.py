@@ -144,3 +144,41 @@ class CreateDataset:
                 img_path, mask_path = line.strip().split(',')
                 data.append((img_path, mask_path))
         return data
+
+    @staticmethod
+    def get_image_mask_pairs(mode, base_path="data/processed"):
+        """
+        Given the mode (train, val, test), returns a list of tuples containing
+        the paths of images and their corresponding masks.
+
+        Args:
+            mode (str): One of 'train', 'val', or 'test'.
+            base_path (str): The base directory where processed data is stored.
+
+        Returns:
+            List[Tuple[str, str]]: List of (image_path, mask_path) tuples.
+        """
+        assert mode in ["train", "val", "test"], "Mode must be 'train', 'val', or 'test'"
+
+        image_dir = os.path.join(base_path, mode, "images")
+        mask_dir = os.path.join(base_path, mode, "masks")
+
+        if not os.path.exists(image_dir) or not os.path.exists(mask_dir):
+            raise FileNotFoundError(f"Directories not found: {image_dir} or {mask_dir}")
+
+        image_mask_pairs = []
+
+        for image_file in sorted(os.listdir(image_dir)):  # Ensure consistent ordering
+            if image_file.endswith((".jpg", ".png")):  # Filter valid image files
+                base_name = os.path.splitext(image_file)[0]  # Remove file extension
+                mask_file = f"{base_name}_mask.jpg"  # Construct corresponding mask filename
+                mask_path = os.path.join(mask_dir, mask_file)
+
+                if os.path.exists(mask_path):  # Ensure the mask file exists
+                    image_path = os.path.join(image_dir, image_file)
+                    image_mask_pairs.append((image_path, mask_path))
+                else:
+                    print(f"Warning: Mask not found for {image_file}, skipping...")
+                # print(image_mask_pairs)
+        return image_mask_pairs
+
