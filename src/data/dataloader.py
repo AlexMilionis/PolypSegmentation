@@ -22,9 +22,12 @@ class DataLoading:
 
 
     def get_loaders(self):
-        train_dataset = PolypDataset(self.config, mode="train", include_data=self.include_data)
-        val_dataset = PolypDataset(self.config, mode="val", include_data=self.include_data)
-        test_dataset = PolypDataset(self.config, mode="test", include_data=self.include_data)
+        # train_dataset = PolypDataset(self.config, mode="train", include_data=self.include_data)
+        # val_dataset = PolypDataset(self.config, mode="val", include_data=self.include_data)
+        # test_dataset = PolypDataset(self.config, mode="test", include_data=self.include_data)
+        train_dataset = PolypDataset(mode="train")
+        val_dataset = PolypDataset(mode="val")
+        test_dataset = PolypDataset(mode="test")
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=self.shuffle_train_data, num_workers=self.num_workers, pin_memory=self.pin_memory)
         val_loader   = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
         test_loader  = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
