@@ -30,11 +30,9 @@ class Trainer:
         # return total_loss.item() / len(train_loader)
 
 
-    def validate_one_epoch(self, loader, metrics=None, to_visualize=False):
+    def validate_one_epoch(self, loader, metrics, to_visualize=False):
         self.model.eval()
         total_val_loss = 0
-        if metrics is None:
-            metrics = Metrics(self.device, self.config)
         already_visualized = False
         threshold = 0.5
         with torch.no_grad():

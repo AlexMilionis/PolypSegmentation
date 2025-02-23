@@ -8,25 +8,58 @@ import torch
 class ExperimentLogger:
 
     @staticmethod
-    def convert_tensor(value):
-        if isinstance(value, torch.Tensor):
-            return value.detach().cpu().item()  # Move to CPU and convert to Python float
-        elif isinstance(value, list):  # If it's a list, apply conversion recursively
-            return [ExperimentLogger.convert_tensor(v) for v in value]
-        return value  # Return as is if not a tensor
+    # def convert_tensor(value):
+    #     if isinstance(value, torch.Tensor):
+    #         return value.detach().cpu().item()  # Move to CPU and convert to Python float
+    #     elif isinstance(value, list):  # If it's a list, apply conversion recursively
+    #         return [ExperimentLogger.convert_tensor(v) for v in value]
+    #     return value  # Return as is if not a tensor
 
+    def convert_tensor(value):
+        """Ensures PyTorch tensors are converted to CPU floats before saving."""
+        if isinstance(value, torch.Tensor):
+            return value.cpu().item()  # Moves to CPU and extracts the numerical value
+        return value
+
+
+    # @staticmethod
+    # def log_metrics(config, metrics):
+    #     print(metrics)
+    #     experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
+    #     if os.path.exists(experiment_results_dir):
+    #         shutil.rmtree(experiment_results_dir)  # Removes directory even if not empty
+    #     os.makedirs(experiment_results_dir, exist_ok=True)  # Re-create clean directory
+    #     csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
+    #     cleaned_metrics = {key: ExperimentLogger.convert_tensor(value) for key, value in metrics.items()}
+    #     metrics_df = pd.DataFrame(cleaned_metrics)
+    #     metrics_df.to_csv(csv_path, index=False)
 
     @staticmethod
     def log_metrics(config, metrics):
-        print(metrics)
+        """
+        Logs metrics into a CSV file without overwriting previous values.
+
+        :param config: Configuration dictionary containing experiment paths.
+        :param metrics: Dictionary containing lists of metric values per epoch.
+        """
         experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
-        if os.path.exists(experiment_results_dir):
-            shutil.rmtree(experiment_results_dir)  # Removes directory even if not empty
-        os.makedirs(experiment_results_dir, exist_ok=True)  # Re-create clean directory
+        os.makedirs(experiment_results_dir, exist_ok=True)  # Ensure directory exists
+
         csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
-        cleaned_metrics = {key: ExperimentLogger.convert_tensor(value) for key, value in metrics.items()}
-        metrics_df = pd.DataFrame(cleaned_metrics)
+
+        # Convert tensors to CPU floats before saving
+        cleaned_metrics = {
+            key: [ExperimentLogger.convert_tensor(value) for value in values]
+            for key, values in metrics.items()
+        }
+
+        # 🔹 Convert dictionary to a DataFrame where each row is an epoch
+        metrics_df = pd.DataFrame.from_dict(cleaned_metrics)
+
+        # ✅ Write the entire DataFrame at once (ensuring proper row-wise format)
         metrics_df.to_csv(csv_path, index=False)
+
+        print(f"Metrics logged to {csv_path}")
 
     #
     # def log_metrics(self, epoch, metrics, mode="train"):

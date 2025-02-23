@@ -59,15 +59,15 @@ class Metrics():
 
     def compute_metrics(self, mode="train", **kwargs):
         if mode == "train":
-            self.metrics["epoch"].append(kwargs.get("epoch", -1))
+            self.metrics["epoch"].append(kwargs.get("epoch", 0))
             self.metrics["train_loss"].append(kwargs.get("train_loss", 0))
             self.metrics["val_loss"].append(kwargs.get("val_loss", 0))
-            self.metrics["test_loss"].append(None)
+            self.metrics["test_loss"].append(-1)
 
         if mode == "test":
-            self.metrics["epoch"].append(None)
-            self.metrics["train_loss"].append(None)
-            self.metrics["val_loss"].append(None)
+            self.metrics["epoch"].append(-1)
+            self.metrics["train_loss"].append(-1)
+            self.metrics["val_loss"].append(-1)
             self.metrics["test_loss"].append(kwargs.get("test_loss", 0))
 
 

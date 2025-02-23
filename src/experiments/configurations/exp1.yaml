@@ -30,7 +30,7 @@ batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 1
+epochs: 2
 optimizer:
   type: 'Adam'
   learning_rate: 0.01

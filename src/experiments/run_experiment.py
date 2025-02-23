@@ -7,6 +7,7 @@ from src.scripts.experiment_utils import ExperimentLogger
 from torch import nn, optim
 from src.scripts.trainer import Trainer
 from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
+from src.scripts.metrics import Metrics
 
 warnings.filterwarnings('ignore')
 
@@ -40,10 +41,11 @@ class Experiment:
     def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             for epoch in pbar:
+                if epoch==0: metrics = Metrics(self.device, self.config)
                 # torch.cuda.empty_cache()  # Clear GPU memory
                 # total_train_loss = self.logger.use_profiler(self.trainer, self.train_loader, epoch)
                 total_train_loss = self.trainer.train_one_epoch(self.train_loader)
-                total_val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader)
+                total_val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(
                     epoch = epoch,
                     train_loss = total_train_loss / len(self.train_loader),
@@ -56,8 +58,6 @@ class Experiment:
 
     def execute_evaluation(self, metrics):
         print('Evaluating...')
-        total_test_loss, test_metrics = self.trainer.validate_one_epoch(self.test_loader,
-                                                                        metrics=metrics,
-                                                                        to_visualize=True)
+        total_test_loss, metrics = self.trainer.validate_one_epoch(self.test_loader, metrics, to_visualize=True)
         metrics.compute_metrics(test_loss = total_test_loss / len(self.test_loader), mode="test")
         ExperimentLogger.log_metrics(self.config, metrics.metrics)
