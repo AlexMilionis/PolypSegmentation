@@ -1,12 +1,13 @@
 experiment_name: 'exp1'
 experiment_description: "Transfer Learning with torch's UNet segmentation model."
 paths:
-  raw_dataset_dir: "data/raw/"  # these need to change, if ran locally again
-  initial_dataset_dir: "data/initial" # these need to change, if ran locally again
+#  raw_dataset_dir: "data/raw/"  # these need to change, if ran locally again
+#  initial_dataset_dir: "data/initial" # these need to change, if ran locally again
   processed_dataset_dir: "data/processed"
-  images_dir: "data/initial/AllImages"  # these need to change, if ran locally again
-  masks_dir: "data/initial/AllMasks"  # these need to change, if ran locally again
+#  images_dir: "data/initial/AllImages"  # these need to change, if ran locally again
+#  masks_dir: "data/initial/AllMasks"  # these need to change, if ran locally again
   results_dir: "results"
+  logs_dir: "results/exp1/logs/"
   model_dir: "src/models/"
   data_visualizations_dir: "data/visualizations/"
 
@@ -35,5 +36,5 @@ optimizer:
   learning_rate: 0.01
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
-metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall', 'average_hausdorff_distance', 'average_surface_distance', 'normalized_surface_distance']
+metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall', 'specificity']
 

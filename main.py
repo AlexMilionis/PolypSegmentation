@@ -17,8 +17,8 @@ if __name__ == '__main__':
     # CreateDataset.create_initial_dataset(config, include_seq_frames=False)  #   create initial dataset (allimages, allmasks)
     # CreateDataset.create_processed_datasets(config) #   create processed dataset (train, val, test)
     train_loader, val_loader, test_loader = DataLoading(config).get_loaders()   #    apply transformations to every dataset separately + create 3 separate data loaders
-    visualize_data(config, train_loader, num_samples = 3)
+    # visualize_data(config, train_loader, num_samples = 3)
     exp = Experiment(train_loader, val_loader, test_loader, config)
-    exp.execute_training()
-    exp.execute_evaluation()
+    metrics = exp.execute_training()
+    exp.execute_evaluation(metrics)
 

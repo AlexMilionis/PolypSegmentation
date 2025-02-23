@@ -30,10 +30,11 @@ class Trainer:
         # return total_loss.item() / len(train_loader)
 
 
-    def validate_one_epoch(self, loader, to_visualize=False):
+    def validate_one_epoch(self, loader, metrics=None, to_visualize=False):
         self.model.eval()
         total_val_loss = 0
-        val_metrics = Metrics(self.device)
+        if metrics is None:
+            metrics = Metrics(self.device, self.config)
         already_visualized = False
         threshold = 0.5
         with torch.no_grad():
@@ -44,9 +45,9 @@ class Trainer:
                     loss = self.criterion(outputs, masks)
                 probs = torch.sigmoid(outputs)
                 preds = (probs > threshold).float()
-                val_metrics.add_batch(preds, masks)
+                metrics.add_batch(preds, masks)
                 total_val_loss += loss
                 if to_visualize and not already_visualized:
                     visualize_outputs(self.config, images, masks, preds, paths)
                     already_visualized = True
-        return total_val_loss, val_metrics
+        return total_val_loss, metrics

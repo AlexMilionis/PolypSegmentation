@@ -1,11 +1,19 @@
 import torch
 
 class Metrics():
-    def __init__(self, device):
+    def __init__(self, device, config):
+        self.metric_names = config['metrics']
         self.tp = torch.tensor(0, dtype=torch.long, device=device)
         self.fn = torch.tensor(0, dtype=torch.long, device=device)
         self.fp = torch.tensor(0, dtype=torch.long, device=device)
         self.tn = torch.tensor(0, dtype=torch.long, device=device)
+        # initialize metrics dict
+        self._create_metrics()
+
+
+    def _create_metrics(self):
+        self.col_names = ["epoch", "train_loss", "val_loss", "test_loss"] + self.metric_names
+        self.metrics = {name:[] for name in self.col_names}
 
 
     def add_batch(self, batch_predictions, batch_ground_truths):
@@ -17,51 +25,59 @@ class Metrics():
         self.fp += torch.sum((predictions == 1) & (ground_truths == 0))
         self.tn += torch.sum((predictions == 0) & (ground_truths == 0))
 
-    def _recall(self):
+    def recall(self):
         return self.tp / (self.tp + self.fn)
 
-    def _precision(self):
+    def precision(self):
         return self.tp / (self.tp + self.fp)
 
-    def _specificity(self):
+    def specificity(self):
         return self.tn / (self.tn + self.fp)
 
-    def _f1_score(self):
+    def f1_score(self):
         # return 2*(self._precision() * self._recall())/(self._precision() + self._recall())
         return 2*self.tp / (2 * self.tp + self.fp + self.fn)
 
-    def _f2_score(self):
+    def f2_score(self):
         return 5*self.tp / (5 * self.tp + self.fp + 4 * self.fn)
 
-    def _jaccard_index(self):
+    def jaccard_index(self):
         return self.tp / (self.tp + self.fp + self.fn)
 
-    def _accuracy(self):
+    def accuracy(self):
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
 
-    def _average_hausdorff_distance(self):
+    def average_hausdorff_distance(self):
         pass
 
-    def _average_surface_distance(self):
+    def average_surface_distance(self):
         pass
 
-    def _normalized_surface_distance(self):
+    def normalized_surface_distance(self):
         pass
 
-    def compute_metrics(self, test_mode, **kwargs):
-        metrics_config = kwargs.get("config_metrics", [])
-        metrics = {}
-        if test_mode:
-            metrics['TestLoss'] = kwargs.get("test_loss", 0) / kwargs.get("len_test_loader", 1)
-        else:
-            metrics["TrainLoss"] = kwargs.get("train_loss", 0) / kwargs.get("len_train_loader", 1)
-            metrics["ValLoss"] = kwargs.get("val_loss", 0) / kwargs.get("len_val_loader", 1)
 
-        for metric_name in metrics_config:
-            metric_name = '_'+ metric_name
-            if hasattr(self,  metric_name):
-                metric_method = getattr(self, metric_name)
-                metrics[metric_name[1:].title().replace('_','')] = metric_method()
-        return metrics
+    def compute_metrics(self, mode="train", **kwargs):
+        if mode == "train":
+            self.metrics["epoch"].append(kwargs.get("epoch", -1))
+            self.metrics["train_loss"].append(kwargs.get("train_loss", 0))
+            self.metrics["val_loss"].append(kwargs.get("val_loss", 0))
+            self.metrics["test_loss"].append(None)
+
+        if mode == "test":
+            self.metrics["epoch"].append(None)
+            self.metrics["train_loss"].append(None)
+            self.metrics["val_loss"].append(None)
+            self.metrics["test_loss"].append(kwargs.get("test_loss", 0))
 
 
+        # self.metrics["jaccard_index"].append(self.jaccard_index())
+        # self.metrics["f1_score"].append(self.f1_score())
+        # self.metrics["f2_score"].append(self.f2_score())
+        # self.metrics["f2_score"].append(self.f2_score())
+        # self.metrics["precision"].append(self.precision())
+        # self.metrics["recall"].append(self.recall())
+        # self.metrics["specificity"].append(self.specificity())
+
+        for metric in self.metric_names:
+            self.metrics[metric].append(getattr(self, metric)())

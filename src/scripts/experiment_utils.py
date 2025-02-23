@@ -1,83 +1,58 @@
-import csv
-from src.config.constants import Constants
-import os
+import os, shutil
 import yaml
 from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
-import csv
+import pandas as pd
+import torch
 
 
 class ExperimentLogger:
 
-    def __init__(self, config, metrics):
-        self.experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
-        self._create_experiment_directory(self.experiment_results_dir)
-        self.metrics_path = os.path.join(self.experiment_results_dir, "metrics.csv")
-        self._init_metrics_csv(self.metrics_path, metrics)  # metrics initialization
-        # self.logs_path = os.path.join(self.experiment_results_dir, "logs.log")    # logs initialization
+    @staticmethod
+    def convert_tensor(value):
+        if isinstance(value, torch.Tensor):
+            return value.detach().cpu().item()  # Move to CPU and convert to Python float
+        elif isinstance(value, list):  # If it's a list, apply conversion recursively
+            return [ExperimentLogger.convert_tensor(v) for v in value]
+        return value  # Return as is if not a tensor
+
 
     @staticmethod
-    def _create_experiment_directory(experiment_results_dir):
-        #   delete directory files from previous experiment, if they exist
+    def log_metrics(config, metrics):
+        print(metrics)
+        experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
         if os.path.exists(experiment_results_dir):
-            for filename in os.listdir(experiment_results_dir):
-                file_path = os.path.join(experiment_results_dir, filename)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            os.rmdir(experiment_results_dir)    #   delete empty directory from previous experiment
-        os.makedirs(experiment_results_dir, exist_ok=True)  #   create directory
+            shutil.rmtree(experiment_results_dir)  # Removes directory even if not empty
+        os.makedirs(experiment_results_dir, exist_ok=True)  # Re-create clean directory
+        csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
+        cleaned_metrics = {key: ExperimentLogger.convert_tensor(value) for key, value in metrics.items()}
+        metrics_df = pd.DataFrame(cleaned_metrics)
+        metrics_df.to_csv(csv_path, index=False)
 
-    @staticmethod
-    def _init_metrics_csv(metrics_path, metrics):
-        with open(metrics_path, "w", newline='') as f:
-            writer = csv.writer(f)
-            cols = ["Epoch"]
-            cols.extend(list(metrics.keys()))
-            writer.writerow(cols)
+    #
+    # def log_metrics(self, epoch, metrics, mode="train"):
+    #     """
+    #     Logs training or test metrics into the appropriate sheet in 'experiment_results.xlsx'.
+    #     :param epoch: The current epoch (integer) or None for test metrics.
+    #     :param metrics: A dictionary containing metric values.
+    #     :param mode: "train" for training metrics, "test" for test metrics.
+    #     """
+    #
+    #     # Ensure tensors remain on the GPU while extracting numerical values
+    #     cleaned_metrics = {
+    #         k: float(v) if isinstance(v, torch.Tensor) else v for k, v in metrics.items()
+    #     }
+    #     # Convert dictionary into DataFrame (single-row)
+    #     df = pd.DataFrame([{"Epoch": epoch, **cleaned_metrics}])
+    #     # Determine sheet name
+    #     sheet_name = "Metrics" if mode == "train" else "Test Metrics"
+    #     # Read current Excel file
+    #     with pd.ExcelWriter(self.csv_path, mode="a", if_sheet_exists="replace", engine="openpyxl") as writer:
+    #         existing_data = pd.read_excel(self.csv_path, sheet_name=sheet_name)
+    #         updated_df = pd.concat([existing_data, df], ignore_index=True)  # Append new data to the existing DataFrame
+    #         updated_df.to_excel(writer, sheet_name=sheet_name, index=False) # Write back the entire sheet
+    #         # df.to_excel(writer, sheet_name=sheet_name, index=False, header=False)
+    #
 
-    def log_metrics(self, epoch, metrics):
-        # Append metrics to the log file
-        with open(self.metrics_path, "a", newline='') as f:
-            writer = csv.writer(f)
-            cols = [epoch]
-            cols.extend(list(metrics.values()))
-            writer.writerow(cols)
-
-    @staticmethod
-    def log_test_metrics(config, metrics):
-        metrics_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "metrics_test.csv")
-        with open(metrics_path, "a", newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(metrics.keys())
-            writer.writerow(metrics.values())
-
-    def log_experiment(self, details):
-        # os.makedirs(self.logs_dir, exist_ok=True)
-
-        #   log format
-        """
-        Experiment ID: experiment_1
-        Model: UNet
-        Encoder: resnet34
-        Learning Rate: 0.0001
-        Batch Size: 32
-        Epochs: 20
-
-        Epoch 1/20:
-            Training Loss: 0.589
-            Validation Loss: 0.612
-            Dice Score: 0.71
-            Time Taken: 45s
-
-        Epoch 2/20:
-            Training Loss: 0.421
-            Validation Loss: 0.459
-            Dice Score: 0.78
-            Time Taken: 42s
-
-        GPU Utilization: 75% average during training.
-
-        Experiment Completed: 2024-12-18 14:23:15
-        """
 
     @staticmethod
     def load_config(config_name, config_dir="src/experiments/configurations/"):
@@ -94,24 +69,25 @@ class ExperimentLogger:
 
 
 
-    @staticmethod
-    def use_profiler(trainer, train_loader, epoch):
-        log_dir = './log'
-        os.makedirs(log_dir, exist_ok=True)
-
-        log_file_path = os.path.join(log_dir, f'epoch_{epoch}.log')
-
-        # Start profiling for the current epoch
-        with profile(
-                activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-                on_trace_ready=tensorboard_trace_handler('./log/epoch_{}'.format(epoch)),
-                record_shapes=True,
-                profile_memory=True,
-        ) as prof:
-            total_train_loss = trainer.train_one_epoch(train_loader)
-
-        # Save profiling results to a .log file
-        with open(log_file_path, 'w') as log_file:
-            log_file.write(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
-
-        return total_train_loss
+    # def use_profiler(self, trainer, train_loader, epoch):
+    #     # log_dir = './log'
+    #     epoch_log_dir = os.path.join(self.experiment_results_dir, "logs", f"epoch_{epoch}")
+    #     os.makedirs(epoch_log_dir, exist_ok=True)
+    #
+    #     log_file_path = os.path.join(epoch_log_dir, "profiling.log")  # Store log file in the same directory
+    #     trace_dir = epoch_log_dir  # TensorBoard traces also go in the same directory
+    #
+    #     # Start profiling for the current epoch
+    #     with profile(
+    #             activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+    #             on_trace_ready=tensorboard_trace_handler(trace_dir),
+    #             record_shapes=True,
+    #             profile_memory=True,
+    #     ) as prof:
+    #         total_train_loss = trainer.train_one_epoch(train_loader)
+    #
+    #     # Save profiling results to a .log file
+    #     with open(log_file_path, 'w') as log_file:
+    #         log_file.write(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+    #
+    #     return total_train_loss
