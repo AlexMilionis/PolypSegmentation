@@ -82,9 +82,22 @@ def class_balance(include_data):
 
 
 if __name__ == '__main__':
+    pass
     # count_images()
     # test_for_overlaps_in_datasets()
     # for data in ["both", "single_frames", "seq_frames"]:
     #     class_balance("train",include_data=data)
     #     class_balance("test",include_data=data)
-    pass
+
+    data = {
+        'epoch': [0, None],
+        'train_loss': [torch.tensor(0.0028, device='cuda:0', requires_grad=True), None],
+        'val_loss': [torch.tensor(0.1594, device='cuda:0'), None],
+        'test_loss': [None, torch.tensor(0.1568, device='cuda:0')],
+        'jaccard_index': torch.tensor(0.4259, device='cuda:0'),
+        'f1_score': torch.tensor(0.5974, device='cuda:0'),
+        'f2_score': torch.tensor(0.5164, device='cuda:0'),
+        'precision': torch.tensor(0.8090, device='cuda:0'),
+        'recall': torch.tensor(0.4735, device='cuda:0')
+    }
+
