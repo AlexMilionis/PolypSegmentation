@@ -30,11 +30,21 @@ batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 2
+epochs: 1
 optimizer:
   type: 'Adam'
   learning_rate: 0.01
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
-metrics: ['jaccard_index', 'f1_score', 'f2_score', 'precision', 'recall', 'specificity']
+metrics: [
+  'jaccard_index',
+  'f1_score',
+  'f2_score',
+  'precision',
+  'recall',
+  'accuracy',
+#  'average_hausdorff_distance',
+#  'average_surface_distance',
+#  'normalised_surface_distance'
+]
 
