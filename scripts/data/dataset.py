@@ -2,8 +2,8 @@ import torch, torchvision
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 from torchvision import tv_tensors
-from src.data.transforms import Transforms
-from src.data.dataset_utils import CreateDataset
+from scripts.data.transforms import Transforms
+from scripts.data.dataset_utils import CreateDataset
 
 class PolypDataset(Dataset):
     def __init__(self, mode, save_preloaded_tensors=False, preload=True):

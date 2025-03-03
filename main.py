@@ -1,10 +1,9 @@
-from src.data.dataloader import DataLoading
-from src.config.seed import set_seed
-from src.scripts.visualization_utils import visualize_data
-from src.experiments.run_experiment import Experiment
-from src.scripts.experiment_utils import ExperimentLogger
+from scripts.data.dataloader import DataLoading
+from scripts.seed import set_seed
+from scripts.visualization_utils import visualize_data
+from scripts.experiments.run_experiment import Experiment
+from scripts.experiments.experiment_utils import ExperimentLogger
 import sys
-from src.data.dataset_utils import CreateDataset
 
 set_seed()
 if __name__ == '__main__':
@@ -17,7 +16,7 @@ if __name__ == '__main__':
     # CreateDataset.create_initial_dataset(config, include_seq_frames=False)  #   create initial dataset (allimages, allmasks)
     # CreateDataset.create_processed_datasets(config) #   create processed dataset (train, val, test)
     train_loader, val_loader, test_loader = DataLoading(config).get_loaders()   #    apply transformations to every dataset separately + create 3 separate data loaders
-    # visualize_data(config, train_loader, num_samples = 3)
+    visualize_data(config, train_loader, num_samples = 3)
     exp = Experiment(train_loader, val_loader, test_loader, config)
     metrics = exp.execute_training()
     exp.execute_evaluation(metrics)

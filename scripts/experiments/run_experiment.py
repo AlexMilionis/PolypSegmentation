@@ -1,13 +1,12 @@
 import torch
-from src.scripts.model_utils import ModelManager
+from scripts.models.model_utils import ModelManager
 import warnings
 from tqdm import tqdm
 from torch.cuda.amp import GradScaler
-from src.scripts.experiment_utils import ExperimentLogger
+from scripts.experiments.experiment_utils import ExperimentLogger
 from torch import nn, optim
-from src.scripts.trainer import Trainer
-from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
-from src.scripts.metrics import Metrics
+from scripts.experiments.trainer import Trainer
+from scripts.experiments.metrics import Metrics
 
 warnings.filterwarnings('ignore')
 

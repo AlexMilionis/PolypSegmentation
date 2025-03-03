@@ -8,7 +8,7 @@ paths:
 #  masks_dir: "data/initial/AllMasks"  # these need to change, if ran locally again
   results_dir: "results"
   logs_dir: "results/exp1/logs/"
-  model_dir: "src/models/"
+  model_dir: "scripts/models/"
   data_visualizations_dir: "data/visualizations/"
 
 dataset:

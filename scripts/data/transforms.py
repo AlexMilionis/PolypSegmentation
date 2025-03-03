@@ -1,6 +1,5 @@
 from torchvision.transforms import v2 as T
-from src.config.constants import Constants
-import numpy as np
+from scripts.constants import Constants
 
 
 class Transforms():

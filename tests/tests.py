@@ -22,7 +22,7 @@ Testing and Analysis Utilities for Datasets:
 
 
 from torch.utils.data import Subset
-from src.data.dataloader import DataLoading
+from scripts.data.dataloader import DataLoading
 import os
 import torch
 

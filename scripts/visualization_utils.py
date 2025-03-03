@@ -26,7 +26,7 @@ Visualization Utilities for Dataset and Predictions:
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from src.config.constants import Constants
+from scripts.constants import Constants
 
 
 def plot_image(ax, image, title, cmap=None):

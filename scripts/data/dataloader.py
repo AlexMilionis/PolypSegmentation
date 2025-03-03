@@ -1,9 +1,5 @@
-import torch
-from torch.utils.data import DataLoader, Subset
-from src.data.dataset import PolypDataset
-from src.config.hyperparameters import Hyperparameters
-from src.config.seed import set_generator
-import numpy as np
+from torch.utils.data import DataLoader
+from scripts.data.dataset import PolypDataset
 
 
 class DataLoading:

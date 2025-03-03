@@ -88,7 +88,7 @@ class ExperimentLogger:
 
 
     @staticmethod
-    def load_config(config_name, config_dir="src/experiments/configurations/"):
+    def load_config(config_name, config_dir="experiments/"):
         if not(config_name.endswith(".yaml")):
             config_name = config_name + '.yaml'
         try:
