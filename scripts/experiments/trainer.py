@@ -1,6 +1,6 @@
 import torch
 from torch.cuda.amp import autocast
-from scripts.visualization_utils import visualize_outputs
+from scripts.visualizations.visualization_utils import visualize_outputs
 
 class Trainer:
     def __init__(self, config, model, optimizer, criterion, scaler, device):
