@@ -1,0 +1,50 @@
+experiment_name: 'exp1_lr'
+experiment_description: "Transfer Learning with torch's UNet segmentation model."
+paths:
+#  raw_dataset_dir: "data/raw/"  # these need to change, if ran locally again
+#  initial_dataset_dir: "data/initial" # these need to change, if ran locally again
+  processed_dataset_dir: "data/processed"
+#  images_dir: "data/initial/AllImages"  # these need to change, if ran locally again
+#  masks_dir: "data/initial/AllMasks"  # these need to change, if ran locally again
+  results_dir: "results"
+  logs_dir: "results/exp1/logs/"
+  model_dir: "scripts/models/"
+  data_visualizations_dir: "data/visualizations/"
+
+dataset:
+  include_data: 'single_frames'
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+
+model:
+  filename: 'unet.py'
+  class_name: 'UNet'
+  use_transfer_learning: True
+  encoder: 'resnet18'
+  encoder_weights: 'imagenet'
+  input_channels: 3
+  num_classes: 1  #num_outputs
+
+batch_size: 16
+num_workers: 4
+pin_memory: True
+persistent_workers: True
+epochs: 30
+optimizer:
+  type: 'Adam'
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+loss_function: 'BCEWithLogitsLoss'
+metrics: [
+  'jaccard_index',
+  'f1_score',
+  'f2_score',
+  'precision',
+  'recall',
+  'accuracy',
+#  'average_hausdorff_distance',
+#  'average_surface_distance',
+#  'normalised_surface_distance'
+]
+
