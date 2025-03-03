@@ -7,7 +7,9 @@ class ModelManager:
 
     @staticmethod
     def save_checkpoint(model, config):
-        checkpoint_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "checkpoint.pth")
+        save_dir  = os.path.join(config['paths']['results_dir'], config['experiment_name'])
+        checkpoint_path = os.path.join(save_dir, "checkpoint.pth")
+        os.makedirs(save_dir, exist_ok=True)
         torch.save(model.state_dict(), checkpoint_path)
         return checkpoint_path
 
