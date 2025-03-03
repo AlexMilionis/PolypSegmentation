@@ -55,6 +55,10 @@ class UNet(nn.Module):
             param.requires_grad = False
         return model
 
+    def unfreeze_encoder(self):
+        """Unfreeze the encoder for fine-tuning."""
+        for param in self.model.encoder.parameters():
+            param.requires_grad = True
 
     def forward(self, x):
         return self.model(x)
