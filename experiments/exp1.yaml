@@ -30,10 +30,10 @@ batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 1
+epochs: 30
 optimizer:
   type: 'Adam'
-  learning_rate: 0.01
+  learning_rate: 0.001
   weight_decay: 0.00001
 loss_function: 'BCEWithLogitsLoss'
 metrics: [
