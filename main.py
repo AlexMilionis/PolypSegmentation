@@ -1,6 +1,6 @@
 from scripts.data.dataloader import DataLoading
 from scripts.seed import set_seed
-from scripts.visualization_utils import visualize_data
+from scripts.visualizations.visualization_utils import visualize_data
 from scripts.experiments.run_experiment import Experiment
 from scripts.experiments.experiment_utils import ExperimentLogger
 import sys
