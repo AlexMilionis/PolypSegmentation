@@ -7,6 +7,7 @@ from scripts.experiments.experiment_utils import ExperimentLogger
 from torch import nn, optim
 from scripts.experiments.trainer import Trainer
 from scripts.experiments.metrics import Metrics
+from scripts.experiments.loss import DiceAndBCE
 
 warnings.filterwarnings('ignore')
 
@@ -27,7 +28,14 @@ class Experiment:
         #     print(f"{i[0]} -> {i[1].device}")
 
         self.num_epochs = config['epochs']
-        self.criterion = getattr(nn, self.config['loss_function'])()
+
+
+        # self.criterion = getattr(nn, self.config['loss_function'])()
+        if self.config['loss_function'] == 'DiceAndBCE':
+            self.criterion = DiceAndBCE(dice_weight=1.0, bce_weight=1.0)
+        else:
+            self.criterion = getattr(nn, self.config['loss_function'])()
+
         optimizer_type = getattr(optim, self.config['optimizer']['type'])
         self.optimizer = optimizer_type(self.model.parameters(),
                                         lr=self.config['optimizer']['learning_rate'],
