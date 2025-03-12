@@ -1,32 +1,10 @@
-"""
-Visualization Utilities for Dataset and Predictions:
-
-1. **Purpose:**
-   This script contains utility functions to visualize data samples and model predictions, aiding in debugging and understanding model behavior.
-
-2. **Functions:**
-
-   - `plot_image(ax, image, title, cmap=None)`:
-     - Plots a single image on the specified axis with a title and optional colormap.
-
-   - `process_image(image_tensor)`:
-     - Converts a PyTorch image tensor to a format suitable for visualization.
-     - Unnormalizes the image using the dataset's normalization parameters and rearranges it to (H, W, C).
-
-   - `visualize_data(dataloader, num_samples=2)`:
-     - Visualizes a specified number of random image-mask pairs from the 9th batch of the provided DataLoader.
-     - Displays side-by-side images and their corresponding masks with proper titles.
-
-   - `visualize_predictions(images, masks, predictions, num_samples)`:
-     - Visualizes a specified number of samples showing input images, ground truth masks, and predicted masks.
-     - Arranges the results in a grid with three columns: Input Image, Ground Truth Mask, and Predicted Mask.
-"""
-
 
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 from scripts.constants import Constants
+import seaborn as sns
+import pandas as pd
 
 
 def plot_image(ax, image, title, cmap=None):
@@ -82,3 +60,69 @@ def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batc
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
     plt.savefig(save_path)
     plt.close(fig)
+
+
+def plot_loss_curves(config):
+    """
+    Creates training/validation error plots from experiment CSV data.
+
+    Args:
+        csv_path (str): Path to CSV file with training metrics
+        save_path (str): Optional path to save the plot image
+    """
+    # Load data and handle -1 values
+    csv_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "experiment_results.csv")
+    df = pd.read_csv(csv_path)
+
+    # Separate test results from epoch data
+    test_results = df[df['epoch'] == -1].copy()
+    epoch_data = df[df['epoch'] != -1].copy()
+
+    # Clean data
+    epoch_data.replace(-1, pd.NA, inplace=True)
+    test_results.replace(-1, pd.NA, inplace=True)
+
+    # Compute error (1 - accuracy)
+    # epoch_data['train_error'] = 1 - epoch_data['accuracy']
+    # epoch_data['val_error'] = 1 - epoch_data[
+    #     'accuracy']  # Assuming validation accuracy is the same as training accuracy
+
+
+    # Melt dataframe for seaborn
+    plot_df = epoch_data.melt(id_vars='epoch',
+                              value_vars=['train_loss', 'val_loss'],
+                              var_name='loss_type',
+                              value_name='loss_value')
+
+    # Create plot
+    plt.figure(figsize=(10, 6))
+    sns.set_style("whitegrid")
+
+    # Plot training/validation curves
+    ax = sns.lineplot(data=plot_df, x='epoch', y='loss_value',
+                      hue='loss_type', palette=['#1f77b4', '#ff7f0e'],
+                      linewidth=2.5)
+
+    # Add test error marker if available
+    if not test_results.empty and not pd.isna(test_results['test_loss'].iloc[0]):
+        test_epoch = epoch_data['epoch'].max() + 1  # Place test after last epoch
+        ax.scatter(x=test_epoch, y=test_results['test_loss'].iloc[0],
+                   color='#2ca02c', s=150, label='Test Loss', zorder=5,
+                   edgecolors='black', linewidth=1.5)
+
+    # Style plot
+    plt.title("Training and Validation Loss", fontsize=14, pad=20)
+    plt.xlabel("Epoch", fontsize=12)
+    plt.ylabel("Loss", fontsize=12)
+    plt.legend(title='Loss Type', loc='upper right')
+
+    # Custom x-axis ticks
+    max_epoch = epoch_data['epoch'].max()
+    xticks = list(range(0, max_epoch + 1, max(1, max_epoch // 10)))
+    if not test_results.empty:
+        xticks.append(test_epoch)
+    plt.xticks(xticks)
+
+    # Save
+    save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "loss_curves.png")
+    plt.savefig(save_path, bbox_inches='tight', dpi=300)

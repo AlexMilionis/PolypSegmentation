@@ -1,10 +1,7 @@
 # TODO:
     #   General
-        #   write down all processes before continuing further
         #   check MONAI
         #   training on notebooks?
-        #   gpu sources, mail me slurm
-        #   EDA
     #   Preprocessing
         #   data split: train(C1-C4), validation C5, test C6 ?
     #   Models
