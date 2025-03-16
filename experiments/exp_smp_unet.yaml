@@ -1,5 +1,5 @@
 experiment_name: 'exp1'
-experiment_description: "Transfer Learning with torch's UNet segmentation model."
+#experiment_description: "Transfer Learning with torch's UNet segmentation model."
 paths:
 #  raw_dataset_dir: "data/raw/"  # these need to change, if ran locally again
 #  initial_dataset_dir: "data/initial" # these need to change, if ran locally again
@@ -26,16 +26,24 @@ model:
   input_channels: 3
   num_classes: 1  #num_outputs
 
+loss:
+  sigmoid: True
+  include_background: True
+  lambda_dice: 0.7
+  lambda_ce: 0.3
+  weight: [0.1, 0.9]
+
+
 batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 2
+epochs: 1
 optimizer:
   type: 'Adam'
   learning_rate: 0.001
   weight_decay: 0.00001
-loss_function: 'BCEWithLogitsLoss'
+#loss_function: 'BCEWithLogitsLoss'
 metrics: [
   'jaccard_index',
   'f1_score',
