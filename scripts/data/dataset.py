@@ -6,7 +6,7 @@ from scripts.data.transforms import Transforms
 from scripts.data.dataset_utils import CreateDataset
 
 class PolypDataset(Dataset):
-    def __init__(self, mode, save_preloaded_tensors=False, preload=True):
+    def __init__(self, mode, preload=True):
         # self.images_dir = config['paths']['images_dir']
         # self.masks_dir  = config['paths']['masks_dir']
         self.mode = mode
@@ -21,15 +21,12 @@ class PolypDataset(Dataset):
         self.preload = preload
         if self.preload:
             self.data = [
-                self._apply_transforms(read_image(img_path), read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY), img_path, mask_path) for img_path, mask_path in CreateDataset.get_image_mask_pairs(self.mode)
+                self._apply_transforms(
+                    read_image(img_path), read_image(mask_path, mode=torchvision.io.ImageReadMode.GRAY), img_path, mask_path)
+                for img_path, mask_path in CreateDataset.get_image_mask_pairs(self.mode)
             ]
-            if save_preloaded_tensors==True:
-                torch.save(self.data, f"D:/repos/MScThesis/github_repo/data/tensors/{self.mode}_cached.pt")
-
         else:
             self.data = CreateDataset.get_image_mask_pairs(self.mode)
-
-
 
 
     def _apply_transforms(self, image, mask, img_path, mask_path):

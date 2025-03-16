@@ -63,40 +63,23 @@ def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batc
 
 
 def plot_loss_curves(config):
-    """
-    Creates training/validation error plots from experiment CSV data.
-
-    Args:
-        csv_path (str): Path to CSV file with training metrics
-        save_path (str): Optional path to save the plot image
-    """
     # Load data and handle -1 values
     csv_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "experiment_results.csv")
     df = pd.read_csv(csv_path)
 
     # Separate test results from epoch data
-    test_results = df[df['epoch'] == -1].copy()
-    epoch_data = df[df['epoch'] != -1].copy()
-
-    # Clean data
-    epoch_data.replace(-1, pd.NA, inplace=True)
-    test_results.replace(-1, pd.NA, inplace=True)
-
-    # Compute error (1 - accuracy)
-    # epoch_data['train_error'] = 1 - epoch_data['accuracy']
-    # epoch_data['val_error'] = 1 - epoch_data[
-    #     'accuracy']  # Assuming validation accuracy is the same as training accuracy
-
+    train_data = df[df['epoch'] != -1].copy()
+    test_row = df[df['epoch'] == -1].copy()
 
     # Melt dataframe for seaborn
-    plot_df = epoch_data.melt(id_vars='epoch',
+    plot_df = train_data.melt(id_vars='epoch',
                               value_vars=['train_loss', 'val_loss'],
                               var_name='loss_type',
                               value_name='loss_value')
 
     # Create plot
     plt.figure(figsize=(10, 6))
-    sns.set_style("whitegrid")
+    sns.set_style("darkgrid")
 
     # Plot training/validation curves
     ax = sns.lineplot(data=plot_df, x='epoch', y='loss_value',
@@ -104,25 +87,32 @@ def plot_loss_curves(config):
                       linewidth=2.5)
 
     # Add test error marker if available
-    if not test_results.empty and not pd.isna(test_results['test_loss'].iloc[0]):
-        test_epoch = epoch_data['epoch'].max() + 1  # Place test after last epoch
-        ax.scatter(x=test_epoch, y=test_results['test_loss'].iloc[0],
-                   color='#2ca02c', s=150, label='Test Loss', zorder=5,
-                   edgecolors='black', linewidth=1.5)
+    if not test_row.empty and not pd.isna(test_row['test_loss'].iloc[0]):
+        test_epoch = train_data['epoch'].max()  # Place test at the last epoch
+        ax.scatter(x=test_epoch, y=test_row['test_loss'].iloc[0], color='black', label='Test Loss', marker='o')
+
+    # Set y-axis limits
+    ax.set_ylim(0, 1)
 
     # Style plot
     plt.title("Training and Validation Loss", fontsize=14, pad=20)
     plt.xlabel("Epoch", fontsize=12)
     plt.ylabel("Loss", fontsize=12)
-    plt.legend(title='Loss Type', loc='upper right')
+    plt.legend(title='Loss Type', loc='upper left', bbox_to_anchor=(1, 1))
 
     # Custom x-axis ticks
-    max_epoch = epoch_data['epoch'].max()
-    xticks = list(range(0, max_epoch + 1, max(1, max_epoch // 10)))
-    if not test_results.empty:
+    max_epoch = train_data['epoch'].max()
+    xticks = list(range(1, max_epoch + 1))
+
+    if not test_row.empty:
         xticks.append(test_epoch)
     plt.xticks(xticks)
 
     # Save
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "loss_curves.png")
     plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+
+
