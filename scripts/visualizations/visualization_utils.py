@@ -44,7 +44,7 @@ def visualize_data(config, dataloader, num_samples=3, outputs=False):
     plt.close(fig)
 
 
-def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=3):
+def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
     num_samples = min(num_samples, len(batch_images))  # Ensure we don't exceed batch size
     fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
     for i in range(num_samples):
