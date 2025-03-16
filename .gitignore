@@ -2,10 +2,8 @@
 .ipynb_checkpoints/
 __pycache__/
 data/
-docs/dataset_paper.pdf
 *.pth
 *.csv
 *.png
 log/
-docs/credentials.txt
 docs/
