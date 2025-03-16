@@ -52,7 +52,6 @@ class Metrics():
         # return 2*(self._precision() * self._recall())/(self._precision() + self._recall())
         return 2*self.tp / (2 * self.tp + self.fp + self.fn)
 
-
     def f2_score(self):
         return 5*self.tp / (5 * self.tp + self.fp + 4 * self.fn)
 
@@ -61,7 +60,6 @@ class Metrics():
 
     def accuracy(self):
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
-
 
     def compute_metrics(self, mode="train", **kwargs):
         if mode == "train":
