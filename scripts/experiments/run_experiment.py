@@ -10,6 +10,8 @@ from scripts.experiments.trainer import Trainer
 from scripts.experiments.metrics import Metrics
 from scripts.experiments.loss import Dice_CE_Loss
 
+from scripts.visualizations.visualization_utils import plot_loss_curves
+
 
 class Experiment:
     def __init__(self, train_loader, val_loader, test_loader, config):
@@ -26,7 +28,7 @@ class Experiment:
         optimizer_type = getattr(optim, self.config['optimizer']['name'])
         self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['optimizer']['learning_rate']))
         scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
-        self.scheduler = scheduler_type(optimizer=self.optimizer, T_max=self.num_epochs)
+        self.scheduler = scheduler_type(optimizer=self.optimizer, T_max=self.num_epochs, eta_min = 1e-6)
 
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
@@ -41,10 +43,6 @@ class Experiment:
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
                 # self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
 
-                # Print the current learning rate
-                current_lr = self.optimizer.param_groups[0]['lr']
-                print(f"Epoch {epoch + 1}/{self.num_epochs}, Learning Rate: {current_lr}")
-
                 # Step the scheduler
                 self.scheduler.step()
         ModelManager.save_checkpoint(self.model, self.config)
@@ -56,3 +54,5 @@ class Experiment:
         test_loss, metrics = self.trainer.validate_one_epoch(self.test_loader, metrics, to_visualize=True)
         metrics.compute_metrics(test_loss = test_loss, mode="test")
         ExperimentLogger.log_metrics(self.config, metrics.metrics)
+
+        plot_loss_curves(self.config)
