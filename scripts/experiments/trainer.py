@@ -1,5 +1,5 @@
 import torch
-from torch.cuda.amp import autocast
+from torch.amp import autocast
 from scripts.visualizations.visualization_utils import visualize_outputs
 
 class Trainer:
@@ -18,7 +18,7 @@ class Trainer:
             images, masks = images.to(self.device), masks.to(self.device)
             self.optimizer.zero_grad()
             # Mixed precision forward pass
-            with autocast():
+            with autocast('cuda'):
                 outputs = self.model(images)
                 loss = self.criterion(outputs, masks)
             self.scaler.scale(loss).backward()
@@ -26,7 +26,6 @@ class Trainer:
             self.scaler.update()
             total_loss += loss
         return total_loss / len(train_loader)
-        # return total_loss.item() / len(train_loader)
 
 
     def validate_one_epoch(self, loader, metrics, to_visualize=False):
@@ -37,14 +36,14 @@ class Trainer:
         with torch.no_grad():
             for images, masks, paths in loader:
                 images, masks = images.to(self.device), masks.to(self.device)
-                with autocast():
+                with autocast('cuda'):
                     outputs = self.model(images)
                     loss = self.criterion(outputs, masks)
                 probs = torch.sigmoid(outputs)
                 preds = (probs > threshold).float()
                 metrics.add_batch(preds, masks)
                 total_val_loss += loss
-                if to_visualize and not already_visualized:
+                if to_visualize and not already_visualized: 
                     visualize_outputs(self.config, images, masks, preds, paths)
                     already_visualized = True
-        return total_val_loss, metrics
+        return total_val_loss/len(loader), metrics
