@@ -8,31 +8,12 @@ import torch
 class ExperimentLogger:
 
     @staticmethod
-    # def convert_tensor(value):
-    #     if isinstance(value, torch.Tensor):
-    #         return value.detach().cpu().item()  # Move to CPU and convert to Python float
-    #     elif isinstance(value, list):  # If it's a list, apply conversion recursively
-    #         return [ExperimentLogger.convert_tensor(v) for v in value]
-    #     return value  # Return as is if not a tensor
-
     def convert_tensor(value):
         """Ensures PyTorch tensors are converted to CPU floats before saving."""
         if isinstance(value, torch.Tensor):
             return value.cpu().item()  # Moves to CPU and extracts the numerical value
         return value
 
-
-    # @staticmethod
-    # def log_metrics(config, metrics):
-    #     print(metrics)
-    #     experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
-    #     if os.path.exists(experiment_results_dir):
-    #         shutil.rmtree(experiment_results_dir)  # Removes directory even if not empty
-    #     os.makedirs(experiment_results_dir, exist_ok=True)  # Re-create clean directory
-    #     csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
-    #     cleaned_metrics = {key: ExperimentLogger.convert_tensor(value) for key, value in metrics.items()}
-    #     metrics_df = pd.DataFrame(cleaned_metrics)
-    #     metrics_df.to_csv(csv_path, index=False)
 
     @staticmethod
     def log_metrics(config, metrics):
@@ -59,33 +40,7 @@ class ExperimentLogger:
         # ✅ Write the entire DataFrame at once (ensuring proper row-wise format)
         metrics_df.to_csv(csv_path, index=False)
 
-        print(f"Metrics logged to {csv_path}")
-
-    #
-    # def log_metrics(self, epoch, metrics, mode="train"):
-    #     """
-    #     Logs training or test metrics into the appropriate sheet in 'experiment_results.xlsx'.
-    #     :param epoch: The current epoch (integer) or None for test metrics.
-    #     :param metrics: A dictionary containing metric values.
-    #     :param mode: "train" for training metrics, "test" for test metrics.
-    #     """
-    #
-    #     # Ensure tensors remain on the GPU while extracting numerical values
-    #     cleaned_metrics = {
-    #         k: float(v) if isinstance(v, torch.Tensor) else v for k, v in metrics.items()
-    #     }
-    #     # Convert dictionary into DataFrame (single-row)
-    #     df = pd.DataFrame([{"Epoch": epoch, **cleaned_metrics}])
-    #     # Determine sheet name
-    #     sheet_name = "Metrics" if mode == "train" else "Test Metrics"
-    #     # Read current Excel file
-    #     with pd.ExcelWriter(self.csv_path, mode="a", if_sheet_exists="replace", engine="openpyxl") as writer:
-    #         existing_data = pd.read_excel(self.csv_path, sheet_name=sheet_name)
-    #         updated_df = pd.concat([existing_data, df], ignore_index=True)  # Append new data to the existing DataFrame
-    #         updated_df.to_excel(writer, sheet_name=sheet_name, index=False) # Write back the entire sheet
-    #         # df.to_excel(writer, sheet_name=sheet_name, index=False, header=False)
-    #
-
+        # print(f"Metrics logged to {csv_path}")
 
     @staticmethod
     def load_config(config_name, config_dir="experiments/"):
