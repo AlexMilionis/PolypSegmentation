@@ -5,7 +5,7 @@ paths:
   results_dir: "results"
   logs_dir: "results/exp1/logs/"
   model_dir: "scripts/models/"
-  data_visualizations_dir: "data/visualizations/"
+  data_visualizations_dir: "data/data_visualizations/"
 
 model:
   filename: 'monai_unet.py'
