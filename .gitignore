@@ -1,8 +1,7 @@
 .idea/
 .ipynb_checkpoints/
 __pycache__/
-data/initial/
-data/raw/
+data/
 docs/dataset_paper.pdf
 *.pth
 *.csv
