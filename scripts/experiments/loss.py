@@ -1,5 +1,3 @@
-import segmentation_models_pytorch as smp
-import torch
 import torch.nn as nn
 import monai.losses as monai_losses
 

@@ -1,6 +1,4 @@
 import torch
-from torchmetrics.segmentation import HausdorffDistance
-from torchmetrics.functional.segmentation.hausdorff_distance import hausdorff_distance
 
 class Metrics():
     def __init__(self, device, config):
