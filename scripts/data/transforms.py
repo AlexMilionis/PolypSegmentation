@@ -43,14 +43,14 @@ class Transforms():
             T.RandomGrayscale(p=0.1),   # convert the image to grayscale
             T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
             T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+            T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
         ])
 
     @staticmethod
     def image_val_test_transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.IMAGENET_COLOR_MEANS, std=Constants.IMAGENET_COLOR_STDS),
+            T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
         ])
 
     @staticmethod
