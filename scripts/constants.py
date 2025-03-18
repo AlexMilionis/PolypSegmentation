@@ -8,5 +8,7 @@ class Constants():
     # MASK_DIR = os.path.join(PROCESSED_DATASET_PATH, "AllMasks")
     IMAGENET_COLOR_MEANS = [0.485, 0.456, 0.406]
     IMAGENET_COLOR_STDS = [0.229, 0.224, 0.225]
+    MEANS = [ 0.0821, -0.5092, -0.6079]
+    STDS  = [1.3483, 1.0123, 0.8642]
     # RESULTS_DIR = os.path.join(PROJECT_PATH, "results/")
     # CONFIG_DIR = os.path.join(PROJECT_PATH, "scripts/experiments/configurations/")
