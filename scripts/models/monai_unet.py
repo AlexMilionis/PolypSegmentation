@@ -12,6 +12,8 @@ class UNet(nn.Module):
         self.num_res_units = config['model']['num_res_units']
         self.norm = config['model']['norm']
         self.activation = config['model']['act']
+        self.dropout = config['model']['dropout']
+        self.bias = config['model']['bias']
         self.model = self._build_model()
 
 
@@ -24,7 +26,9 @@ class UNet(nn.Module):
             strides=self.strides,  # Downsampling steps
             num_res_units=self.num_res_units,  # Residual blocks per stage
             norm=self.norm,  # BatchNorm by default
+            bias = self.bias,
             act=self.activation,  # Activation function
+            dropout=self.dropout
         )
 
     def forward(self, x):
