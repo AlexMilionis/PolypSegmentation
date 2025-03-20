@@ -18,8 +18,8 @@ def process_image(image_tensor):
 
 
 def unnormalize_image(image):
-    mean = np.array(Constants.IMAGENET_COLOR_MEANS)
-    std = np.array(Constants.IMAGENET_COLOR_STDS)
+    mean = np.array(Constants.MEANS)
+    std = np.array(Constants.STDS)
     # reverse normalization
     unnormalized_image = (image * std) + mean
     unnormalized_image = np.clip(unnormalized_image, a_min = 0, a_max = 1)
