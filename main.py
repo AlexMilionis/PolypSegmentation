@@ -12,8 +12,8 @@ if __name__ == '__main__':
 
     config = ExperimentLogger.load_config(config_name)
 
-    train_loader, val_loader, test_loader = DataLoadingLocal(config).get_loaders(viz=True)
-    # train_loader, val_loader, test_loader = DataLoadingCloud(config).get_loaders()
+    # train_loader, val_loader, test_loader = DataLoadingLocal(config).get_loaders(viz=True)
+    train_loader, val_loader, test_loader = DataLoadingCloud(config).get_loaders()
 
     exp = Experiment(train_loader, val_loader, test_loader, config)
 
