@@ -3,6 +3,7 @@ import yaml
 from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
 import pandas as pd
 import torch
+import argparse
 
 
 class ExperimentLogger:
@@ -37,7 +38,7 @@ class ExperimentLogger:
         # 🔹 Convert dictionary to a DataFrame where each row is an epoch
         metrics_df = pd.DataFrame.from_dict(cleaned_metrics)
 
-        # ✅ Write the entire DataFrame at once (ensuring proper row-wise format)
+        # Write the entire DataFrame at once (ensuring proper row-wise format)
         metrics_df.to_csv(csv_path, index=False)
 
         # print(f"Metrics logged to {csv_path}")
@@ -56,6 +57,12 @@ class ExperimentLogger:
             exit()
 
 
+    @staticmethod
+    def parse_arguments():
+        parser = argparse.ArgumentParser(description="Run experiment with specified configuration.")
+        parser.add_argument("--config", type=str, help="Path to YAML config file.")
+        parser.add_argument("--dict", type=str, help="Configuration dictionary as a string.")
+        return parser.parse_args()
 
     # def use_profiler(self, trainer, train_loader, epoch):
     #     # log_dir = './log'
