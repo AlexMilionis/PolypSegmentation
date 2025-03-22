@@ -36,13 +36,11 @@ class Experiment:
     def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             for epoch in pbar:
-                if epoch==0: metrics = Metrics(self.device, self.config)
-                # torch.cuda.empty_cache()  # Clear GPU memory
+                if epoch==0:
+                    metrics = Metrics(self.device, self.config)
                 train_loss = self.trainer.train_one_epoch(self.train_loader)
                 val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
-                # self.logger.log_metrics(epoch=epoch, metrics=val_metrics_dict)
-
                 # Step the scheduler
                 self.scheduler.step()
         ModelManager.save_checkpoint(self.model, self.config)
@@ -50,8 +48,9 @@ class Experiment:
 
 
     def execute_evaluation(self, metrics):
-        print('Evaluating...')
+
         test_loss, metrics = self.trainer.validate_one_epoch(self.test_loader, metrics, to_visualize=True)
+
         metrics.compute_metrics(test_loss = test_loss, mode="test")
         ExperimentLogger.log_metrics(self.config, metrics.metrics)
 
