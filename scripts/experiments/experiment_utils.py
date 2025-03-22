@@ -44,7 +44,7 @@ class ExperimentLogger:
         # print(f"Metrics logged to {csv_path}")
 
     @staticmethod
-    def load_config(config_name, config_dir="experiments/"):
+    def load_config(config_name, config_dir="configurations/"):
         if not(config_name.endswith(".yaml")):
             config_name = config_name + '.yaml'
         try:
@@ -62,7 +62,15 @@ class ExperimentLogger:
         parser = argparse.ArgumentParser(description="Run experiment with specified configuration.")
         parser.add_argument("--config", type=str, help="Path to YAML config file.")
         parser.add_argument("--dict", type=str, help="Configuration dictionary as a string.")
-        return parser.parse_args()
+        args = parser.parse_args()
+        if args.config:
+            config = ExperimentLogger.load_config(args.config)
+        elif args.dict:
+            config = yaml.safe_load(args.dict)
+        else:
+            raise ValueError("Either --config or --dict must be provided.")
+        return config
+
 
     # def use_profiler(self, trainer, train_loader, epoch):
     #     # log_dir = './log'

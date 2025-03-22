@@ -7,18 +7,8 @@ import sys, yaml
 
 set_seed()
 if __name__ == '__main__':
-    # python main.py <experiment_name>
 
-    args = ExperimentLogger.parse_arguments()
-    if args.config:
-        config = ExperimentLogger.load_config(args.config)
-    elif args.dict:
-        config = yaml.safe_load(args.dict)
-    else:
-        raise ValueError("Either --config or --dict must be provided.")
-
-    # if len(sys.argv) > 1: config_name = sys.argv[1]
-    # config = ExperimentLogger.load_config(config_name)
+    config = ExperimentLogger.parse_arguments()
 
     # train_loader, val_loader, test_loader = DataLoadingLocal(config).get_loaders(viz=True)
     train_loader, val_loader, test_loader = DataLoadingCloud(config).get_loaders(viz=True)
@@ -28,4 +18,3 @@ if __name__ == '__main__':
     metrics = exp.execute_training()
 
     exp.execute_evaluation(metrics)
-
