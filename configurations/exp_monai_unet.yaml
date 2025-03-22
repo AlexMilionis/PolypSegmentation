@@ -1,9 +1,7 @@
 experiment_name: 'exp_monai_unet'
 
 paths:
-#  processed_dataset_dir: "data/processed"
   results_dir: "results"
-#  logs_dir: "results/exp1/logs/"
   model_dir: "scripts/models/"
   data_visualizations_dir: "results/data_visualizations/"
 
@@ -32,13 +30,12 @@ batch_size: 16
 num_workers: 4
 pin_memory: True
 persistent_workers: True
-epochs: 2
+epochs: 200
 optimizer:
   name: 'Adam'
   learning_rate: 0.0001
   scheduler: CosineAnnealingLR
-#  weight_decay: 0.00001
-#loss_function: 'BCEWithLogitsLoss'
+
 
 metrics: [
   'mIoU',
@@ -47,8 +44,5 @@ metrics: [
   'precision',
   'recall',
   'accuracy',
-#  'average_hausdorff_distance',
-#  'average_surface_distance',
-#  'normalised_surface_distance'
 ]
 
