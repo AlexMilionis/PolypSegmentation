@@ -11,4 +11,4 @@ class Constants():
     MEANS = [ 0.0821, -0.5092, -0.6079]
     STDS  = [1.3483, 1.0123, 0.8642]
     # RESULTS_DIR = os.path.join(PROJECT_PATH, "results/")
-    # CONFIG_DIR = os.path.join(PROJECT_PATH, "scripts/experiments/configurations/")
+    # CONFIG_DIR = os.path.join(PROJECT_PATH, "scripts/configurations/configurations/")
