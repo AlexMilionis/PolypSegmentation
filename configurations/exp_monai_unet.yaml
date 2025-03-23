@@ -3,7 +3,7 @@ experiment_name: 'exp_monai_unet'
 paths:
   results_dir: "results"
   model_dir: "scripts/models/"
-  data_visualizations_dir: "data/visualizations/"
+  data_visualizations_dir: "data/"
 
 model:
   filename: 'monai_unet.py'

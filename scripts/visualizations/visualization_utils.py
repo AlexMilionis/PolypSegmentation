@@ -38,7 +38,7 @@ def visualize_data(config, dataloader, num_samples=3, outputs=False):
         plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
         plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
     plt.tight_layout()
-    save_path = os.path.join(config['paths']['data_visualizations_dir'], "data_visualizations.png")
+    save_path = os.path.join(config['paths']['data_visualizations_dir'], "input_data_visualizations.png")
     plt.savefig(save_path)
     plt.close(fig)
 
