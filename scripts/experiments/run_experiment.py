@@ -41,7 +41,7 @@ class Experiment:
                 mode="min"
             )
         else:
-            raise ValueError(f"Unknown scheduler: {self.config["scheduler"]}")
+            raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
 
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
