@@ -22,8 +22,8 @@ model:
 loss:
   sigmoid: True
   include_background: False
-  lambda_dice: 0.7
-  lambda_ce: 0.3
+  lambda_dice: 0.5
+  lambda_ce: 0.5
 #  weight: [0.1, 0.9]
 
 batch_size: 16
