@@ -34,7 +34,7 @@ epochs: 100
 optimizer:
   name: 'Adam'
   learning_rate: 0.001
-  scheduler: CosineAnnealingLR
+scheduler: 'ReduceLROnPlateau'  # CosineAnnealingLR
 
 
 metrics: [

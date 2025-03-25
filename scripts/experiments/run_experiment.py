@@ -27,8 +27,21 @@ class Experiment:
         self.criterion = Dice_CE_Loss(self.config)
         optimizer_type = getattr(optim, self.config['optimizer']['name'])
         self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['optimizer']['learning_rate']))
-        scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
-        self.scheduler = scheduler_type(optimizer=self.optimizer, T_max=self.num_epochs, eta_min = 1e-6)
+
+        # scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
+        if self.config["scheduler"] == "CosineAnnealingLR":
+            self.scheduler = lr_scheduler.CosineAnnealingLR(
+                optimizer=self.optimizer,
+                T_max=self.num_epochs,
+                eta_min=1e-6
+            )
+        elif self.config["scheduler"] == "ReduceLROnPlateau":
+            self.scheduler = lr_scheduler.ReduceLROnPlateau(
+                optimizer=self.optimizer,
+                mode="min"
+            )
+        else:
+            raise ValueError(f"Unknown scheduler: {self.config["scheduler"]}")
 
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
@@ -42,7 +55,10 @@ class Experiment:
                 val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
                 # Step the scheduler
-                self.scheduler.step()
+                if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
+                    self.scheduler.step(val_loss)
+                else:
+                    self.scheduler.step()
         ModelManager.save_checkpoint(self.model, self.config)
         return metrics
 
