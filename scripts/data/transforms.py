@@ -23,26 +23,36 @@ class Transforms():
     @staticmethod
     def image_and_mask_train_transforms():
         return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2.0)),
-            T.RandomHorizontalFlip(p=0.5),
-            T.RandomVerticalFlip(p=0.5),
-            T.RandomRotation(degrees=90, interpolation=T.InterpolationMode.BILINEAR),
+            T.RandomResizedCrop(size=(256, 256), scale=(0.8, 1.2)),
+            T.RandomHorizontalFlip(p=0.2),
+            # T.RandomVerticalFlip(p=0.5),
+            T.RandomRotation(degrees=15, interpolation=T.InterpolationMode.BILINEAR),
         ])
 
     @staticmethod
     def image_and_mask_val_test_transforms():
         return T.Compose([
-            T.Resize(size=(512, 512)),
+            T.Resize(size=(256, 256)),
         ])
 
     @staticmethod
     def image_train_transforms():
+        # return T.Compose([
+        #     T.Lambda(Transforms.convert_to_float),
+        #     # T.ColorJitter(brightness=0.1, contrast=0.1),
+        #     T.RandomGrayscale(p=0.1),   # convert the image to grayscale
+        #     # T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
+        #     T.RandomApply([T.GaussianBlur(3)], p=0.2),
+        #     T.Lambda(Transforms.convert_to_01_range),
+        #     T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
+        # ])
         return T.Compose([
             T.Lambda(Transforms.convert_to_float),
-            T.ColorJitter(),
-            T.RandomGrayscale(p=0.1),   # convert the image to grayscale
-            T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
             T.Lambda(Transforms.convert_to_01_range),
+            T.ColorJitter(brightness=0.1, contrast=0.1),
+            T.RandomGrayscale(p=0.1),  # convert the image to grayscale
+            # T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
+            T.RandomApply([T.GaussianBlur(3)], p=0.2),
             T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
         ])
 
