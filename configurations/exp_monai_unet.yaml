@@ -16,14 +16,14 @@ model:
   num_res_units: 0                     # Residual blocks per stage
   norm: 'batch'                        #  normalization
   act: "relu"                          # ReLU activation
-  dropout: 0.2                         #  dropout
+  dropout: 0.3                         #  dropout
   bias: True                           # Include bias terms
 
 loss:
   sigmoid: True
   include_background: False
-  lambda_dice: 0.5
-  lambda_ce: 0.5
+  lambda_dice: 0.6
+  lambda_ce: 0.4
 #  weight: [0.1, 0.9]
 
 batch_size: 16
@@ -32,7 +32,7 @@ pin_memory: True
 persistent_workers: True
 epochs: 100
 optimizer: 'Adam'
-learning_rate: 0.001
+learning_rate: 0.0005
 scheduler: 'ReduceLROnPlateau'  # CosineAnnealingLR
 
 
