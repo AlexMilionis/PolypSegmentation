@@ -57,7 +57,7 @@ class Experiment:
 
                 # Print learning rate
                 current_lr = self.optimizer.param_groups[0]['lr']
-                print(f"Epoch {epoch + 1}, Learning Rate: {current_lr:.6f}")
+                print(f"Learning Rate: {current_lr:.6f}")
 
                 # Step the scheduler
                 if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
