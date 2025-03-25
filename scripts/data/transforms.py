@@ -23,11 +23,11 @@ class Transforms():
     @staticmethod
     def image_and_mask_train_transforms():
         return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.8, 1.2)),
+            T.RandomResizedCrop(size=(512, 512), scale=(0.9, 1.1)),
             T.RandomHorizontalFlip(p=0.2),
             # T.RandomVerticalFlip(p=0.5),
             T.RandomRotation(degrees=15, interpolation=T.InterpolationMode.BILINEAR),
-            T.ElasticTransform(alpha=34, sigma=4, interpolation=T.InterpolationMode.BILINEAR, fill=0)
+            T.ElasticTransform(alpha=25, sigma=6, interpolation=T.InterpolationMode.BILINEAR, fill=0)
         ])
 
     @staticmethod
