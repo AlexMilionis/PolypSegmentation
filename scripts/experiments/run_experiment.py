@@ -25,8 +25,8 @@ class Experiment:
         self.model = ModelManager.load_model(self.config).to(self.device)
         self.num_epochs = config['epochs']
         self.criterion = Dice_CE_Loss(self.config)
-        optimizer_type = getattr(optim, self.config['optimizer']['name'])
-        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['optimizer']['learning_rate']))
+        optimizer_type = getattr(optim, self.config['optimizer'])
+        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']))
 
         # scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
         if self.config["scheduler"] == "CosineAnnealingLR":

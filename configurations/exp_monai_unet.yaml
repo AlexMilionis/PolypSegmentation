@@ -31,9 +31,8 @@ num_workers: 4
 pin_memory: True
 persistent_workers: True
 epochs: 100
-optimizer:
-  name: 'Adam'
-  learning_rate: 0.001
+optimizer: 'Adam'
+learning_rate: 0.001
 scheduler: 'ReduceLROnPlateau'  # CosineAnnealingLR
 
 
