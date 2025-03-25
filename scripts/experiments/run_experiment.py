@@ -38,7 +38,9 @@ class Experiment:
         elif self.config["scheduler"] == "ReduceLROnPlateau":
             self.scheduler = lr_scheduler.ReduceLROnPlateau(
                 optimizer=self.optimizer,
-                mode="min"
+                mode="min",
+                patience=10,
+                factor=0.5,
             )
         else:
             raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
