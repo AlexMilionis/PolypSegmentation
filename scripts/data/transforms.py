@@ -25,6 +25,7 @@ class Transforms():
         return T.Compose([
             T.RandomResizedCrop(size=(512, 512), scale=(0.9, 1.1)),
             T.RandomHorizontalFlip(p=0.2),
+            T.RandomVerticalFlip(p=0.2),
             # T.RandomVerticalFlip(p=0.5),
             T.RandomRotation(degrees=15, interpolation=T.InterpolationMode.BILINEAR),
             T.ElasticTransform(alpha=25, sigma=6, interpolation=T.InterpolationMode.BILINEAR, fill=0)
@@ -42,8 +43,8 @@ class Transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_float),
             T.Lambda(Transforms.convert_to_01_range),
-            T.ColorJitter(brightness=0.2, contrast=0.2),
-            T.RandomGrayscale(p=0.1),  # convert the image to grayscale
+            T.ColorJitter(brightness=0.1, contrast=0.1),
+            # T.RandomGrayscale(p=0.1),  # convert the image to grayscale
             # T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
             T.RandomApply([T.GaussianBlur(3)], p=0.2),
             T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
