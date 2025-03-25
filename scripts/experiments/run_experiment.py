@@ -57,9 +57,9 @@ class Experiment:
                 val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
 
-                # Print learning rate
-                current_lr = self.optimizer.param_groups[0]['lr']
-                print(f"Learning Rate: {current_lr:.6f}")
+                # # Print learning rate
+                # current_lr = self.optimizer.param_groups[0]['lr']
+                # print(f"Learning Rate: {current_lr:.6f}")
 
                 # Step the scheduler
                 if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
