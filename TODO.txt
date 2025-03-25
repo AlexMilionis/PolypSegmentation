@@ -1,10 +1,11 @@
-Loss functions weights adjustment
-cosineannealinglr -> reduce_on_plateau
-adam -> adamw, sgd
-data augmentations:
-    - spatial: random rotations, horizontal flips, vertical flips, scaling/zooming, random cropping, elastic deformations, random shifts
-    - intensity: random changes in brightness, contrast
-    - color jitter: random changes in hue
-    - monai transforms: ranajdustcontrast, randgaussiannoise,
-    - prob of applying each transform: 0.2-0.5
+augmentations:
+    - heavier color jittering
+    - 2d elastic transformations
+
+lr: from 1e3 to 5e-4
+
+loss function: increase ce if not proper shape, increase dice for more robustness
+
+optimizer: adam -> adamw
+
 
