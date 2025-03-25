@@ -26,7 +26,7 @@ class Experiment:
         self.num_epochs = config['epochs']
         self.criterion = Dice_CE_Loss(self.config)
         optimizer_type = getattr(optim, self.config['optimizer'])
-        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']), weight_decay=0.0001)
+        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']), weight_decay=self.config['weight_decay'])
 
         # scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
         if self.config["scheduler"] == "CosineAnnealingLR":
