@@ -26,7 +26,7 @@ class Experiment:
         self.num_epochs = config['epochs']
         self.criterion = Dice_CE_Loss(self.config)
         optimizer_type = getattr(optim, self.config['optimizer'])
-        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']))
+        self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']), weight_decay=0.0001)
 
         # scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
         if self.config["scheduler"] == "CosineAnnealingLR":
@@ -39,8 +39,9 @@ class Experiment:
             self.scheduler = lr_scheduler.ReduceLROnPlateau(
                 optimizer=self.optimizer,
                 mode="min",
-                patience=10,
+                patience=5,
                 factor=0.5,
+                min_lr=1e-6
             )
         else:
             raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
