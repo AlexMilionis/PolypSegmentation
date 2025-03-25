@@ -22,8 +22,8 @@ model:
 loss:
   sigmoid: True
   include_background: False
-  lambda_dice: 0.6
-  lambda_ce: 0.4
+  lambda_dice: 0.7
+  lambda_ce: 0.3
 #  weight: [0.1, 0.9]
 
 batch_size: 16
@@ -33,6 +33,7 @@ persistent_workers: True
 epochs: 100
 optimizer: 'Adam'
 learning_rate: 0.0005
+weight_decay: 0.0001
 scheduler: 'ReduceLROnPlateau'  # CosineAnnealingLR
 
 
