@@ -1,4 +1,6 @@
 import torch
+from torch.optim.lr_scheduler import CosineAnnealingLR
+
 from scripts.models.model_utils import ModelManager
 from tqdm import tqdm
 # from torch.cuda.amp import GradScaler
@@ -43,6 +45,8 @@ class Experiment:
                 factor=0.5,
                 min_lr=1e-6
             )
+        elif self.config["scheduler"] == None:
+            self.scheduler = None
         else:
             raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
 
@@ -65,8 +69,9 @@ class Experiment:
                 # Step the scheduler
                 if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
                     self.scheduler.step(val_loss)
-                else:
+                elif isinstance(self.scheduler, CosineAnnealingLR):
                     self.scheduler.step()
+
 
         ModelManager.save_checkpoint(self.model, self.config)
         return metrics
