@@ -45,7 +45,7 @@ class Experiment:
                 factor=0.5,
                 min_lr=1e-6
             )
-        elif self.config["scheduler"] == None:
+        elif self.config["scheduler"] in [None, "None"]:
             self.scheduler = None
         else:
             raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
