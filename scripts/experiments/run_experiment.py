@@ -35,7 +35,7 @@ class Experiment:
             self.scheduler = lr_scheduler.CosineAnnealingLR(
                 optimizer=self.optimizer,
                 T_max=self.num_epochs,
-                eta_min=1e-6
+                eta_min=1e-5,
             )
         elif self.config["scheduler"] == "ReduceLROnPlateau":
             self.scheduler = lr_scheduler.ReduceLROnPlateau(
