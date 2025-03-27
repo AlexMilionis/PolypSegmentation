@@ -11,8 +11,8 @@ model:
   spatial_dims: 2                      # 2D images
   in_channels: 3                       # RGB input (3 channels)
   out_channels: 1                      # Binary segmentation (1 output channel)
-  channels: [16, 32, 64, 128, 256, 512] # Channel progression
-  strides: [2, 2, 2, 2, 2]                # Downsampling steps
+  channels: [16, 32, 64, 128, 256]     # Channel progression
+  strides: [2, 2, 2, 2]                # Downsampling steps
   num_res_units: 0                     # Residual blocks per stage
   norm: 'batch'                        #  normalization
   act: "relu"                          # ReLU activation
@@ -32,9 +32,9 @@ pin_memory: True
 persistent_workers: True
 epochs: 100
 optimizer: 'Adam'
-learning_rate: 0.0005
+learning_rate: 0.001
 weight_decay: 0.0001
-scheduler: 'ReduceLROnPlateau'  # CosineAnnealingLR
+scheduler: None # 'ReduceLROnPlateau'  # CosineAnnealingLR
 
 metrics: [
   'mIoU',
