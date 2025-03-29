@@ -23,7 +23,7 @@ class Transforms():
     @staticmethod
     def image_and_mask_train_transforms():
         return T.Compose([
-            T.RandomResizedCrop(size=(512, 512), scale=(0.9, 1.1)),
+            T.RandomResizedCrop(size=(512, 512), scale=(0.5, 2)),
             T.RandomHorizontalFlip(p=0.2),
             T.RandomVerticalFlip(p=0.2),
             T.RandomRotation(degrees=15, interpolation=T.InterpolationMode.BILINEAR),
@@ -42,7 +42,7 @@ class Transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_float),
             T.Lambda(Transforms.convert_to_01_range),
-            T.ColorJitter(brightness=0.2, contrast=0.2),
+            T.ColorJitter(brightness=0.25, contrast=0.25, hue=0.25),
             T.RandomGrayscale(p=0.1),  # convert the image to grayscale
             # T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
             T.RandomApply([T.GaussianBlur(3)], p=0.2),
