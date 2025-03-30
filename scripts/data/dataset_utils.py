@@ -187,7 +187,7 @@ class CreateDataset:
         """
         Returns list of (image_path, mask_path) tuples with correct extensions.
         """
-        assert mode in ["train_val", "test"], "Mode must be 'train_val', or 'test'"
+        assert mode in ["train", "val", "test"], "Mode must be 'train', 'val', or 'test'"
 
         image_dir = os.path.join(base_path, mode, "images")
         mask_dir = os.path.join(base_path, mode, "masks")
