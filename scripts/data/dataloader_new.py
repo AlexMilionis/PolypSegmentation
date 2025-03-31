@@ -55,8 +55,8 @@ class DataLoading:
         # re-run preload step for that subset
         val_dataset.preloaded_data = []
         for (img_path, msk_path) in val_data_pairs:
-            img, msk = val_dataset._read_and_transform(img_path, msk_path)
-            val_dataset.preloaded_data.append((img, msk, (img_path, msk_path)))
+            img, msk, paths = val_dataset._read_and_transform(img_path, msk_path)
+            val_dataset.preloaded_data.append((img, msk, paths))
 
         # Similarly for test
         test_dataset = PolypDataset(
