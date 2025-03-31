@@ -1,8 +1,11 @@
 import os
 from torchvision.io import read_image, ImageReadMode
-from scripts.data.transforms import Transforms
+from scripts.data.transforms_new import Transforms
 import torchvision
 from torch.utils.data import Dataset
+import cv2
+import numpy as np
+
 
 class PolypDataset(Dataset):
 
@@ -20,20 +23,22 @@ class PolypDataset(Dataset):
         # "train" => random data augmentations
         # "val"/"test" => deterministic transforms
         if self.mode == "train":
-            self.image_mask_transform = Transforms.image_and_mask_train_transforms()
-            self.image_transform = Transforms.image_train_transforms()
-            self.mask_transform = Transforms.mask_train_transforms()
+            # self.image_mask_transform = Transforms.image_and_mask_train_transforms()
+            # self.image_transform = Transforms.image_train_transforms()
+            # self.mask_transform = Transforms.mask_train_transforms()
+            self.transform = Transforms.image_and_mask_train_transforms()
         elif self.mode in ["val", "test"]:
-            self.image_mask_transform = Transforms.image_and_mask_val_test_transforms()
-            self.image_transform = Transforms.image_val_test_transforms()
-            self.mask_transform = Transforms.mask_val_test_transforms()
+            # self.image_mask_transform = Transforms.image_and_mask_val_test_transforms()
+            # self.image_transform = Transforms.image_val_test_transforms()
+            # self.mask_transform = Transforms.mask_val_test_transforms()
+            self.transform = Transforms.image_and_mask_val_test_transforms()
 
         # If preload => load & transform entire dataset here
         if self.preload:
             self.preloaded_data = []
             for (img_path, msk_path) in self.data_pairs:
-                img, msk = self._read_and_transform(img_path, msk_path)
-                self.preloaded_data.append( (img, msk, (img_path, msk_path)) )
+                img, msk, paths = self._read_and_transform(img_path, msk_path)
+                self.preloaded_data.append( (img, msk, paths) )
 
     def _collect_image_mask_pairs(self):
         """Collect all (img_path, mask_path) from the directories."""
@@ -49,34 +54,32 @@ class PolypDataset(Dataset):
         return data_pairs
 
 
-    # def _read_and_transform(self, img_path, msk_path):
-    #     # read images and masks
-    #     img = read_image(img_path)
-    #     msk = read_image(msk_path, mode=torchvision.io.ImageReadMode.GRAY)
-    #     # transform images and masks
-    #     img, msk = self.image_mask_transform(img, msk)
-    #     img = self.image_transform(img)
-    #     msk = self.mask_transform(msk)
-    #     return img, msk
-
     def _read_and_transform(self, img_path, msk_path):
-        # Read images
-        img = read_image(img_path, mode=ImageReadMode.RGB)  # shape (3,H,W)
-        msk = read_image(msk_path, mode=ImageReadMode.GRAY)  # shape (1,H,W)
+        # read images and masks
+        # img = read_image(img_path)
+        # msk = read_image(msk_path, mode=torchvision.io.ImageReadMode.GRAY)
+        image_bgr = cv2.imread(img_path, cv2.IMREAD_COLOR)  # shape (H,W,3)
+        mask_gray = cv2.imread(msk_path, cv2.IMREAD_GRAYSCALE)  # shape (H,W)
 
-        # Convert them into the dict format
-        sample = {"input": img, "mask": msk}
+        if image_bgr is None or mask_gray is None:
+            print(f"[WARNING] Could not read {img_path} or {msk_path}. Returning None.")
+            return None
+        # 2) Convert BGR -> RGB if you prefer
+        image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-        # 1) Apply the dictionary-based transform
-        sample = self.image_mask_transform(sample)
-        # => This should resize/crop/flip both 'input' & 'mask' identically
+        # mask to binary
+        mask = (mask_gray > 128).astype(np.float32)
 
-        # 2) Retrieve them back
-        img, msk = sample["input"], sample["mask"]
+        # 3) Apply Albumentations
+        augmented = self.transform(image=image_rgb, mask=mask)
+        # 4) Extract results
+        aug_img = augmented["image"].float()  # torch.Tensor shape (C,H,W)
+        aug_mask = augmented["mask"].unsqueeze(0)  # torch.Tensor shape (1,H,W)
+        
+        # print(f'augmented image shape:{aug_img.size()}, augmented mask shape: {aug_mask.size()}')
+        
+        return aug_img, aug_mask, (img_path, msk_path)
 
-        # 3) (Optional) Additional transforms on just the image or mask
-        img = self.image_transform(img)
-        msk = self.mask_transform(msk)
 
 
     def __len__(self):
@@ -89,7 +92,9 @@ class PolypDataset(Dataset):
         else:
             # Read+transform now
             img_path, msk_path = self.data_pairs[idx]
-            img, msk = self._read_and_transform(img_path, msk_path)
+            img, msk, paths = self._read_and_transform(img_path, msk_path)
+            if msk.ndim == 2:
+                msk = msk.unsqueeze(0)
             return img, msk, (img_path, msk_path)
 
 
