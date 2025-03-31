@@ -1,3 +1,5 @@
+import os
+
 
 class Constants():
     # PROJECT_PATH = "D:/repos/MScThesis/github_repo/"
@@ -6,6 +8,10 @@ class Constants():
     # PROCESSED_DATASET_PATH     = os.path.join(PROJECT_PATH, "data/initial/")
     # IMAGE_DIR = os.path.join(PROCESSED_DATASET_PATH, "AllImages")
     # MASK_DIR = os.path.join(PROCESSED_DATASET_PATH, "AllMasks")
+    TRAIN_VAL_IMAGES_DIR = os.path.join("data", "data", "train_val", "images")
+    TRAIN_VAL_MASKS_DIR = os.path.join("data", "data", "train_val", "masks")
+    TEST_IMAGES_DIR = os.path.join("data", "data", "test", "images")
+    TEST_MASKS_DIR = os.path.join("data", "data", "test", "masks")
     IMAGENET_COLOR_MEANS = [0.485, 0.456, 0.406]
     IMAGENET_COLOR_STDS = [0.229, 0.224, 0.225]
     MEANS = [ 0.0821, -0.5092, -0.6079]
