@@ -4,10 +4,12 @@ import numpy as np
 from scripts.constants import Constants
 import seaborn as sns
 import pandas as pd
+import torch
 
 
 def plot_image(ax, image, title, cmap=None):
-    ax.imshow(image, cmap=cmap)
+    # ax.imshow(image, cmap=cmap, interpolation='nearest')
+    ax.imshow(image, cmap=cmap, interpolation='nearest', aspect='equal')
     ax.set_title(title)
     ax.axis("off")
 
@@ -18,47 +20,146 @@ def process_image(image_tensor):
 
 
 def unnormalize_image(image):
-    mean = np.array(Constants.MEANS)
-    std = np.array(Constants.STDS)
-    # reverse normalization
+    mean = np.array(Constants.TRAIN_DATA_MEANS)
+    std = np.array(Constants.TRAIN_DATA_STDS)
+
     unnormalized_image = (image * std) + mean
-    unnormalized_image = np.clip(unnormalized_image, a_min = 0, a_max = 1)
+    
+    unnormalized_image = np.clip(unnormalized_image, 0, 1)
+
     return unnormalized_image
 
 
-def visualize_data(config, dataloader, num_samples=3, outputs=False):
-    batch_images, batch_masks, batch_paths = next(iter(dataloader))
+
+def visualize_data(config, dataloader, num_samples=3):
+    batch = next(iter(dataloader))
+    batch_images, batch_masks, batch_paths = batch
     num_samples = min(num_samples, len(batch_images))
+
     fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
     for i in range(num_samples):
+        # Process image tensor
+        
         image = process_image(batch_images[i].cpu())
-        mask = batch_masks[i].squeeze().cpu().numpy()  # Convert (1, H, W) -> (H, W)
-        img_path, mask_path = batch_paths[0][i], batch_paths[1][i]
-        # Plot the image and mask
-        plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
-        plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
+        # Process mask tensor
+        mask = batch_masks[i].squeeze().cpu().numpy() # .astype(np.uint8)  #changed
+
+        img_path = os.path.basename(batch_paths[0][i])
+        mask_path = os.path.basename(batch_paths[1][i])
+
+        plot_image(axes[i][0], image, f"Image: {img_path}")
+        plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
+
     plt.tight_layout()
     save_path = os.path.join(config['paths']['data_visualizations_dir'], "input_data_visualizations.png")
     plt.savefig(save_path)
     plt.close(fig)
 
 
+# def visualize_data(config, dataloader, num_samples=3):
+#     batch = next(iter(dataloader))
+#     batch_images, batch_masks, batch_paths = batch
+#     num_samples = min(num_samples, len(batch_images))
+
+#     # Calculate figure size for 1:1 pixel mapping
+#     dpi = 100
+#     fig_width = 2 * 512 / dpi  # 2 columns (image + mask)
+#     fig_height = num_samples * 512 / dpi
+    
+#     fig, axes = plt.subplots(
+#         num_samples, 
+#         2, 
+#         figsize=(fig_width, fig_height), 
+#         dpi=dpi
+#     )
+    
+#     for i in range(num_samples):
+#         # Process image and mask
+#         image = process_image(batch_images[i].cpu())
+#         mask = batch_masks[i].squeeze().cpu().numpy()
+        
+#         img_path = os.path.basename(batch_paths[0][i])
+#         mask_path = os.path.basename(batch_paths[1][i])
+
+#         # Plot with pixel-perfect settings
+#         plot_image(axes[i][0], image, f"Image: {img_path}")
+#         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
+
+#     plt.subplots_adjust(wspace=0, hspace=0)  # Remove spacing
+#     plt.tight_layout()
+    
+#     save_path = os.path.join(
+#         config['paths']['data_visualizations_dir'], 
+#         "input_data_visualizations.png"
+#     )
+#     plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+#     plt.close(fig)
+
+
+# def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
+
+#     num_samples = min(num_samples, len(batch_images))
+#     fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
+#     for i in range(num_samples):
+        
+#         image = process_image(batch_images[i].cpu()) 
+
+#         mask = batch_masks[i].squeeze().cpu().numpy()   #.astype(np.uint8)  
+
+#         # print(f"Prediction before: {batch_predictions[i]}")
+        
+#         # predicted_mask = (batch_predictions[i].squeeze().cpu().numpy() > 0.5).astype(int)
+#         predicted_mask = (batch_predictions[i]*255).squeeze().cpu().numpy().astype(int)
+
+#         # print(f"Prediction after: {predicted_mask}")
+
+#         # get the unique pixel values in the predicted mask
+#         # print(f"Unique pixel values in predicted mask: {np.unique(predicted_mask)}")
+
+#         img_path =  os.path.basename(batch_paths[0][i])
+#         mask_path = os.path.basename(batch_paths[1][i])
+
+
+#         plot_image(axes[i][0], image, f"Image: {img_path}")
+#         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
+#         # plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
+#         plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
+
+#     plt.tight_layout()
+
+#     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
+#     plt.savefig(save_path)
+#     plt.close(fig)
+
+
 def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
-    num_samples = min(num_samples, len(batch_images))  # Ensure we don't exceed batch size
-    fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
+    num_samples = min(num_samples, len(batch_images))
+    
+    # Calculate figure size to preserve 512x512 resolution per image
+    dpi = 100  # Adjust DPI for your display/saving needs
+    fig_width = 3 * 512 / dpi  # 3 columns (image, mask, prediction)
+    fig_height = num_samples * 512 / dpi
+    
+    fig, axes = plt.subplots(num_samples, 3, figsize=(fig_width, fig_height), dpi=dpi)
+    
     for i in range(num_samples):
+        # Process image and masks (your existing code)
         image = process_image(batch_images[i].cpu())
         mask = batch_masks[i].squeeze().cpu().numpy()
-        predicted_mask = (batch_predictions[i].squeeze().cpu().numpy() > 0.5).astype(int)
-        img_path, mask_path = batch_paths[0][i], batch_paths[1][i]
-        plot_image(axes[i][0], image, f"Image: {os.path.basename(img_path)}")
-        plot_image(axes[i][1], mask, f"Mask: {os.path.basename(mask_path)}", cmap="gray")
+        predicted_mask = (batch_predictions[i] * 255).squeeze().cpu().numpy().astype(int)
+        
+        # Plot with NO interpolation and fixed aspect ratio
+        plot_image(axes[i][0], image, f"Image: {os.path.basename(batch_paths[0][i])}")
+        plot_image(axes[i][1], mask, f"Mask: {os.path.basename(batch_paths[1][i])}", cmap="gray")
         plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
+    
+    plt.subplots_adjust(wspace=0, hspace=0)  # Remove spacing between subplots
     plt.tight_layout()
-
+    
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
-    plt.savefig(save_path)
+    plt.savefig(save_path, bbox_inches='tight', pad_inches=0)  # Avoid padding
     plt.close(fig)
+
 
 
 def plot_loss_curves(config):

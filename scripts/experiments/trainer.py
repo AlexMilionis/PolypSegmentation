@@ -15,7 +15,8 @@ class Trainer:
         self.model.train()
         total_loss = 0
         for images, masks, _ in train_loader:
-            images, masks = images.to(self.device), masks.to(self.device)
+            images = images.to(self.device, dtype=torch.float16)
+            masks  = masks.to(self.device, dtype=torch.float16)
             self.optimizer.zero_grad()
             # Mixed precision forward pass
             with autocast('cuda'):
@@ -35,7 +36,8 @@ class Trainer:
         threshold = 0.5
         with torch.no_grad():
             for images, masks, paths in loader:
-                images, masks = images.to(self.device), masks.to(self.device)
+                images = images.to(self.device, dtype=torch.float16)
+                masks = masks.to(self.device, dtype=torch.float16)
                 with autocast('cuda'):
                     outputs = self.model(images)
                     loss = self.criterion(outputs, masks)

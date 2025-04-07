@@ -1,6 +1,5 @@
 from torch.utils.data import DataLoader, random_split
 from scripts.data.dataset_new import PolypDataset
-from scripts.visualizations.visualization_utils import visualize_data
 from scripts.seed import set_generator
 from scripts.constants import Constants
 
@@ -15,7 +14,7 @@ class DataLoading:
         # self.persistent_workers = config['persistent_workers']
 
 
-    def get_dataloaders(self, viz=False):
+    def get_dataloaders(self):
 
         full_dataset = PolypDataset(
             images_dir = Constants.TRAIN_VAL_IMAGES_DIR,
@@ -33,8 +32,7 @@ class DataLoading:
         val_len = int(full_len * val_split)
         train_len = full_len - val_len
 
-        g = set_generator(42)
-        train_subset, val_subset = random_split(full_dataset, [train_len, val_len], generator=g)
+        train_subset, val_subset = random_split(full_dataset, [train_len, val_len], generator=set_generator(42))
 
         # Override val_subset to have val transforms & preload
         # We'll just re-wrap val_subset.dataset in a new PolypDataset so we can preload
@@ -55,8 +53,8 @@ class DataLoading:
         # re-run preload step for that subset
         val_dataset.preloaded_data = []
         for (img_path, msk_path) in val_data_pairs:
-            img, msk, paths = val_dataset._read_and_transform(img_path, msk_path)
-            val_dataset.preloaded_data.append((img, msk, paths))
+            img, msk = val_dataset._read_and_transform(img_path, msk_path)
+            val_dataset.preloaded_data.append((img, msk, (img_path, msk_path)))
 
         # Similarly for test
         test_dataset = PolypDataset(
@@ -72,7 +70,5 @@ class DataLoading:
         val_loader   = DataLoader(val_dataset,  batch_size=self.config['batch_size'], shuffle=False)
         test_loader  = DataLoader(test_dataset, batch_size=self.config['batch_size'], shuffle=False)
 
-        if viz:
-            visualize_data(self.config, train_loader, num_samples=5)
 
         return train_loader, val_loader, test_loader

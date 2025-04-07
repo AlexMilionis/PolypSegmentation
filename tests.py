@@ -1,5 +1,5 @@
 from torch.utils.data import Subset
-from scripts.data.dataloader import DataLoadingLocal
+from scripts.data.dataloader_new import DataLoading
 import os
 import torch
 import sys
@@ -62,39 +62,46 @@ from scripts.experiments.experiment_utils import ExperimentLogger
 
 
 if __name__ == '__main__':
-    # # Initialize accumulators and pixel count
-    # channel_sum = torch.zeros(3)
-    # channel_sum_sq = torch.zeros(3)
-    # total_pixels = 0
-    # if len(sys.argv) > 1: config_name = sys.argv[1]
-    #
-    # config = ExperimentLogger.load_config(config_name)
-    #
-    # # Get training data loader
-    # train_loader, _, _ = DataLoadingLocal(config).get_loaders(viz=True)
-    #
-    # # Initialize accumulators and pixel count
-    # channel_sum = torch.zeros(3)
-    # channel_sum_sq = torch.zeros(3)
-    # total_pixels = 0
-    #
-    # # Iterate over the loader
-    # for batch in train_loader:
-    #     images = batch[0]  # shape: [B, C, H, W]
-    #     batch_size, channels, height, width = images.shape
-    #     total_pixels += batch_size * height * width
-    #     channel_sum += images.sum(dim=[0, 2, 3])
-    #     channel_sum_sq += (images ** 2).sum(dim=[0, 2, 3])
-    #
-    # # Compute per-channel mean and std
-    # mean = channel_sum / total_pixels
-    # std = torch.sqrt(channel_sum_sq / total_pixels - mean ** 2)
-    #
-    # print(f'Mean: {mean}')
-    # print(f'Standard Deviation: {std}')
+    # Initialize accumulators and pixel count
+    channel_sum = torch.zeros(3)
+    channel_sum_sq = torch.zeros(3)
+    total_pixels = 0
+    if len(sys.argv) > 1: config_name = sys.argv[1]
+    
+    config = ExperimentLogger.load_config(config_name)
+    
+    # Get training data loader
+    train_loader, _, _ = DataLoading(config).get_loaders(viz=False)
+    
+    # Initialize accumulators and pixel count
+    channel_sum = torch.zeros(3)
+    channel_sum_sq = torch.zeros(3)
+    total_pixels = 0
+    
+    # Iterate over the loader
+    for batch in train_loader:
+        images = batch[0]  # shape: [B, C, H, W]
+        batch_size, channels, height, width = images.shape
+        total_pixels += batch_size * height * width
+        channel_sum += images.sum(dim=[0, 2, 3])
+        channel_sum_sq += (images ** 2).sum(dim=[0, 2, 3])
+    
+    # Compute per-channel mean and std
+    mean = channel_sum / total_pixels
+    std = torch.sqrt(channel_sum_sq / total_pixels - mean ** 2)
+    
+    print(f'Mean: {mean}')
+    print(f'Standard Deviation: {std}')
 
     # Custom x-axis ticks
-    max_epoch = 100
-    desired_ticks = [1] + [i for i in range(25, max_epoch + 1, 25)]
-    print(desired_ticks)
-    # xticks = list(range(1, max_epoch + 1))
+    # max_epoch = 100
+    # desired_ticks = [1] + [i for i in range(25, max_epoch + 1, 25)]
+    # print(desired_ticks)
+    # # xticks = list(range(1, max_epoch + 1))
+
+    # # initialize torch tensor with values from 0 to 255
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # tensor = torch.arange(0, 256, dtype=torch.uint8).view(1, 256)
+    # print(tensor)
+    # tensor = tensor.to(device, dtype=torch.float16)
+    # print(tensor)

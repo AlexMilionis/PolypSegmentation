@@ -46,14 +46,14 @@ class Transforms():
             T.RandomGrayscale(p=0.1),  # convert the image to grayscale
             # T.GaussianBlur(kernel_size=(3, 3)), # blur the image with a 3x3 kernel
             T.RandomApply([T.GaussianBlur(3)], p=0.2),
-            T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
+            T.Normalize(mean=Constants.TRAIN_DATA_MEANS, std=Constants.TRAIN_DATA_STDS),
         ])
 
     @staticmethod
     def image_val_test_transforms():
         return T.Compose([
             T.Lambda(Transforms.convert_to_01_range),
-            T.Normalize(mean=Constants.MEANS, std=Constants.STDS),
+            T.Normalize(mean=Constants.TRAIN_DATA_MEANS, std=Constants.TRAIN_DATA_STDS),
         ])
 
     @staticmethod
@@ -69,79 +69,79 @@ class Transforms():
         ])
 
 
-# scripts/data/transforms.py
-from torchvision.transforms import v2 as T, InterpolationMode
-import torch
-
-# TODO: understand this, or better use Albumentations
-class Transforms_new:
-    @staticmethod
-    def train_dict_transforms():
-        """
-        Return a Compose that expects a dict:
-        {
-          "input": (C,H,W) image tensor,
-          "mask":  (1,H,W) mask tensor
-        }
-        and returns them with random augmentations applied in sync.
-        """
-        return T.Compose([
-            # RandomResizedCrop applies to both "input" & "mask" by default
-            T.RandomResizedCrop(size=(512, 512),
-                                scale=(0.5, 1.5),
-                                interpolation=InterpolationMode.BILINEAR),
-            T.RandomHorizontalFlip(prob=0.2),  # flips both input & mask
-            T.RandomVerticalFlip(prob=0.2),
-            T.RandomRotation(degrees=15, interpolation=InterpolationMode.BILINEAR),
-            # If you want an elastic transform that handles the mask too:
-            # T.ElasticTransform(...)
-            # etc.
-            T.ElasticTransform(alpha=25, sigma=6, interpolation=T.InterpolationMode.BILINEAR, fill=0)
-        ])
-
-    @staticmethod
-    def val_dict_transforms():
-        """
-        Deterministic resizing for val/test.
-        """
-        return T.Compose([
-            T.Resize(size=(512, 512), interpolation=InterpolationMode.BILINEAR),
-        ])
-
-    @staticmethod
-    def image_extra_transform(mode):
-        """
-        Optionally add color, normalization, or other image-only transforms
-        AFTER the dictionary transform.
-        We'll just do a few examples here.
-        """
-        from torchvision.transforms import functional as F
-
-        def _image_only_transform(img_tensor: torch.Tensor) -> torch.Tensor:
-            # Convert to float [0..1]
-            img_tensor = img_tensor.float() / 255.0
-            # Example: color jitter only if train
-            if mode == "train":
-                # manually do random color ops, or do a T.ColorJitter on single image
-                # e.g. T.ColorJitter(0.2,0.2,0.2,0.1)(img_tensor)
-                pass
-            # e.g. normalization
-            # means = [0.485, 0.456, 0.406]
-            # stds  = [0.229, 0.224, 0.225]
-            # ...
-            return img_tensor
-
-        return _image_only_transform  # a function that takes a tensor
-
-    @staticmethod
-    def mask_extra_transform(mode):
-        """
-        For the mask, maybe binarize it or convert to float, etc.
-        """
-        from torchvision.transforms import functional as F
-
-        def _mask_only_transform(msk_tensor: torch.Tensor) -> torch.Tensor:
-            # Already shape (1,H,W), typical mask usage
-            # maybe we want to binarize:
-            return (msk_tensor > 0).float()
-        return _mask_only_transform
+# # scripts/data/transforms.py
+# from torchvision.transforms import v2 as T, InterpolationMode
+# import torch
+#
+# # TODO: understand this, or better use Albumentations
+# class Transforms_new:
+#     @staticmethod
+#     def train_dict_transforms():
+#         """
+#         Return a Compose that expects a dict:
+#         {
+#           "input": (C,H,W) image tensor,
+#           "mask":  (1,H,W) mask tensor
+#         }
+#         and returns them with random augmentations applied in sync.
+#         """
+#         return T.Compose([
+#             # RandomResizedCrop applies to both "input" & "mask" by default
+#             T.RandomResizedCrop(size=(512, 512),
+#                                 scale=(0.5, 1.5),
+#                                 interpolation=InterpolationMode.BILINEAR),
+#             T.RandomHorizontalFlip(prob=0.2),  # flips both input & mask
+#             T.RandomVerticalFlip(prob=0.2),
+#             T.RandomRotation(degrees=15, interpolation=InterpolationMode.BILINEAR),
+#             # If you want an elastic transform that handles the mask too:
+#             # T.ElasticTransform(...)
+#             # etc.
+#             T.ElasticTransform(alpha=25, sigma=6, interpolation=T.InterpolationMode.BILINEAR, fill=0)
+#         ])
+#
+#     @staticmethod
+#     def val_dict_transforms():
+#         """
+#         Deterministic resizing for val/test.
+#         """
+#         return T.Compose([
+#             T.Resize(size=(512, 512), interpolation=InterpolationMode.BILINEAR),
+#         ])
+#
+#     @staticmethod
+#     def image_extra_transform(mode):
+#         """
+#         Optionally add color, normalization, or other image-only transforms
+#         AFTER the dictionary transform.
+#         We'll just do a few examples here.
+#         """
+#         from torchvision.transforms import functional as F
+#
+#         def _image_only_transform(img_tensor: torch.Tensor) -> torch.Tensor:
+#             # Convert to float [0..1]
+#             img_tensor = img_tensor.float() / 255.0
+#             # Example: color jitter only if train
+#             if mode == "train":
+#                 # manually do random color ops, or do a T.ColorJitter on single image
+#                 # e.g. T.ColorJitter(0.2,0.2,0.2,0.1)(img_tensor)
+#                 pass
+#             # e.g. normalization
+#             # means = [0.485, 0.456, 0.406]
+#             # stds  = [0.229, 0.224, 0.225]
+#             # ...
+#             return img_tensor
+#
+#         return _image_only_transform  # a function that takes a tensor
+#
+#     @staticmethod
+#     def mask_extra_transform(mode):
+#         """
+#         For the mask, maybe binarize it or convert to float, etc.
+#         """
+#         from torchvision.transforms import functional as F
+#
+#         def _mask_only_transform(msk_tensor: torch.Tensor) -> torch.Tensor:
+#             # Already shape (1,H,W), typical mask usage
+#             # maybe we want to binarize:
+#             return (msk_tensor > 0).float()
+#         return _mask_only_transform

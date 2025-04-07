@@ -37,8 +37,9 @@ class PolypDataset(Dataset):
         if self.preload:
             self.preloaded_data = []
             for (img_path, msk_path) in self.data_pairs:
-                img, msk, paths = self._read_and_transform(img_path, msk_path)
-                self.preloaded_data.append( (img, msk, paths) )
+                img, msk = self._read_and_transform(img_path, msk_path)
+                self.preloaded_data.append( (img, msk, (img_path, msk_path)) )
+
 
     def _collect_image_mask_pairs(self):
         """Collect all (img_path, mask_path) from the directories."""
@@ -58,28 +59,41 @@ class PolypDataset(Dataset):
         # read images and masks
         # img = read_image(img_path)
         # msk = read_image(msk_path, mode=torchvision.io.ImageReadMode.GRAY)
-        image_bgr = cv2.imread(img_path, cv2.IMREAD_COLOR)  # shape (H,W,3)
-        mask_gray = cv2.imread(msk_path, cv2.IMREAD_GRAYSCALE)  # shape (H,W)
 
-        if image_bgr is None or mask_gray is None:
+        image = cv2.imread(img_path, cv2.IMREAD_COLOR)  # shape (H,W,3)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mask  = cv2.imread(msk_path, cv2.IMREAD_GRAYSCALE)  # shape (H,W)
+
+        if image is None or mask is None:
             print(f"[WARNING] Could not read {img_path} or {msk_path}. Returning None.")
             return None
-        # 2) Convert BGR -> RGB if you prefer
-        image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+        
+        # mask shape (H,W) => (H,W,1)
+        mask = np.expand_dims(mask, axis=-1)  # shape (H,W,1)
+        
+        # # 2) Convert BGR -> RGB if you prefer
+        # image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-        # mask to binary
-        mask = (mask_gray > 128).astype(np.float32)
+        # masks convert to binary, convert to float
+        mask = (mask > 128).astype(np.float32)
+
+        # convert images to unit range [0,1]
+        image = (image / 255.0).astype(np.float32) 
 
         # 3) Apply Albumentations
-        augmented = self.transform(image=image_rgb, mask=mask)
-        # 4) Extract results
-        aug_img = augmented["image"].float()  # torch.Tensor shape (C,H,W)
-        aug_mask = augmented["mask"].unsqueeze(0)  # torch.Tensor shape (1,H,W)
-        
-        # print(f'augmented image shape:{aug_img.size()}, augmented mask shape: {aug_mask.size()}')
-        
-        return aug_img, aug_mask, (img_path, msk_path)
+        augmented = self.transform(image=image, mask=mask)
 
+        # 4) Extract results
+        # aug_img = augmented["image"]  # torch.Tensor shape (C,H,W) converted to int type  # torch.Tensor shape (C,H,W)
+        # aug_mask = augmented["mask"].unsqueeze(0) # torch.Tensor shape (1,H,W)
+        aug_img, aug_mask = augmented["image"], augmented["mask"]
+
+        # # print maximum values, minimum values for debugging
+        # print(f"aug_img min: {aug_img.min()}, aug_img max:, {aug_img.max()}")
+        # print(f"aug_mask min: {aug_mask.min()}, aug_mask max:, {aug_mask.max()}")
+
+     
+        return aug_img, aug_mask
 
 
     def __len__(self):
@@ -92,9 +106,8 @@ class PolypDataset(Dataset):
         else:
             # Read+transform now
             img_path, msk_path = self.data_pairs[idx]
-            img, msk, paths = self._read_and_transform(img_path, msk_path)
-            if msk.ndim == 2:
-                msk = msk.unsqueeze(0)
+            img, msk = self._read_and_transform(img_path, msk_path)
+            
             return img, msk, (img_path, msk_path)
 
 
