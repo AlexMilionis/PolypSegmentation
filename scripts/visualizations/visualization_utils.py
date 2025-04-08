@@ -5,6 +5,7 @@ from scripts.constants import Constants
 import seaborn as sns
 import pandas as pd
 import torch
+from PIL import Image 
 
 
 def plot_image(ax, image, title, cmap=None):
@@ -29,6 +30,39 @@ def unnormalize_image(image):
 
     return unnormalized_image
 
+
+# def visualize_data(config, dataloader, num_samples=3):
+#     batch = next(iter(dataloader))
+#     batch_images, batch_masks, batch_paths = batch
+#     num_samples = min(num_samples, len(batch_images))
+    
+#     save_dir = config['paths']['data_visualizations_dir']
+#     os.makedirs(save_dir, exist_ok=True)  # Create directory if needed
+
+#     for i in range(num_samples):
+#         # Process image tensor (convert to numpy array)
+#         image = process_image(batch_images[i].cpu())
+        
+#         # Process mask tensor (convert to numpy array)
+#         mask = batch_masks[i].squeeze().cpu().numpy()
+
+#         # Convert to uint8 (0-255 range) if needed
+#         if image.dtype != np.uint8:
+#             image = (image * 255).astype(np.uint8)
+#         if mask.dtype != np.uint8:
+#             mask = (mask * 255).astype(np.uint8)
+
+#         # Get original filenames
+#         img_filename = os.path.basename(batch_paths[0][i])
+#         mask_filename = os.path.basename(batch_paths[1][i])
+
+#         # Save image
+#         img_name = f"{os.path.splitext(img_filename)[0]}.jpg"
+#         Image.fromarray(image).save(os.path.join(save_dir, img_name))
+
+#         # Save mask (grayscale)
+#         mask_name = f"{os.path.splitext(mask_filename)[0]}_mask.jpg"
+#         Image.fromarray(mask).save(os.path.join(save_dir, mask_name))
 
 
 def visualize_data(config, dataloader, num_samples=3):
@@ -55,81 +89,6 @@ def visualize_data(config, dataloader, num_samples=3):
     plt.savefig(save_path)
     plt.close(fig)
 
-
-# def visualize_data(config, dataloader, num_samples=3):
-#     batch = next(iter(dataloader))
-#     batch_images, batch_masks, batch_paths = batch
-#     num_samples = min(num_samples, len(batch_images))
-
-#     # Calculate figure size for 1:1 pixel mapping
-#     dpi = 100
-#     fig_width = 2 * 512 / dpi  # 2 columns (image + mask)
-#     fig_height = num_samples * 512 / dpi
-    
-#     fig, axes = plt.subplots(
-#         num_samples, 
-#         2, 
-#         figsize=(fig_width, fig_height), 
-#         dpi=dpi
-#     )
-    
-#     for i in range(num_samples):
-#         # Process image and mask
-#         image = process_image(batch_images[i].cpu())
-#         mask = batch_masks[i].squeeze().cpu().numpy()
-        
-#         img_path = os.path.basename(batch_paths[0][i])
-#         mask_path = os.path.basename(batch_paths[1][i])
-
-#         # Plot with pixel-perfect settings
-#         plot_image(axes[i][0], image, f"Image: {img_path}")
-#         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
-
-#     plt.subplots_adjust(wspace=0, hspace=0)  # Remove spacing
-#     plt.tight_layout()
-    
-#     save_path = os.path.join(
-#         config['paths']['data_visualizations_dir'], 
-#         "input_data_visualizations.png"
-#     )
-#     plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
-#     plt.close(fig)
-
-
-# def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
-
-#     num_samples = min(num_samples, len(batch_images))
-#     fig, axes = plt.subplots(num_samples, 3, figsize=(12, 6 * num_samples))
-#     for i in range(num_samples):
-        
-#         image = process_image(batch_images[i].cpu()) 
-
-#         mask = batch_masks[i].squeeze().cpu().numpy()   #.astype(np.uint8)  
-
-#         # print(f"Prediction before: {batch_predictions[i]}")
-        
-#         # predicted_mask = (batch_predictions[i].squeeze().cpu().numpy() > 0.5).astype(int)
-#         predicted_mask = (batch_predictions[i]*255).squeeze().cpu().numpy().astype(int)
-
-#         # print(f"Prediction after: {predicted_mask}")
-
-#         # get the unique pixel values in the predicted mask
-#         # print(f"Unique pixel values in predicted mask: {np.unique(predicted_mask)}")
-
-#         img_path =  os.path.basename(batch_paths[0][i])
-#         mask_path = os.path.basename(batch_paths[1][i])
-
-
-#         plot_image(axes[i][0], image, f"Image: {img_path}")
-#         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
-#         # plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
-#         plot_image(axes[i][2], predicted_mask, "Predicted Mask", cmap="gray")
-
-#     plt.tight_layout()
-
-#     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
-#     plt.savefig(save_path)
-#     plt.close(fig)
 
 
 def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
@@ -159,6 +118,37 @@ def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batc
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0)  # Avoid padding
     plt.close(fig)
+
+
+# def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
+#     num_samples = min(num_samples, len(batch_images))
+    
+#     # Create output directory
+#     save_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
+#     os.makedirs(save_dir, exist_ok=True)
+    
+#     for i in range(num_samples):
+#         # Process image tensor
+#         image = process_image(batch_images[i].cpu())
+#         if image.dtype != np.uint8:  # Convert to 0-255 range if needed
+#             image = (image * 255).astype(np.uint8)
+        
+#         # Process mask tensor
+#         mask = batch_masks[i].squeeze().cpu().numpy()
+#         if mask.max() <= 1.0:  # Convert to 0-255 if normalized
+#             mask = (mask * 255).astype(np.uint8)
+        
+#         # Process prediction tensor
+#         pred = (batch_predictions[i].squeeze().cpu().numpy() * 255).astype(np.uint8)
+        
+#         # Get original image filename
+#         img_filename = os.path.basename(batch_paths[0][i])
+#         base_name = os.path.splitext(img_filename)[0]  # Remove extension
+        
+#         # Save files
+#         Image.fromarray(image).save(os.path.join(save_dir, f"{base_name}.jpg"))
+#         Image.fromarray(mask).save(os.path.join(save_dir, f"{base_name}_mask.jpg"))
+#         Image.fromarray(pred).save(os.path.join(save_dir, f"{base_name}_pred.jpg"))
 
 
 
