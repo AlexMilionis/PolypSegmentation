@@ -26,12 +26,12 @@ loss:
   lambda_ce: 0.3
 #  weight: [0.1, 0.9]
 
-batch_size: 16
+batch_size: 32
 val_split: 0.2
 #num_workers: 4
 #pin_memory: True
 #persistent_workers: True
-epochs: 10
+epochs: 100
 optimizer: 'Adam'
 learning_rate: 0.0001
 weight_decay: 0.00001 # 0.0001
