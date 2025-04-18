@@ -4,8 +4,9 @@ from scripts.experiments.run_experiment import Experiment
 from scripts.experiments.experiment_utils import ExperimentLogger
 from scripts.visualizations.visualization_utils import visualize_data
 from scripts.data.get_train_mean_std import get_train_mean_std
-
 import sys, yaml
+import warnings
+warnings.filterwarnings("ignore")
 
 
 set_seed()
