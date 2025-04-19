@@ -41,9 +41,9 @@ class Experiment:
             self.scheduler = lr_scheduler.ReduceLROnPlateau(
                 optimizer=self.optimizer,
                 mode="min",
-                patience=5,
-                factor=0.5,
-                min_lr=1e-6
+                patience=10,
+                factor=0.1,
+                # min_lr=1e-6
             )
         elif self.config["scheduler"] in [None, "None"]:
             self.scheduler = None
