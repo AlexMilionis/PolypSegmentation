@@ -55,6 +55,7 @@ class Experiment:
 
     def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
+            early_stopping = Trainer.EarlyStopping(patience=10)
             for epoch in pbar:
                 if epoch==0:
                     metrics = Metrics(self.device, self.config)
@@ -62,10 +63,16 @@ class Experiment:
                 val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
 
+                # Early stopping check
+                early_stopping.check_early_stop(val_loss)
+                if early_stopping.stop_training:
+                    print(f"Early stopping at epoch {epoch}")
+                    break
+
                 # Step the scheduler
                 if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
                     self.scheduler.step(val_loss)
-                elif isinstance(self.scheduler, CosineAnnealingLR):
+                elif isinstance(self.scheduler, lr_scheduler.CosineAnnealingLR):
                     self.scheduler.step()
 
 
@@ -76,8 +83,6 @@ class Experiment:
     def execute_evaluation(self, metrics):
 
         test_loss, metrics = self.trainer.validate_one_epoch(self.test_loader, metrics, to_visualize=True)
-
         metrics.compute_metrics(test_loss = test_loss, mode="test")
         ExperimentLogger.log_metrics(self.config, metrics.metrics)
-
         plot_loss_curves(self.config)
