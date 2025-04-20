@@ -41,8 +41,8 @@ class Experiment:
             self.scheduler = lr_scheduler.ReduceLROnPlateau(
                 optimizer=self.optimizer,
                 mode="min",
-                patience=10,
-                factor=0.1,
+                patience=5,
+                factor=0.5,
                 verbose=True,
                 # min_lr=1e-6
             )
@@ -59,11 +59,11 @@ class Experiment:
             # Initialize early stopping 
             early_stopping = EarlyStopping(patience=15)
             # Initialize metrics
-            metrics = Metrics(self.device, self.config)
+            self.metrics = Metrics(self.device, self.config)
             for epoch in pbar:                    
                 train_loss = self.trainer.train_one_epoch(self.train_loader)
-                val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
-                metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
+                val_loss, self.metrics = self.trainer.validate_one_epoch(self.val_loader, self.metrics)
+                self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
                 # Early stopping check
                 early_stopping.check_early_stop(val_loss)
                 if early_stopping.stop_training:
@@ -77,8 +77,8 @@ class Experiment:
                     self.scheduler.step()
 
                 # Save model checkpoint
-                ModelManager.save_model_checkpoint(self.model, self.config, metrics, epoch)
-        return metrics
+                ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
+        return self.metrics
 
 
     def execute_evaluation(self, metrics):
