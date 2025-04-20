@@ -43,6 +43,7 @@ class Experiment:
                 mode="min",
                 patience=10,
                 factor=0.1,
+                verbose=True,
                 # min_lr=1e-6
             )
         elif self.config["scheduler"] in [None, "None"]:
@@ -53,7 +54,7 @@ class Experiment:
         self.trainer = Trainer(self.config, self.model, self.optimizer, self.criterion, self.scaler, self.device)
 
 
-    def execute_training(self):
+    def execute_training(self, load_checkpoint=False):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
             # Initialize early stopping 
             early_stopping = EarlyStopping(patience=15)
