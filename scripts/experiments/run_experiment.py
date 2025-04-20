@@ -8,7 +8,7 @@ from torch.amp import GradScaler
 from scripts.experiments.experiment_utils import ExperimentLogger
 from torch import nn, optim
 from torch.optim import lr_scheduler
-from scripts.experiments.trainer import Trainer
+from scripts.experiments.trainer import Trainer, EarlyStopping
 from scripts.experiments.metrics import Metrics
 from scripts.experiments.loss import Dice_CE_Loss
 
@@ -55,14 +55,14 @@ class Experiment:
 
     def execute_training(self):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
-            early_stopping = Trainer.EarlyStopping(patience=10)
-            for epoch in pbar:
-                if epoch==0:
-                    metrics = Metrics(self.device, self.config)
+            # Initialize early stopping 
+            early_stopping = EarlyStopping(patience=15)
+            # Initialize metrics
+            metrics = Metrics(self.device, self.config)
+            for epoch in pbar:                    
                 train_loss = self.trainer.train_one_epoch(self.train_loader)
                 val_loss, metrics = self.trainer.validate_one_epoch(self.val_loader, metrics)
                 metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
-
                 # Early stopping check
                 early_stopping.check_early_stop(val_loss)
                 if early_stopping.stop_training:
@@ -75,8 +75,8 @@ class Experiment:
                 elif isinstance(self.scheduler, lr_scheduler.CosineAnnealingLR):
                     self.scheduler.step()
 
-
-        ModelManager.save_checkpoint(self.model, self.config)
+                # Save model checkpoint
+                ModelManager.save_model_checkpoint(self.model, self.config, metrics, epoch)
         return metrics
 
 

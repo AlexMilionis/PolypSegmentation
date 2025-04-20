@@ -6,12 +6,19 @@ import importlib
 class ModelManager:
 
     @staticmethod
-    def save_checkpoint(model, config):
+    def _save_checkpoint(model, config):
         save_dir  = os.path.join(config['paths']['results_dir'], config['experiment_name'])
         checkpoint_path = os.path.join(save_dir, "checkpoint.pth")
         os.makedirs(save_dir, exist_ok=True)
         torch.save(model.state_dict(), checkpoint_path)
         return checkpoint_path
+    
+    @staticmethod
+    def save_model_checkpoint(model, config, metrics, epoch):
+        # save model if conditions are met: epoch > 100 and val_loss < min(val_loss)
+        if epoch+1>100:
+            if metrics.metrics["val_loss"][-1] < min(metrics.metrics["val_loss"][:-1]):
+                ModelManager._save_checkpoint(model, config)
 
     @staticmethod
     def load_checkpoint(model, config):
