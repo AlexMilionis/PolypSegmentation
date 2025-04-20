@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     config = ExperimentLogger.parse_arguments()
 
-    train_loader, val_loader, test_loader = DataLoading(config).get_dataloaders()
+    train_loader, val_loader, test_loader = DataLoading(config).get_dataloaders(run_in_colab=True)
     # train_loader, val_loader, test_loader = DataLoadingCloud(config).get_loaders(viz=True)
 
     visualize_data(config, train_loader, num_samples=5)
