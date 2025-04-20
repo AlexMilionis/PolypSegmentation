@@ -24,13 +24,13 @@ loss:
   include_background: False
   lambda_dice: 0.5
   lambda_ce: 0.5
-  # weight: 1.1
+  weight: [2.0]
 
-batch_size: 32
+batch_size: 16
 val_split: 0.2
 epochs: 300
 optimizer: 'Adam'
-learning_rate: 0.0003
+learning_rate: 0.0001
 weight_decay: 0 #0.00001 # 0.0001
 scheduler: ReduceLROnPlateau #None #CosineAnnealingLR
 
