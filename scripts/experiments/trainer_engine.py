@@ -83,7 +83,8 @@ class Optimizer:
         self.optimizer = optimizer_type(
             self.model.parameters(), 
             lr=float(self.config['learning_rate']), 
-            weight_decay=self.config['weight_decay'])
+            weight_decay=self.config['weight_decay']
+            )
         
 
         if self.config["scheduler"] == "CosineAnnealingLR":
@@ -102,6 +103,15 @@ class Optimizer:
                 verbose=True,
                 # min_lr=1e-6
             )
+
+        elif self.config["scheduler"] == "CosineAnnealingWarmRestarts":
+            self.scheduler = lr_scheduler.CosineAnnealingWarmRestarts(
+                optimizer=self.optimizer,
+                T_0=10,  # Number of iterations for the first restart
+                T_mult=2,  # Factor by which to increase T_0 after each restart
+                eta_min=1e-6,  # Minimum learning rate
+            )
+
 
         elif self.config["scheduler"] in [None, "None"]:
             self.scheduler = None
