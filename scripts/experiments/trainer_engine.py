@@ -84,5 +84,39 @@ class Optimizer:
             self.model.parameters(), 
             lr=float(self.config['learning_rate']), 
             weight_decay=self.config['weight_decay'])
+        
 
+        if self.config["scheduler"] == "CosineAnnealingLR":
+            self.scheduler = lr_scheduler.CosineAnnealingLR(
+                optimizer=self.optimizer,
+                T_max=self.num_epochs,
+                eta_min=1e-5,
+            )
+
+        elif self.config["scheduler"] == "ReduceLROnPlateau":
+            self.scheduler = lr_scheduler.ReduceLROnPlateau(
+                optimizer=self.optimizer,
+                mode="min",
+                patience=5,
+                factor=0.5,
+                verbose=True,
+                # min_lr=1e-6
+            )
+
+        elif self.config["scheduler"] in [None, "None"]:
+            self.scheduler = None
+
+        else:
+            raise ValueError(f"Unknown scheduler: {self.config['scheduler']}") 
+        
+
+    def scheduler_step(self, val_loss):
+        if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
+            old_lr = self.optimizer.param_groups[0]['lr']
+            self.scheduler.step(val_loss)
+            new_lr = self.optimizer.param_groups[0]['lr']
+            if new_lr < old_lr:
+                print(f"Learning rate reduced from {old_lr:.6f} to {new_lr:.6f}")
+        elif isinstance(self.scheduler, lr_scheduler.CosineAnnealingLR):
+            self.scheduler.step()
 
