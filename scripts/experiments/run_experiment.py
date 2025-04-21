@@ -1,5 +1,4 @@
 import torch
-from torch.optim.lr_scheduler import CosineAnnealingLR
 
 from scripts.models.model_utils import ModelManager
 from tqdm import tqdm
@@ -8,7 +7,7 @@ from torch.amp import GradScaler
 from scripts.experiments.experiment_utils import ExperimentLogger
 from torch import nn, optim
 from torch.optim import lr_scheduler
-from scripts.experiments.trainer import Trainer, EarlyStopping
+from scripts.experiments.trainer_engine import Trainer, EarlyStopping
 from scripts.experiments.metrics import Metrics
 from scripts.experiments.loss import Dice_CE_Loss
 
@@ -30,6 +29,8 @@ class Experiment:
         optimizer_type = getattr(optim, self.config['optimizer'])
         self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']), weight_decay=self.config['weight_decay'])
 
+
+        # self.opt
         # scheduler_type = getattr(lr_scheduler, self.config['optimizer']['scheduler'])
         if self.config["scheduler"] == "CosineAnnealingLR":
             self.scheduler = lr_scheduler.CosineAnnealingLR(
@@ -72,7 +73,11 @@ class Experiment:
 
                 # Step the scheduler
                 if isinstance(self.scheduler, lr_scheduler.ReduceLROnPlateau):
+                    old_lr = self.optimizer.param_groups[0]['lr']
                     self.scheduler.step(val_loss)
+                    new_lr = self.optimizer.param_groups[0]['lr']
+                    if new_lr < old_lr:
+                        print(f"Learning rate reduced from {old_lr:.6f} to {new_lr:.6f}")
                 elif isinstance(self.scheduler, lr_scheduler.CosineAnnealingLR):
                     self.scheduler.step()
 
