@@ -94,10 +94,33 @@ class DataLoading:
                 shuffle=False,
                 drop_last=False,
                 )
+            
         else:   # local execution
-            train_loader = DataLoader(train_subset, batch_size=self.config['batch_size'], shuffle=True)
-            val_loader   = DataLoader(val_dataset,  batch_size=self.config['batch_size'], shuffle=False)
-            test_loader  = DataLoader(test_dataset, batch_size=self.config['batch_size'], shuffle=False)
-
+            train_loader = DataLoader(
+                train_subset, 
+                batch_size=self.config['batch_size'], 
+                num_workers=4, 
+                pin_memory=True, 
+                persistent_workers=True, 
+                shuffle=True,
+                drop_last=True,
+                )
+            val_loader = DataLoader(
+                val_dataset,  
+                batch_size=self.config['batch_size'], 
+                num_workers=4,
+                pin_memory=True, 
+                persistent_workers=True, 
+                shuffle=False,
+                drop_last=False,
+                )
+            test_loader = DataLoader(
+                test_dataset, 
+                batch_size=self.config['batch_size'], 
+                num_workers=12,
+                pin_memory=True, 
+                shuffle=False,
+                drop_last=False,
+                )
 
         return train_loader, val_loader, test_loader
