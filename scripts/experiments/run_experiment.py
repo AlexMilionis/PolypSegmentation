@@ -28,7 +28,7 @@ class Experiment:
         self.criterion = Dice_CE_Loss(self.config)
         # optimizer_type = getattr(optim, self.config['optimizer'])
         # self.optimizer = optimizer_type(self.model.parameters(), lr=float(self.config['learning_rate']), weight_decay=self.config['weight_decay'])
-        self.optimizer_object = Optimizer(self.config, self.model)
+        self.opt_object = Optimizer(self.config, self.model)
         
 
         # # self.opt
@@ -53,7 +53,7 @@ class Experiment:
         # else:
         #     raise ValueError(f"Unknown scheduler: {self.config['scheduler']}")
 
-        self.trainer = Trainer(self.config, self.model, self.optimizer_object.optimizer, self.criterion, self.scaler, self.device)
+        self.trainer = Trainer(self.config, self.model, self.opt_object.optimizer, self.criterion, self.scaler, self.device)
 
 
     def execute_training(self, load_checkpoint=False):
@@ -81,7 +81,7 @@ class Experiment:
                 #         print(f"Learning rate reduced from {old_lr:.6f} to {new_lr:.6f}")
                 # elif isinstance(self.scheduler, lr_scheduler.CosineAnnealingLR):
                 #     self.scheduler.step()
-                self.optimizer_object.scheduler_step(val_loss)
+                self.opt_object.scheduler_step(val_loss)
 
                 # Save model checkpoint
                 ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
