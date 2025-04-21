@@ -1,6 +1,9 @@
 import torch
 from torch.amp import autocast
 from scripts.visualizations.visualization_utils import visualize_outputs
+from torch import optim
+from torch.optim import lr_scheduler
+
 
 class Trainer:
     def __init__(self, config, model, optimizer, criterion, scaler, device):
@@ -70,4 +73,16 @@ class EarlyStopping:
                 self.stop_training = True
                 if self.verbose:
                     print("Stopping early as no improvement has been observed.")
+
+
+class Optimizer:
+    def __init__(self, config, model):
+        self.config = config
+        self.model = model
+        optimizer_type = getattr(optim, self.config['optimizer'])
+        self.optimizer = optimizer_type(
+            self.model.parameters(), 
+            lr=float(self.config['learning_rate']), 
+            weight_decay=self.config['weight_decay'])
+
 
