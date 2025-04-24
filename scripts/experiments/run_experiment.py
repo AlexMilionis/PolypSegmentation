@@ -42,6 +42,10 @@ class Experiment:
                 train_loss = self.trainer.train_one_epoch(self.train_loader)
                 val_loss, self.metrics = self.trainer.validate_one_epoch(self.val_loader, self.metrics)
                 self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
+
+                # Save model checkpoint
+                ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
+
                 # Early stopping check
                 early_stopping.check_early_stop(val_loss)
                 if early_stopping.stop_training:
@@ -49,9 +53,7 @@ class Experiment:
                     break
 
                 self.opt_object.scheduler_step(val_loss)
-
-                # Save model checkpoint
-                ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
+                
         return self.metrics
 
 
