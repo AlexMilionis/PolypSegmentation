@@ -71,8 +71,7 @@ class EarlyStopping:
             self.no_improvement_count += 1
             if self.no_improvement_count >= self.patience:
                 self.stop_training = True
-                if self.verbose:
-                    print("Stopping early as no improvement has been observed.")
+
 
 
 class Optimizer:
