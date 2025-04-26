@@ -48,13 +48,13 @@ class Metrics():
 
     def mDice(self):
         # return 2*(self._precision() * self._recall())/(self._precision() + self._recall())
-        return 2*self.tp / (2 * self.tp + self.fp + self.fn)
+        return 2*self.tp / (2 * self.tp + self.fp + self.fn) # DEN EINAI MEAN
 
     def f2_score(self):
         return 5*self.tp / (5 * self.tp + self.fp + 4 * self.fn)
 
     def mIoU(self):
-        return self.tp / (self.tp + self.fp + self.fn)
+        return self.tp / (self.tp + self.fp + self.fn)  # DEN EINAI MEAN
 
     def accuracy(self):
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
