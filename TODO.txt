@@ -1,11 +1,6 @@
-augmentations:
-    - heavier color jittering
-    - 2d elastic transformations
-
-lr: from 1e3 to 5e-4
-
-loss function: increase ce if not proper shape, increase dice for more robustness
-
-optimizer: adam -> adamw
+Train se 5-10 samples, gia na bebaiwsw oti kanei overfit
+maybe too much augmentations (too aggressive)
+metric i use is Dice, not mDice
+na dw an doulevei me effisegnet
 
 
