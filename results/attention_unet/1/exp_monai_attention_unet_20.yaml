@@ -1,0 +1,42 @@
+experiment_name: 'exp_monai_attention_unet'
+
+paths:
+  results_dir: "results"
+  model_dir: "scripts/models/"
+  data_visualizations_dir: "data/"
+
+model:
+  filename: 'monai_attention_unet.py'
+  class_name: 'AttentionUNet'
+  spatial_dims: 2                      # 2D images
+  in_channels: 3                       # RGB input (3 channels)
+  out_channels: 1                      # Binary segmentation (1 output channel)
+  channels: [32, 64, 128, 256, 512]    # Channel progression
+  strides: [2, 2, 2, 2]                # Downsampling steps
+  dropout: 0.1                         # dropout
+
+loss:
+  sigmoid: True
+  include_background: False
+  lambda_dice: 0.5
+  lambda_ce: 0.5
+  weight: [2.0]
+
+batch_size: 16
+val_split: 0.2
+epochs: 300
+optimizer: 'Adam'
+learning_rate: 0.0001
+weight_decay: 0 #0.00001 # 0.0001
+scheduler: ReduceLROnPlateau #None #CosineAnnealingLR
+
+
+metrics: [
+  'mIoU',
+  'mDice',
+  'f2_score',
+  'precision',
+  'recall',
+  'accuracy',
+]
+
