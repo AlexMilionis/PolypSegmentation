@@ -2,7 +2,5 @@
 .ipynb_checkpoints/
 __pycache__/
 *.pth
-*.csv
-*.png
 log/
 docs/
