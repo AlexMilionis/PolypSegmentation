@@ -3,3 +3,5 @@
 __pycache__/
 *.pth
 log/
+docs/credentials.txt
+docs/structure.txt
