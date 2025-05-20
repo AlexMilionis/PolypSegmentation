@@ -5,3 +5,4 @@ __pycache__/
 log/
 docs/credentials.txt
 docs/structure.txt
+training/
