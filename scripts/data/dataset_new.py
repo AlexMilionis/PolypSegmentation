@@ -48,7 +48,7 @@ class PolypDataset(Dataset):
         for fn in img_files:
             img_path = os.path.join(self.images_dir, fn)
             base_name = os.path.splitext(fn)[0]
-            mask_fn = f"{base_name}_mask.jpg"  # or some other pattern
+            mask_fn = f"{base_name}_mask.jpg"
             msk_path = os.path.join(self.masks_dir, mask_fn)
             if os.path.exists(msk_path):
                 data_pairs.append( (img_path, msk_path) )
