@@ -115,6 +115,7 @@ def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batc
     plt.subplots_adjust(wspace=0, hspace=0)  # Remove spacing between subplots
     plt.tight_layout()
     
+    os.makedirs(os.path.join(config['paths']['results_dir'], config['experiment_name']), exist_ok=True)
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0)  # Avoid padding
     plt.close(fig)
@@ -199,6 +200,7 @@ def plot_loss_curves(config):
     plt.xticks(xticks)
 
     # Save
+
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "loss_curves.png")
     plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close()
