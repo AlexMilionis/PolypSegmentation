@@ -66,8 +66,10 @@ def unnormalize_image(image):
 
 
 def visualize_data(config, dataloader, num_samples=3):
+    print(f"Visualizing {num_samples} samples from the dataset...")
     batch = next(iter(dataloader))
-    batch_images, batch_masks, batch_paths = batch
+    # batch_images, batch_masks, batch_paths = batch
+    batch_images, batch_masks, paths = batch
     num_samples = min(num_samples, len(batch_images))
 
     fig, axes = plt.subplots(num_samples, 2, figsize=(12, 6 * num_samples))
@@ -78,8 +80,10 @@ def visualize_data(config, dataloader, num_samples=3):
         # Process mask tensor
         mask = batch_masks[i].squeeze().cpu().numpy() # .astype(np.uint8)  #changed
 
-        img_path = os.path.basename(batch_paths[0][i])
-        mask_path = os.path.basename(batch_paths[1][i])
+        # img_path = os.path.basename(batch_paths[0][i])
+        # mask_path = os.path.basename(batch_paths[1][i])
+        img_path, mask_path = paths[0][i], paths[1][i]  
+        print(f"Image path: {img_path}, Mask path: {mask_path}")
 
         plot_image(axes[i][0], image, f"Image: {img_path}")
         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
