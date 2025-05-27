@@ -21,8 +21,8 @@ def process_image(image_tensor):
 
 
 def unnormalize_image(image):
-    mean = np.array(Constants.TRAIN_DATA_MEANS)
-    std = np.array(Constants.TRAIN_DATA_STDS)
+    mean = np.array(Constants.DATASET_MEANS)
+    std = np.array(Constants.DATASET_STDS)
 
     unnormalized_image = (image * std) + mean
     
