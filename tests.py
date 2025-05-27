@@ -1,5 +1,5 @@
 from torch.utils.data import Subset
-from scripts.data.dataloader_new import DataLoading
+from scripts.data.dataloader import DataLoading
 import os
 import torch
 import sys
