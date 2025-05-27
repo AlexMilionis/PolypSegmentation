@@ -61,14 +61,11 @@ class ExperimentLogger:
     def parse_arguments():
         parser = argparse.ArgumentParser(description="Run experiment with specified configuration.")
         parser.add_argument("--config", type=str, help="Path to YAML config file.")
-        parser.add_argument("--dict", type=str, help="Configuration dictionary as a string.")
         args = parser.parse_args()
         if args.config:
             config = ExperimentLogger.load_config(args.config)
-        elif args.dict:
-            config = yaml.safe_load(args.dict)
         else:
-            raise ValueError("Either --config or --dict must be provided.")
+            raise ValueError("--config must be provided.")
         return config
 
 
