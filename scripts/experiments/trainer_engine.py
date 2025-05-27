@@ -48,6 +48,7 @@ class Trainer:
                 preds = (probs > threshold).float()
                 metrics.add_batch(preds, masks)
                 total_val_loss += loss
+
                 if to_visualize and not already_visualized: 
                     visualize_outputs(self.config, images, masks, preds, paths)
                     already_visualized = True
