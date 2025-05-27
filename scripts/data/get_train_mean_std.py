@@ -1,6 +1,6 @@
 import torch
 import sys
-from scripts.data.dataloader_new import DataLoading
+from scripts.data.dataloader import DataLoading
 from scripts.experiments.experiment_utils import ExperimentLogger
 
 def get_train_mean_std(train_loader):
