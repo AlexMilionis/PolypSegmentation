@@ -1,4 +1,4 @@
-from scripts.data.dataloader import DataLoading
+from scripts.data.data_module import DataLoading
 from scripts.seed import set_seed
 from scripts.experiments.run_experiment import Experiment
 from scripts.experiments.experiment_utils import ExperimentLogger
@@ -12,11 +12,8 @@ if __name__ == '__main__':
     config = ExperimentLogger.parse_arguments()
 
     dl = DataLoading(config, mode="overfit")
+
     dl.build_loaders()
-    
-    # # loop through the train_loader
-    # for batch in dl.train_loader:
-    #     print(f"---batch---")
     
     visualize_data(config, dl.train_loader, num_samples=5)
     
