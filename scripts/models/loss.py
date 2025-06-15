@@ -2,7 +2,6 @@ import torch.nn as nn
 import monai.losses as monai_losses
 
 
-
 class Dice_CE_Loss(nn.Module):
     def __init__(self, config):
         super().__init__()
