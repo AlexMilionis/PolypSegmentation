@@ -24,11 +24,15 @@ class Trainer:
             # Mixed precision forward pass
             with autocast('cuda'):
                 outputs = self.model(images)
-                loss = self.criterion(outputs, masks)
+                # print(f"Output shape: {outputs.shape}, Mask shape: {masks.shape}")
+                # print(f"Outputs: {outputs}, Masks: {masks}")
+                loss = self.criterion(outputs, masks) 
+                
             self.scaler.scale(loss).backward()
             self.scaler.step(self.optimizer)
             self.scaler.update()
             total_loss += loss
+            # print(f"Loss: {loss}")
         return total_loss / len(train_loader)
 
 
