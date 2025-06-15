@@ -8,16 +8,7 @@ class Metrics():
         self.fn = torch.tensor(0, dtype=torch.long, device=self.device)
         self.fp = torch.tensor(0, dtype=torch.long, device=self.device)
         self.tn = torch.tensor(0, dtype=torch.long, device=self.device)
-
-
         # initialize metrics dict
-        self._create_metrics()
-
-        # # Store batch predictions and ground truths for Hausdorff Distance
-        # self.predictions_list = []
-        # self.ground_truths_list = []
-
-    def _create_metrics(self):
         self.col_names = ["epoch", "train_loss", "val_loss", "test_loss"] + self.metric_names
         self.metrics = {name:[] for name in self.col_names}
 
