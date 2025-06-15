@@ -9,7 +9,7 @@ from torch import nn, optim
 from torch.optim import lr_scheduler
 from scripts.experiments.trainer_engine import Trainer, EarlyStopping, Optimizer
 from scripts.experiments.metrics import Metrics
-from scripts.experiments.loss import Dice_CE_Loss
+from scripts.models.loss import Dice_CE_Loss
 
 from scripts.visualizations.visualization_utils import plot_loss_curves
 
@@ -44,13 +44,13 @@ class Experiment:
                 self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
 
                 # Save model checkpoint
-                ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
+                # ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
 
-                # Early stopping check
-                early_stopping.check_early_stop(val_loss)
-                if early_stopping.stop_training:
-                    print(f"Early stopping at epoch {epoch}")
-                    break
+                # # Early stopping check
+                # early_stopping.check_early_stop(val_loss)
+                # if early_stopping.stop_training:
+                #     print(f"Early stopping at epoch {epoch}")
+                #     break
 
                 self.opt_object.scheduler_step(val_loss)
                 
