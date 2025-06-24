@@ -8,8 +8,8 @@ class Dice_CE_Loss(nn.Module):
         self.loss_fn = monai_losses.DiceCELoss(
             sigmoid = config['loss']['sigmoid'],  # Apply sigmoid to logits (binary segmentation)
             include_background=config['loss']['include_background'],  # First channel = foreground (polyps)
-            lambda_dice=config['loss']['lambda_dice'],
-            lambda_ce=config['loss']['lambda_ce'],
+            # lambda_dice=config['loss']['lambda_dice'],
+            # lambda_ce=config['loss']['lambda_ce'],
             # weight=torch.tensor(config["loss"]["weight"]).cuda()  # Optional class balancing
         )
 
