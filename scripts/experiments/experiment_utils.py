@@ -26,22 +26,27 @@ class ExperimentLogger:
         """
         experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
         os.makedirs(experiment_results_dir, exist_ok=True)  # Ensure directory exists
-
         csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
 
-        # Convert tensors to CPU floats before saving
-        cleaned_metrics = {
-            key: [ExperimentLogger.convert_tensor(value) for value in values]
-            for key, values in metrics.items()
-        }
+        # # Convert tensors to CPU floats before saving
+        # cleaned_metrics = {
+        #     key: [ExperimentLogger.convert_tensor(value) for value in values]
+        #     for key, values in metrics.items()
+        # }
 
-        # 🔹 Convert dictionary to a DataFrame where each row is an epoch
-        metrics_df = pd.DataFrame.from_dict(cleaned_metrics)
-
-        # Write the entire DataFrame at once (ensuring proper row-wise format)
+        metrics_df = pd.DataFrame(metrics)
+        metrics_df = metrics_df.applymap(lambda x: x.cpu().item() if torch.is_tensor(x) and x.numel() == 1 else x)
+        mask = metrics_df["epoch"].notna()
+        metrics_df.loc[mask, "epoch"] = metrics_df.loc[mask, "epoch"].astype(int)
         metrics_df.to_csv(csv_path, index=False)
 
-        # print(f"Metrics logged to {csv_path}")
+        # # 🔹 Convert dictionary to a DataFrame where each row is an epoch
+        # metrics_df = pd.DataFrame.from_dict(cleaned_metrics)
+        #
+        # # Write the entire DataFrame at once (ensuring proper row-wise format)
+        # metrics_df.to_csv(csv_path, index=False)
+        #
+        # # print(f"Metrics logged to {csv_path}")
 
     @staticmethod
     def load_config(config_name, config_dir="configurations/"):
