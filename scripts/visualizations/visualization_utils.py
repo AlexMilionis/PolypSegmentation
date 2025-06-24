@@ -162,8 +162,54 @@ def plot_loss_curves(config):
     csv_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "experiment_results.csv")
     df = pd.read_csv(csv_path)
 
+    # # Separate test results from epoch data
+    # train_data = df[df['epoch'].isna()].copy()
+    # test_row = df[df['epoch'] == -1].copy()
+    #
+    # # Melt dataframe for seaborn
+    # plot_df = train_data.melt(id_vars='epoch',
+    #                           value_vars=['train_loss', 'val_loss'],
+    #                           var_name='loss_type',
+    #                           value_name='loss_value')
+    #
+    # # Create plot
+    # plt.figure(figsize=(10, 6))
+    # sns.set_style("darkgrid")
+    #
+    # # Plot training/validation curves
+    # ax = sns.lineplot(data=plot_df, x='epoch', y='loss_value',
+    #                   hue='loss_type', palette=['#1f77b4', '#ff7f0e'],
+    #                   linewidth=2.5)
+    #
+    # # Add test error marker if available
+    # if not test_row.empty and not pd.isna(test_row['test_loss'].iloc[0]):
+    #     test_epoch = train_data['epoch'].max()  # Place test at the last epoch
+    #     ax.scatter(x=test_epoch, y=test_row['test_loss'].iloc[0], color='black', label='Test Loss', marker='o')
+    #
+    # # Set y-axis limits
+    # ax.set_ylim(0, 1)
+    #
+    # # Style plot
+    # plt.title("Training and Validation Loss", fontsize=14, pad=20)
+    # plt.xlabel("Epoch", fontsize=12)
+    # plt.ylabel("Loss", fontsize=12)
+    # plt.legend(title='Loss Type', loc='upper left', bbox_to_anchor=(1, 1))
+    #
+    # # Custom x-axis ticks
+    # max_epoch = train_data['epoch'].max()
+    # xticks = [1] + [i for i in range(25, max_epoch + 1, 25)]
+    #
+    # if not test_row.empty:
+    #     xticks.append(test_epoch)
+    # plt.xticks(xticks)
+    #
+    # # Save
+    # save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "loss_curves.png")
+    # plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    # plt.close()
+
     # Separate test results from epoch data
-    train_data = df[df['epoch'] != -1].copy()
+    train_data = df[df['epoch'].isna()].copy()
     test_row = df[df['epoch'] == -1].copy()
 
     # Melt dataframe for seaborn
@@ -187,7 +233,7 @@ def plot_loss_curves(config):
         ax.scatter(x=test_epoch, y=test_row['test_loss'].iloc[0], color='black', label='Test Loss', marker='o')
 
     # Set y-axis limits
-    ax.set_ylim(0, 1)
+    ax.set_ylim(0, 2)
 
     # Style plot
     plt.title("Training and Validation Loss", fontsize=14, pad=20)
@@ -204,11 +250,6 @@ def plot_loss_curves(config):
     plt.xticks(xticks)
 
     # Save
-
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "loss_curves.png")
     plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close()
-
-
-
-
