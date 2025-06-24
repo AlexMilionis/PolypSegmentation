@@ -15,11 +15,11 @@ if __name__ == '__main__':
 
     dl.build_loaders()
     
-    visualize_data(config, dl.train_loader, num_samples=5)
+    # visualize_data(config, dl.train_loader, num_samples=5)
     
     exp = Experiment(dl.train_loader, dl.val_loader, dl.test_loader, config)
 
-    metrics = exp.execute_training()
+    exp.execute_training()
 
-    exp.execute_evaluation(metrics)
+    exp.execute_evaluation()
 
