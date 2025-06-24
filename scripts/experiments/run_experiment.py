@@ -1,5 +1,5 @@
 import torch
-
+import numpy as np
 from scripts.models.model_utils import ModelManager
 from tqdm import tqdm
 # from torch.cuda.amp import GradScaler
@@ -8,7 +8,7 @@ from scripts.experiments.experiment_utils import ExperimentLogger
 from torch import nn, optim
 from torch.optim import lr_scheduler
 from scripts.experiments.trainer_engine import Trainer, EarlyStopping, Optimizer
-from scripts.experiments.metrics import Metrics
+# from scripts.experiments.metrics import Metrics
 from scripts.models.loss import Dice_CE_Loss
 
 from scripts.visualizations.visualization_utils import plot_loss_curves
@@ -30,18 +30,29 @@ class Experiment:
         self.opt_object = Optimizer(self.config, self.model)
         
         self.trainer = Trainer(self.config, self.model, self.opt_object.optimizer, self.criterion, self.scaler, self.device)
-
+        self.metrics = []
 
     def execute_training(self, load_checkpoint=False):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
-            # Initialize early stopping 
             early_stopping = EarlyStopping(patience=15)
-            # Initialize metrics
-            self.metrics = Metrics(self.device, self.config)
+            # self.metrics = Metrics(self.device)
+
             for epoch in pbar:                    
                 train_loss = self.trainer.train_one_epoch(self.train_loader)
+
+                self.metrics.append({
+                    'epoch': epoch+1,
+                    'train_loss': train_loss,
+                    'val_loss': np.nan,
+                    'meanIoU': np.nan,
+                    'meanDice': np.nan,
+                    'precision': np.nan,
+                    'recall': np.nan,
+                    'accuracy': np.nan,
+                })
                 val_loss, self.metrics = self.trainer.validate_one_epoch(self.val_loader, self.metrics)
-                self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
+
+                # self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
 
                 # Save model checkpoint
                 # ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
@@ -53,13 +64,11 @@ class Experiment:
                 #     break
 
                 self.opt_object.scheduler_step(val_loss)
-                
-        return self.metrics
 
 
-    def execute_evaluation(self, metrics):
+    def execute_evaluation(self):
 
-        test_loss, metrics = self.trainer.validate_one_epoch(self.test_loader, metrics, to_visualize=True)
-        metrics.compute_metrics(test_loss = test_loss, mode="test")
-        ExperimentLogger.log_metrics(self.config, metrics.metrics)
+        test_loss, self.metrics = self.trainer.validate_one_epoch(self.test_loader, self.metrics, test=True)
+        # metrics.compute_metrics(test_loss = test_loss, mode="test")
+        ExperimentLogger.log_metrics(self.config, self.metrics)
         plot_loss_curves(self.config)

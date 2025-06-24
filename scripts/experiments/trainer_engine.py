@@ -1,9 +1,10 @@
 import torch
+import numpy as np
 from torch.amp import autocast
 from scripts.visualizations.visualization_utils import visualize_outputs
 from torch import optim
 from torch.optim import lr_scheduler
-
+from monai import metrics as mm
 
 class Trainer:
     def __init__(self, config, model, optimizer, criterion, scaler, device):
@@ -13,6 +14,14 @@ class Trainer:
         self.criterion = criterion
         self.scaler = scaler
         self.device = device
+
+        self.mean_dice = mm.DiceMetric(include_background=False, reduction="mean")
+        self.mean_iou = mm.MeanIoU(include_background=False, reduction="mean")
+        self.precision = mm.ConfusionMatrixMetric(include_background=False, metric_name="precision")
+        self.recall = mm.ConfusionMatrixMetric(include_background=False, metric_name="sensitivity")
+        # self.get_f1_score = mm.ConfusionMatrixMetric(include_background=False, metric_name="f1_score")
+        self.accuracy = mm.ConfusionMatrixMetric(include_background=False, metric_name="accuracy")
+
 
     def train_one_epoch(self, train_loader):
         self.model.train()
@@ -33,12 +42,12 @@ class Trainer:
             self.scaler.update()
             total_loss += loss
             # print(f"Loss: {loss}")
+
         return total_loss / len(train_loader)
 
-
-    def validate_one_epoch(self, loader, metrics, to_visualize=False):
+    def validate_one_epoch(self, loader, metrics, test=False):
         self.model.eval()
-        total_val_loss = 0
+        total_loss = 0
         already_visualized = False
         threshold = 0.5
         with torch.no_grad():
@@ -50,13 +59,46 @@ class Trainer:
                     loss = self.criterion(outputs, masks)
                 probs = torch.sigmoid(outputs)
                 preds = (probs > threshold).float()
-                metrics.add_batch(preds, masks)
-                total_val_loss += loss
+                # metrics.add_batch(preds, masks)
+                total_loss += loss
+                computed_loss = total_loss/len(loader)
 
-                if to_visualize and not already_visualized: 
+                # Update metrics
+                self.mean_iou(y_pred=preds, y=masks)
+                self.mean_dice(y_pred=preds, y=masks)
+                self.precision(y_pred=preds, y=masks)
+                self.recall(y_pred=preds, y=masks)
+                self.accuracy(y_pred=preds, y=masks)
+
+                if test:
+                    metrics.append({
+                        "epoch": np.nan,
+                        "train_loss": np.nan,
+                        "val_loss": computed_loss,
+                        "meanIoU": self.mean_iou.aggregate(),
+                        "meanDice": self.mean_dice.aggregate(),
+                        "precision": self.precision.aggregate(),
+                        "recall": self.recall.aggregate(),
+                        "accuracy": self.accuracy.aggregate()
+                    })
+                else:   # validation
+                    metrics[-1]["val_loss"] = computed_loss
+                    metrics[-1]["meanIoU"] = self.mean_iou.aggregate()
+                    metrics[-1]["meanDice"] = self.mean_dice.aggregate()
+                    metrics[-1]["precision"] = self.precision.aggregate()
+                    metrics[-1]["recall"] = self.recall.aggregate()
+                    metrics[-1]["accuracy"] = self.accuracy.aggregate()
+
+                self.mean_iou.reset()
+                self.mean_dice.reset()
+                self.precision.reset()
+                self.recall.reset()
+                self.accuracy.reset()
+
+                if test and not already_visualized:
                     visualize_outputs(self.config, images, masks, preds, paths)
                     already_visualized = True
-        return total_val_loss/len(loader), metrics
+        return computed_loss, metrics
     
 
 class EarlyStopping:
@@ -94,7 +136,7 @@ class Optimizer:
         if self.config["scheduler"] == "CosineAnnealingLR":
             self.scheduler = lr_scheduler.CosineAnnealingLR(
                 optimizer=self.optimizer,
-                T_max=self.num_epochs,
+                T_max=self.config["epochs"],
                 eta_min=1e-5,
             )
 
