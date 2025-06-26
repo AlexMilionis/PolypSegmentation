@@ -3,8 +3,7 @@ import yaml
 from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
 import pandas as pd
 import torch
-import argparse
-
+import sys
 
 class ExperimentLogger:
 
@@ -49,28 +48,12 @@ class ExperimentLogger:
         # # print(f"Metrics logged to {csv_path}")
 
     @staticmethod
-    def load_config(config_name, config_dir="configurations/"):
-        if not(config_name.endswith(".yaml")):
-            config_name = config_name + '.yaml'
-        try:
-            config_path = os.path.join(config_dir, config_name)
-            # print(config_path)
-            with open(config_path, 'r') as f:
-                return yaml.safe_load(f)
-        except FileNotFoundError:
-            print("Configuration not found.")
-            exit()
-
-
-    @staticmethod
-    def parse_arguments():
-        parser = argparse.ArgumentParser(description="Run experiment with specified configuration.")
-        parser.add_argument("--config", type=str, help="Path to YAML config file.")
-        args = parser.parse_args()
-        if args.config:
-            config = ExperimentLogger.load_config(args.config)
-        else:
-            raise ValueError("--config must be provided.")
+    def load_config():
+        if len(sys.argv) < 2:
+            sys.exit(1)
+        config_path = os.path.join("configurations", sys.argv[1])
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
         return config
 
 
