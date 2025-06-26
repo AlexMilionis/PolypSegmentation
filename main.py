@@ -9,7 +9,7 @@ warnings.filterwarnings("ignore")
 set_seed()
 if __name__ == '__main__':
 
-    config = ExperimentLogger.parse_arguments()
+    config = ExperimentLogger.load_config()
 
     dl = DataLoading(config, mode="overfit")
 
