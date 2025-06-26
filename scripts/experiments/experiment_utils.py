@@ -7,45 +7,34 @@ import sys
 
 class ExperimentLogger:
 
-    @staticmethod
-    def convert_tensor(value):
-        """Ensures PyTorch tensors are converted to CPU floats before saving."""
-        if isinstance(value, torch.Tensor):
-            return value.cpu().item()  # Moves to CPU and extracts the numerical value
-        return value
-
 
     @staticmethod
     def log_metrics(config, metrics):
-        """
-        Logs metrics into a CSV file without overwriting previous values.
-
-        :param config: Configuration dictionary containing experiment paths.
-        :param metrics: Dictionary containing lists of metric values per epoch.
-        """
+        
         experiment_results_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
         os.makedirs(experiment_results_dir, exist_ok=True)  # Ensure directory exists
         csv_path = os.path.join(experiment_results_dir, 'experiment_results.csv')
 
-        # # Convert tensors to CPU floats before saving
-        # cleaned_metrics = {
-        #     key: [ExperimentLogger.convert_tensor(value) for value in values]
-        #     for key, values in metrics.items()
-        # }
+        converted_metrics = []
 
-        metrics_df = pd.DataFrame(metrics)
-        metrics_df = metrics_df.applymap(lambda x: x.cpu().item() if torch.is_tensor(x) and x.numel() == 1 else x)
-        mask = metrics_df["epoch"].notna()
-        metrics_df.loc[mask, "epoch"] = metrics_df.loc[mask, "epoch"].astype(int)
+        for metric in metrics:
+            converted_metric = {
+                'epoch': metric['epoch'],
+                'train_loss': metric['train_loss'].item() if isinstance(metric['train_loss'], torch.Tensor) else metric['train_loss'],
+                'val_loss': metric['val_loss'].item(),
+                'meanIoU': metric['meanIoU'][0].item(),
+                'meanDice': metric['meanDice'][0].item(),
+                'precision': metric['precision'][0][0].item(),
+                'recall': metric['recall'][0][0].item(),
+                'accuracy': metric['accuracy'][0][0].item()
+            }
+            converted_metrics.append(converted_metric)
+
+        metrics_df = pd.DataFrame(converted_metrics)
+
         metrics_df.to_csv(csv_path, index=False)
 
-        # # 🔹 Convert dictionary to a DataFrame where each row is an epoch
-        # metrics_df = pd.DataFrame.from_dict(cleaned_metrics)
-        #
-        # # Write the entire DataFrame at once (ensuring proper row-wise format)
-        # metrics_df.to_csv(csv_path, index=False)
-        #
-        # # print(f"Metrics logged to {csv_path}")
+
 
     @staticmethod
     def load_config():
