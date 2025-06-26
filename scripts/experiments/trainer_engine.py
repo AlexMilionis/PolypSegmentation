@@ -72,7 +72,7 @@ class Trainer:
 
                 if test:
                     metrics.append({
-                        "epoch": np.nan,
+                        "epoch": -1,
                         "train_loss": np.nan,
                         "val_loss": computed_loss,
                         "meanIoU": self.mean_iou.aggregate(),
