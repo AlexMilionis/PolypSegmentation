@@ -43,7 +43,7 @@ class DataLoading:
 
         self.mode = mode
         if self.mode=="cloud":
-            self.num_workers = config['num_workers']
+            self.num_workers = 8 #config['num_workers']
             self.batch_size = config['batch_size']
         elif self.mode=="local":
             self.num_workers = 4
