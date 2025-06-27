@@ -26,13 +26,13 @@ loss:
 #  lambda_ce: 0.5
 #  weight: [2.0]
 
-batch_size: 8
+batch_size: 16 #8
 #val_split: 0.2
-epochs: 100
+epochs: 300
 optimizer: 'AdamW'
 learning_rate: 0.0001
 weight_decay: 0.0 #0.0001
-scheduler: None #CosineAnnealingLR  #None #ReduceLROnPlateau # #CosineAnnealingWarmRestarts
+scheduler: CosineAnnealingLR #CosineAnnealingLR  #None #ReduceLROnPlateau # #CosineAnnealingWarmRestarts
 
 
 #metrics: [

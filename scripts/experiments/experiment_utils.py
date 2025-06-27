@@ -7,7 +7,6 @@ import sys
 
 class ExperimentLogger:
 
-
     @staticmethod
     def log_metrics(config, metrics):
         

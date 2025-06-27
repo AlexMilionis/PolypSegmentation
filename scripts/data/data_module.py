@@ -50,8 +50,8 @@ class DataLoading:
             self.batch_size = config['batch_size']
         elif self.mode=="overfit":
             self.num_workers = 4
-            self.batch_size = 5
-            self.overfit_samples = 5
+            self.batch_size = 3
+            self.overfit_samples = 3
 
     @staticmethod
     def _create_image_mask_pairs(images, masks):
