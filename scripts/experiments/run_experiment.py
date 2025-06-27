@@ -34,7 +34,7 @@ class Experiment:
 
     def execute_training(self, load_checkpoint=False):
         with tqdm(range(self.num_epochs), desc="Training Epochs") as pbar:
-            early_stopping = EarlyStopping(patience=15)
+            # early_stopping = EarlyStopping(patience=15)
             # self.metrics = Metrics(self.device)
 
             for epoch in pbar:                    
@@ -54,7 +54,7 @@ class Experiment:
 
                 # self.metrics.compute_metrics(epoch = epoch+1, train_loss = train_loss, val_loss = val_loss)
 
-                # Save model checkpoint
+                # # Save model checkpoint
                 # ModelManager.save_model_checkpoint(self.model, self.config, self.metrics, epoch)
 
                 # # Early stopping check
@@ -64,6 +64,9 @@ class Experiment:
                 #     break
 
                 self.opt_object.scheduler_step(val_loss)
+
+        # save final model
+        ModelManager.save_checkpoint(self.model, self.config)
 
 
     def execute_evaluation(self):
