@@ -83,7 +83,7 @@ def visualize_data(config, dataloader, num_samples=3):
         # img_path = os.path.basename(batch_paths[0][i])
         # mask_path = os.path.basename(batch_paths[1][i])
         img_path, mask_path = paths[0][i], paths[1][i]  
-        print(f"Image path: {img_path}, Mask path: {mask_path}")
+        # print(f"Image path: {img_path}, Mask path: {mask_path}")
 
         plot_image(axes[i][0], image, f"Image: {img_path}")
         plot_image(axes[i][1], mask, f"Mask: {mask_path}", cmap="gray")
