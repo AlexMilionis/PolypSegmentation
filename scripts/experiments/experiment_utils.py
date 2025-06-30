@@ -34,7 +34,6 @@ class ExperimentLogger:
         metrics_df.to_csv(csv_path, index=False)
 
 
-
     @staticmethod
     def load_config():
         if len(sys.argv) < 2:
