@@ -59,45 +59,49 @@ class Trainer:
                     loss = self.criterion(outputs, masks)
                 probs = torch.sigmoid(outputs)
                 preds = (probs > threshold).float()
-                # metrics.add_batch(preds, masks)
                 total_loss += loss
-                computed_loss = total_loss/len(loader)
 
-                # Update metrics
+                # Update metrics for all batches
                 self.mean_iou(y_pred=preds, y=masks)
                 self.mean_dice(y_pred=preds, y=masks)
                 self.precision(y_pred=preds, y=masks)
                 self.recall(y_pred=preds, y=masks)
                 self.accuracy(y_pred=preds, y=masks)
 
-                if test:
-                    metrics.append({
-                        "epoch": -1,
-                        "train_loss": np.nan,
-                        "val_loss": computed_loss,
-                        "meanIoU": self.mean_iou.aggregate(),
-                        "meanDice": self.mean_dice.aggregate(),
-                        "precision": self.precision.aggregate(),
-                        "recall": self.recall.aggregate(),
-                        "accuracy": self.accuracy.aggregate()
-                    })
-                else:   # validation
-                    metrics[-1]["val_loss"] = computed_loss
-                    metrics[-1]["meanIoU"] = self.mean_iou.aggregate()
-                    metrics[-1]["meanDice"] = self.mean_dice.aggregate()
-                    metrics[-1]["precision"] = self.precision.aggregate()
-                    metrics[-1]["recall"] = self.recall.aggregate()
-                    metrics[-1]["accuracy"] = self.accuracy.aggregate()
-
-                self.mean_iou.reset()
-                self.mean_dice.reset()
-                self.precision.reset()
-                self.recall.reset()
-                self.accuracy.reset()
-
                 if test and not already_visualized:
                     visualize_outputs(self.config, images, masks, preds, paths)
                     already_visualized = True
+
+            # Compute final metrics after processing all batches
+            computed_loss = total_loss/len(loader)
+            
+            if test:
+                # Only append one test entry after processing all batches
+                metrics.append({
+                    "epoch": -1,
+                    "train_loss": np.nan,
+                    "val_loss": computed_loss,
+                    "meanIoU": self.mean_iou.aggregate(),
+                    "meanDice": self.mean_dice.aggregate(),
+                    "precision": self.precision.aggregate(),
+                    "recall": self.recall.aggregate(),
+                    "accuracy": self.accuracy.aggregate()
+                })
+            else:   # validation
+                metrics[-1]["val_loss"] = computed_loss
+                metrics[-1]["meanIoU"] = self.mean_iou.aggregate()
+                metrics[-1]["meanDice"] = self.mean_dice.aggregate()
+                metrics[-1]["precision"] = self.precision.aggregate()
+                metrics[-1]["recall"] = self.recall.aggregate()
+                metrics[-1]["accuracy"] = self.accuracy.aggregate()
+
+            # Reset metrics after aggregation
+            self.mean_iou.reset()
+            self.mean_dice.reset()
+            self.precision.reset()
+            self.recall.reset()
+            self.accuracy.reset()
+
         return computed_loss, metrics
     
 
