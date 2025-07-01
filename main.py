@@ -11,8 +11,8 @@ if __name__ == '__main__':
 
     config = ExperimentLogger.load_config()
 
-    # dl = DataLoading(config, mode="overfit")
-    dl = DataLoading(config)
+    dl = DataLoading(config, mode="overfit")
+    # dl = DataLoading(config)
 
     dl.build_loaders()
     
