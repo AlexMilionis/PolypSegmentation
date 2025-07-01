@@ -197,7 +197,7 @@ def plot_loss_curves(config):
 
     # Custom x-axis ticks
     max_epoch = train_data['epoch'].max()
-    xticks = [1] + [i for i in range(5, max_epoch + 1, 5)]
+    xticks = [1] + [i for i in range(20, max_epoch + 1, 20)]
 
     if not test_row.empty:
         xticks.append(test_epoch)
