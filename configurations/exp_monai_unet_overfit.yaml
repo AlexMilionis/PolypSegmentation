@@ -11,12 +11,12 @@ model:
   spatial_dims: 2                      # 2D images
   in_channels: 3                       # RGB input (3 channels)
   out_channels: 1                      # Binary segmentation (1 output channel)
-  channels: [64, 128, 256, 512, 1024]  #[32, 64, 128, 256, 512]    # Channel progression
+  channels: [64, 128, 256, 512, 1024]  # Channel progression
   strides: [2, 2, 2, 2]                # Downsampling steps
-  num_res_units: 2                     # Number of residual units in each block
+  num_res_units: 0
   norm: 'batch'                        #  normalization
   act: "relu"                          # ReLU activation
-  dropout: 0.1                         # dropout
+  dropout: 0                           # dropout
   bias: True                           # bias in conv layers
 
 loss:
@@ -26,13 +26,13 @@ loss:
 #  lambda_ce: 0.5
 #  weight: [2.0]
 
-batch_size: 8
+batch_size: 3
 #val_split: 0.2
 epochs: 300
 optimizer: 'AdamW'
 learning_rate: 0.0001
-weight_decay: 0.00001 #0.0001
-scheduler: CosineAnnealingLR #CosineAnnealingLR  #None #ReduceLROnPlateau # #CosineAnnealingWarmRestarts
+weight_decay: 0.0 #0.0001
+scheduler: None #CosineAnnealingLR  #None #ReduceLROnPlateau # #CosineAnnealingWarmRestarts
 
 
 #metrics: [
