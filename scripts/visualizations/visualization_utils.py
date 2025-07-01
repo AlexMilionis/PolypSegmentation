@@ -31,40 +31,6 @@ def unnormalize_image(image):
     return unnormalized_image
 
 
-# def visualize_data(config, dataloader, num_samples=3):
-#     batch = next(iter(dataloader))
-#     batch_images, batch_masks, batch_paths = batch
-#     num_samples = min(num_samples, len(batch_images))
-    
-#     save_dir = config['paths']['data_visualizations_dir']
-#     os.makedirs(save_dir, exist_ok=True)  # Create directory if needed
-
-#     for i in range(num_samples):
-#         # Process image tensor (convert to numpy array)
-#         image = process_image(batch_images[i].cpu())
-        
-#         # Process mask tensor (convert to numpy array)
-#         mask = batch_masks[i].squeeze().cpu().numpy()
-
-#         # Convert to uint8 (0-255 range) if needed
-#         if image.dtype != np.uint8:
-#             image = (image * 255).astype(np.uint8)
-#         if mask.dtype != np.uint8:
-#             mask = (mask * 255).astype(np.uint8)
-
-#         # Get original filenames
-#         img_filename = os.path.basename(batch_paths[0][i])
-#         mask_filename = os.path.basename(batch_paths[1][i])
-
-#         # Save image
-#         img_name = f"{os.path.splitext(img_filename)[0]}.jpg"
-#         Image.fromarray(image).save(os.path.join(save_dir, img_name))
-
-#         # Save mask (grayscale)
-#         mask_name = f"{os.path.splitext(mask_filename)[0]}_mask.jpg"
-#         Image.fromarray(mask).save(os.path.join(save_dir, mask_name))
-
-
 def visualize_data(config, dataloader, num_samples=3):
     print(f"Visualizing {num_samples} samples from the dataset...")
     batch = next(iter(dataloader))
@@ -123,37 +89,6 @@ def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batc
     save_path = os.path.join(config['paths']['results_dir'], config['experiment_name'], "results_visualizations.png")
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0)  # Avoid padding
     plt.close(fig)
-
-
-# def visualize_outputs(config, batch_images, batch_masks, batch_predictions, batch_paths, num_samples=5):
-#     num_samples = min(num_samples, len(batch_images))
-    
-#     # Create output directory
-#     save_dir = os.path.join(config['paths']['results_dir'], config['experiment_name'])
-#     os.makedirs(save_dir, exist_ok=True)
-    
-#     for i in range(num_samples):
-#         # Process image tensor
-#         image = process_image(batch_images[i].cpu())
-#         if image.dtype != np.uint8:  # Convert to 0-255 range if needed
-#             image = (image * 255).astype(np.uint8)
-        
-#         # Process mask tensor
-#         mask = batch_masks[i].squeeze().cpu().numpy()
-#         if mask.max() <= 1.0:  # Convert to 0-255 if normalized
-#             mask = (mask * 255).astype(np.uint8)
-        
-#         # Process prediction tensor
-#         pred = (batch_predictions[i].squeeze().cpu().numpy() * 255).astype(np.uint8)
-        
-#         # Get original image filename
-#         img_filename = os.path.basename(batch_paths[0][i])
-#         base_name = os.path.splitext(img_filename)[0]  # Remove extension
-        
-#         # Save files
-#         Image.fromarray(image).save(os.path.join(save_dir, f"{base_name}.jpg"))
-#         Image.fromarray(mask).save(os.path.join(save_dir, f"{base_name}_mask.jpg"))
-#         Image.fromarray(pred).save(os.path.join(save_dir, f"{base_name}_pred.jpg"))
 
 
 def plot_loss_curves(config):
