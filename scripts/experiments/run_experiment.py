@@ -5,7 +5,7 @@ from tqdm import tqdm
 # from torch.cuda.amp import GradScaler
 from torch.amp import GradScaler, autocast
 from scripts.experiments.experiment_utils import ExperimentLogger
-from scripts.experiments.trainer_engine import Trainer, EarlyStopping, Optimizer
+# from scripts.experiments.trainer_engine import Trainer, EarlyStopping, Optimizer
 # from scripts.experiments.metrics import Metrics
 from scripts.models.loss import Dice_CE_Loss
 
@@ -42,14 +42,13 @@ class Experiment:
             eta_min=1e-5,
         )
         
-        self.trainer = Trainer(self.config, self.model, self.opt_object.optimizer, self.criterion, self.scaler, self.device)
+        # self.trainer = Trainer(self.config, self.model, self.opt_object.optimizer, self.criterion, self.scaler, self.device)
         self.mean_dice = mm.DiceMetric(include_background=False, reduction="mean")
         self.mean_iou = mm.MeanIoU(include_background=False, reduction="mean")
         self.precision = mm.ConfusionMatrixMetric(include_background=False, metric_name="precision")
         self.recall = mm.ConfusionMatrixMetric(include_background=False, metric_name="sensitivity")
         # self.get_f1_score = mm.ConfusionMatrixMetric(include_background=False, metric_name="f1_score")
         self.accuracy = mm.ConfusionMatrixMetric(include_background=False, metric_name="accuracy")
-
 
         self.metrics = []
 
@@ -65,6 +64,7 @@ class Experiment:
                 self.model.train()
                 total_train_loss = 0
                 for images, masks, _ in self.train_loader:
+                    
                     images = images.to(self.device)
                     masks  = masks.to(self.device)
                     self.optimizer.zero_grad()
