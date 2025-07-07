@@ -1,0 +1,37 @@
+defaults:
+  - model: effiSegNetBN
+  - optimizer: adamw
+  - _self_
+
+scheduler: null
+
+run_name: ${model.object.model_name}_${model.object.ch}
+
+trainer:
+  _target_: lightning.pytorch.Trainer
+  accelerator: auto
+  max_epochs: 25
+  log_every_n_steps: 1
+  deterministic: warn
+
+criterion:
+  _target_: monai.losses.DiceCELoss
+  include_background: True #False
+  sigmoid: True
+
+ch: 32
+pretrained: True
+freeze_encoder: False
+deep_supervision: False
+model_name: efficientnet-b0
+img_size: derived
+batch_size: 10
+lr: 1e-3
+
+# Use if you want to sweep over multiple models
+hydra:
+  sweeper:
+    params:
+      model_name: efficientnet-b0
+      # , efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7
+      

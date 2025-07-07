@@ -25,20 +25,18 @@ class KvasirSEGDatagen(Dataset):
             transformed = self.transform(image=image, mask=mask)
             image = transformed["image"]
             mask = transformed["mask"]
-
+        
         return image, mask.long().unsqueeze(0)
 
 
 class KvasirSEGDataset(L.LightningDataModule):
     def __init__(
         self,
-        # batch_size=64,
         batch_size=10,
-        root_dir= "./PolypGen",
-        num_workers=2,
+        root_dir="./PolypGen",
+        num_workers=4,
         train_val_ratio=0.8,
         img_size=(224, 224),
-        # img_size=(512, 512),
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -80,6 +78,8 @@ class KvasirSEGDataset(L.LightningDataModule):
                 A.Normalize(
                     mean=(0.485, 0.456, 0.406),
                     std=(0.229, 0.224, 0.225),
+                    # mean=(0.5543, 0.3644, 0.2777),
+                    # std=(0.2840, 0.2101, 0.1770),
                     max_pixel_value=255,
                 ),
                 ToTensorV2(),
@@ -116,18 +116,12 @@ class KvasirSEGDataset(L.LightningDataModule):
         test_masks = [os.path.join(self.root_dir, "test/masks", mask) for mask in test_masks]
 
         train_pairs = list(zip(train_images, train_masks))[:10]
-        print(f"Train pairs: {train_pairs[:10]}")
-        val_pairs = list(zip(val_images, val_masks))[:10]
-        test_pairs = list(zip(test_images, test_masks))[:10]
+        # val_pairs = list(zip(val_images, val_masks))[:10]
+        # test_pairs = list(zip(test_images, test_masks))[:10]
 
-        # self.train_set = KvasirSEGDatagen(
-        #     train_pairs, transform=self.get_train_transforms()
-        # )
         self.train_set = KvasirSEGDatagen(train_pairs, transform=self.get_val_transforms())
-        # self.val_set = KvasirSEGDatagen(val_pairs, transform=self.get_val_transforms())
         self.val_set = KvasirSEGDatagen(train_pairs, transform=self.get_val_transforms())
-        # self.test_set = KvasirSEGDatagen(test_pairs, transform=self.get_test_transforms())
-        self.test_set = KvasirSEGDatagen(train_pairs, transform=self.get_test_transforms())
+        self.test_set = KvasirSEGDatagen(train_pairs, transform=self.get_val_transforms())
 
     def train_dataloader(self):
         return DataLoader(

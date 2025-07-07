@@ -1,0 +1,2 @@
+# No scheduler - use constant learning rate
+_target_: null
